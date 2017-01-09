@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>PopImage|Jquery Simple Plugins</title>
+<script type="text/javascript" src="jquery_1.5.min.js"></script>
+<script type="text/javascript" src="jquery.popImage.mini.js"></script>
+<style type="text/css">
+body{margin:0;padding:0; font-family:Verdana; font-size:14px;}
+a{text-decoration:none; outline:none;}
+ul,ol,li,img,p{
+	margin:0;padding:0;
+	list-style-type:none;
+	border:none;
+	}
+#main{
+	margin:20px auto 50px auto;
+	padding:20px;
+	width:800px;
+	background:#fff;
+	border:1px solid #ccc;
+}
+ul.thumbs,ul.thumbs li{float:left;}
+a.image_gall{
+	 margin:5px 30px 5px 0;
+	border:4px solid #fff;
+	background:#fff;
+	display:block;
+	padding:2px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 5px #888;
+	-webkit-box-shadow: 0 0 5px #888;
+	box-shadow: 0 0 5px #888;
+}
+h1{font-size:26px; font-weight:normal;}
+h2{font-size:20px; font-weight:normal;}
+</style>
+</head>
+<body>
+<h1><a href="http://www.skygq.com/2011/04/05/jquery-popimage/">一个简单的jQuery图片弹出插件</a></h1>
+<ul class="thumbs">
+    <li>
+        <a href="images/31.jpg" rel="slide"  class="image_gall" title="Big image 1">
+            <img src="images/31s.jpg" width="100" height="100"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/30.jpg" rel="gallery"  class="image_gall" title="Big image 2">
+            <img src="images/30s.jpg" width="100" height="100"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/27.jpg" rel="gallery"  class="image_gall" title="Big image 3">
+            <img src="images/27s.jpg" width="100" height="100"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/22.jpg" rel="gallery"  class="image_gall" title="Big image 4">
+            <img src="images/22s.jpg" width="100" height="100"  />
+        </a>
+    </li>
+</ul>
+<br><br><br><br><br><br><br><br><br>
+<ul class="thumbs">
+    <li>
+        <a href="images/1.jpg" rel="slide"  class="image_gall" title="Big image 1">
+            <img src="images/1s.jpg"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/2.jpg" rel="gallery"  class="image_gall" title="Big image 2">
+            <img src="images/2s.jpg"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/3.jpg" rel="gallery"  class="image_gall" title="Big image 3">
+            <img src="images/3s.jpg"  />
+        </a>
+    </li>
+    <li>
+        <a href="images/4.jpg" rel="gallery"  class="image_gall" title="Big image 4">
+            <img src="images/4s.jpg"  />
+        </a>
+    </li>
+</ul>
+<br><br><br><br><br><br><br><br><br>
+<div id="link_group">
+    <a href="javascript:void(0)" rel="images/1.jpg">link1</a><br>
+    <a href="javascript:void(0)" rel="images/1.jpg">link2</a><br>
+    <a href="javascript:void(0)" rel="images/1.jpg">link3</a><br>
+</div>
+<br><br><br><br><br><br><br><br><br>
+<div id="input_group">
+	<input type="button" value="点击我查看图片1" title="images/2.jpg"><br>
+	<input type="button" value="点击我查看图片2" title="images/3.jpg"><br>
+	<input type="button" value="点击我查看图片3" title="images/4.jpg"><br>
+</div>
+<br><br><br><br><br><br><br><br><br>
+<img id="image" src="images/3s.jpg" alt="点击我查看大图" title="images/3.jpg"/>
+<script>
+$(function(){
+	$("a.image_gall").popImage();
+	$("#link_group a").popImage({"tagName":"rel"});
+	$("#input_group input").popImage({"tagName":"title"});
+	$("#image").popImage({"tagName":"title"});
+});
+</script>
+</body>
+</html>

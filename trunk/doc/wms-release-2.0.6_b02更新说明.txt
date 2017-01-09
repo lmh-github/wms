@@ -1,0 +1,9 @@
+需要在wms.properties中加入以下内容，顺丰和ems的帐号等信息
+
+#======kuaidi Settings======#
+wms.shunfeng.wsurl=http://219.134.187.132:9090/bsp-ois/ws/expressService?wsdl
+wms.shunfeng.custid=7699476943
+wms.shunfeng.checkwork=_DQcPl7DO8[}p2wH
+wms.ems.wsurl=http://219.134.187.38:7010/sdzzfwservice/webservice/mailQueryService
+wms.ems.vuserno=test
+wms.ems.password=test

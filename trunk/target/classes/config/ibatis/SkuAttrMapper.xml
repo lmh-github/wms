@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SkuAttrDao" >
+	<!-- 
+	<resultMap id="skuAttrDetailMap" type="SkuAttr">
+		<id property="id" column="attr_id" />
+		<result property="attrName" column="attr_name" />
+		<association property="attrSet" column="attr_set_id" javaType="AttrSet">
+			<id property="id" column="attr_set_id" />
+			<result property="attrSetName" column="attr_set_name" />
+		</association>
+		<collection property="skuItemList" javaType="SkuItem">
+			<id property="id" column="item_id" />
+			<result property="itemName" column="item_name" />
+		</collection>
+	</resultMap>-->
+	<!-- 获取指定属性的详细信息 
+	<select id="queryAttrWithDetail" parameterType="int" resultMap="skuAttrDetailMap">
+		select a.id as attr_id,
+		a.attr_name as attr_name,
+		s.id as attr_set_id,
+		s.attr_set_name as attr_set_name,
+		i.id as item_id,
+		i.item_name as item_name
+		from wms_sku_attr a, wms_attr_set s, wms_sku_item i
+		where a.attr_set_id=s.id and a.id=i.attr_id
+		and a.id=#{id}
+	</select>
+	 -->
+	 
+	 <!-- 获取指定商品类型的属性详细信息 
+	<select id="queryAttrWithDetailBySetId" parameterType="int" resultMap="skuAttrDetailMap">
+		select a.id as attr_id,
+		a.attr_name as attr_name,
+		s.id as attr_set_id,
+		s.attr_set_name as attr_set_name,
+		i.id as item_id,
+		i.item_name as item_name
+		from wms_sku_attr a, wms_attr_set s, wms_sku_item i
+		where a.attr_set_id=s.id and a.id=i.attr_id
+		and s.id=#{id}
+	</select>-->
+	
+	<!-- 查询所有SKU属性
+	<select id="querySkuAttrByAttrSetId" parameterType="long" resultType="SkuAttr">
+		select id,
+			   attr_set_id as attrSetId,
+			   attr_name as attrName
+  		  from wms_sku_attr
+ 	</select>-->
+	
+	<!-- 自定义resultMap嵌套对象 -->
+ 	<resultMap id="attrMap" type="SkuAttr">
+		<id property="id" column="attr_id" />
+		<result property="attrName" column="attr_name" />
+		<association property="attrSet" column="attrSetId" javaType="AttrSet">
+			<id property="id" column="set_id"/>
+			<result property="attrSetName" column="set_name"/>
+		</association>
+		<collection property="itemList" javaType="SkuItem">
+			<id property="id" column="item_id" />
+			<result property="itemName" column="item_name" />
+			<result property="attrId" column="attr_id" />
+		</collection>
+	</resultMap>
+	
+	<!-- 查询SKU属性列表-->
+	<select id="queryAttrList" parameterType="map" resultMap="attrMap">
+		select a.id as attr_id,
+       		   a.attr_name as attr_name,
+       		   s.id as set_id,
+       		   s.attr_set_name as set_name,
+               i.id          as item_id,
+               i.item_name   as item_name
+  		  from wms_sku_attr a
+  		  join wms_attr_set s
+  		    on a.attr_set_id = s.id
+     left join wms_sku_item i
+          	on a.id = i.attr_id
+     <where>
+   		<if test="id != null">a.id=#{id}</if>
+   		<if test="attrSetId != null">and s.id=#{attrSetId}</if>
+     </where> 
+	 </select>
+	
+	
+	 
+ 	<!-- 添加属性 -->
+	<insert id="addAttr" parameterType="SkuAttr">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_sku_attr
+		  (id, attr_set_id, attr_name)
+		select #{id},#{attrSet.id},#{attrName} from dual
+		 where not exists (select 1 from wms_sku_attr where attr_set_id = #{attrSet.id} and attr_name = #{attrName})
+	</insert>
+	
+ 	<!-- 批量添加属性可选项 -->
+	<insert id="addItem" parameterType="list">
+ 		insert into wms_sku_item(id, attr_id, item_name)
+		select WMS_SEQ_COMMON.nextval,A.* from(
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.attrId},#{item.itemName} from dual
+		</foreach>
+		  )A
+	</insert>
+
+	<!-- 更新属性 -->
+	<update id="updateAttr" parameterType="SkuAttr">
+  		update wms_sku_attr
+  		<set>
+			<if test="attrSet.id!=null">attr_set_id=#{attrSet.id},</if>
+			<if test="attrName!=null">attr_name=#{attrName}</if>
+		</set>
+  	     where id=#{id} 
+  	       and not exists (select 1 from wms_sku_attr where id!=#{id} and attr_set_id = #{attrSet.id} and attr_name = #{attrName})
+  	</update>
+  	
+  	<!-- 删除指定属性的所有可选项 -->
+	<delete id="deleteItemByAttrId" parameterType="long">
+		delete from wms_sku_item t1
+	 	 where attr_id = #{attrId} 
+	 	   and not exists (select 1 from wms_sku_item_relation where sku_item_id = t1.id)
+	</delete>
+  	
+	<!-- 批量删除属性可选项 -->
+	<delete id="deleteItem" parameterType="list">
+		delete from wms_sku_item 
+	 	 where id in
+	 	 <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item}
+	 	 </foreach>
+   		   and not exists (select 1 from wms_sku_item_relation where sku_item_id in
+		 <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item}
+	 	 </foreach>)
+	</delete>
+	
+	<!-- 删除属性 -->
+	<delete id="deleteAttr" parameterType="long">
+		delete from wms_sku_attr 
+	 	 where id = #{id}
+   		   and not exists (select 1 from wms_sku_item t1,wms_sku_item_relation t2 where t2.sku_item_id = t1.id and attr_id = #{id})
+	</delete>
+	
+	
+ 
+ </mapper>

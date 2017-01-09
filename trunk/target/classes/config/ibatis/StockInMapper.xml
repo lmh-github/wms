@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.StockInDao" >
+	<!-- 自定义入库单头部信息嵌套对象 -->
+ 	<resultMap id="stockInMap" type="StockIn">
+		<id property="id" column="stockin_id" />
+		<result property="stockInCode" column="stockin_code" />
+		<result property="stockInType" column="stockin_type" />
+		<result property="opposite" column="stockin_opposite"/>
+		<result property="originalCode" column="stockin_original_code"/>
+		<result property="handledBy" column="stockin_handled_by"/>
+		<result property="handledDate" column="stockin_handled_date"/>
+		<result property="preparedBy" column="stockin_prepared_by"/>
+		<result property="preparedTime" column="stockin_prepared_time"/>
+		<result property="remark" column="stockin_remark"/>
+		<result property="handlingStatus" column="stockin_handling_status"/>
+		<result property="enabled" column="stockin_enabled"/>
+		<association property="warehouse" column="warehouse_id" javaType="Warehouse">
+			<id property="id" column="warehouse_id"/>
+			<result property="warehouseCode" column="warehouse_code"/>
+			<result property="warehouseName" column="warehouse_name"/>
+		</association>
+	</resultMap>
+
+	<!-- 自定义入库信息嵌套对象 
+ 	<resultMap id="stockInWithDetailMap" type="StockIn">
+		<id property="id" column="stockin_id" />
+		<result property="inType" column="stockin_in_type" />
+		<result property="opposite" column="stockin_opposite"/>
+		<result property="originalCode" column="stockin_original_code"/>
+		<result property="handledBy" column="stockin_handled_by"/>
+		<result property="handledDate" column="stockin_handled_date"/>
+		<result property="preparedBy" column="stockin_prepared_by"/>
+		<result property="preparedTime" column="stockin_prepared_time"/>
+		<result property="remark" column="stockin_remark"/>
+		<result property="handlingStatus" column="stockin_handling_status"/>
+		<result property="enabled" column="stockin_enabled"/>
+		<association property="warehouse" column="warehouse_id" javaType="Warehouse">
+			<id property="id" column="warehouse_id"/>
+			<result property="warehouseName" column="warehouse_name"/>
+		</association>
+		<collection property="detail" javaType="StockInItem">
+			<id property="id" column="detail_id" />
+			<result property="batchNumber" column="detail_batch_number"/>
+			<result property="quantity" column="detail_quantity"/>
+			<result property="remark" column="detail_remark"/>
+			<association property="stockIn" column="stockin_id" javaType="StockIn">
+				<id property="id" column="stockin_id"/>
+			</association>
+			<association property="sku" column="sku_id" javaType="Sku">
+				<id property="id" column="sku_id"/>
+				<result property="skuCode" column="sku_code"/>
+				<result property="skuName" column="sku_name"/>
+				<result property="skuBarcode" column="sku_barcode"/>
+				<result property="measureUnit" column="sku_measure_unit"/>
+			</association>
+		</collection>
+	</resultMap>-->
+	
+	<!-- 获取入库单头部信息列表. -->
+	<select id="queryStockInList" parameterType="map" resultMap="stockInMap">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select t1.id as stockin_id,
+		  	  			   t1.stockin_code as stockin_code,
+			 			   t1.stockin_type as stockin_type,
+			 			   t1.opposite as stockin_opposite,
+			 			   t1.original_code as stockin_original_code,
+			 			   t1.handled_by as stockin_handled_by,
+			 			   t1.handled_date as stockin_handled_date,
+			 			   t1.prepared_by as stockin_prepared_by,
+			 			   t1.prepared_time as stockin_prepared_time,
+			 			   t1.remark as stockin_remark,
+			 			   t1.handling_status as stockin_handling_status,
+			 			   t1.enabled as stockin_enabled,
+			 			   t2.id as warehouse_id,
+			 			   t2.warehouse_code as warehouse_code,
+			 			   t2.warehouse_name as warehouse_name
+					  from wms_stockin t1
+			     left join wms_warehouse t2
+					    on t1.warehouse_code = t2.warehouse_code
+				   <where>
+				   		<if test="id != null">t1.id=#{id}</if>
+				   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+				   		<if test="originalCode != null">and t1.original_code=#{originalCode}</if>
+				   		<if test="stockInType != null">and t1.stockin_type=#{stockInType}</if>
+				   		<if test="warehouseCode != null">and t1.warehouse_code=#{warehouseCode}</if>
+				   		<if test="handledBy != null">and t1.handled_by=#{handledBy}</if>
+				   		<if test="handledDateBegin != null and handledDateEnd != null">and (t1.handled_date between #{handledDateBegin} and #{handledDateEnd})</if>
+				   </where>
+				   order by t1.prepared_time desc
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+ 	<!-- 查询入库单头部信息列表总数-->
+	<select id="queryStockInListTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_stockin t1
+	 left join wms_warehouse t2
+		    on t1.warehouse_code = t2.warehouse_code
+	   <where>
+	   		<if test="id != null">t1.id=#{id}</if>
+	   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+	   		<if test="originalCode != null">and t1.original_code=#{originalCode}</if>
+	   		<if test="stockInType != null">and t1.stockin_type=#{stockInType}</if>
+	   		<if test="warehouseCode != null">and t1.warehouse_code=#{warehouseCode}</if>
+	   		<if test="handledBy != null">and t1.handled_by=#{handledBy}</if>
+	   		<if test="handledDateBegin != null and handledDateEnd != null">and (t1.handled_date between #{handledDateBegin} and #{handledDateEnd})</if>
+	   </where> 
+	</select>
+	
+	<!-- 查询指定的入库信息 
+	<select id="queryStockInWithDetail" parameterType="long" resultMap="stockInWithDetailMap">
+		select t1.id as stockin_id,
+ 			   t1.in_type as stockin_type,
+ 			   t1.opposite as stockin_opposite,
+ 			   t1.original_code as stockin_original_code,
+ 			   t1.handled_by as stockin_handled_by,
+ 			   t1.handled_date as stockin_handled_date,
+ 			   t1.prepared_by as stockin_prepared_by,
+ 			   t1.prepared_time as stockin_prepared_time,
+ 			   t1.remark as stockin_remark,
+ 			   t1.handling_status as stockin_handling_status,
+ 			   t1.enabled as stockin_enabled,
+ 			   t2.id as detail_id,
+ 			   t2.batch_number as detail_batch_number,
+ 			   t2.quantity as detail_quantity,
+ 			   t2.remark as detail_remark,
+ 			   t3.id as sku_id,
+ 			   t3.sku_code as sku_code,
+ 			   t3.sku_barcode as sku_barcode,
+ 			   t3.measure_unit as sku_measure_unit,
+ 			   t4.id as warehouse_id,
+ 			   t4.warehouse_name as warehouse_name
+		  from wms_stockin t1
+	 left join wms_stockin_goods t2
+		    on t2.stockin_id = t1.id
+	 left join wms_sku t3
+		    on t2.sku_id = t3.id
+		  join wms_warehouse t4
+		    on t1.warehouse_id = t4.id
+		 where t1.id = #{id}
+	</select>
+	-->
+	<!-- 获取入库明细列表. -->
+	<select id="queryStockInDetailList" parameterType="map" resultMap="stockInDetailMap">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select t1.id as stockin_id,
+		  	  			   t1.stockin_code as stockin_code,
+			 			   t1.stockin_type as stockin_type,
+			 			   t1.opposite as stockin_opposite,
+			 			   t1.original_code as stockin_original_code,
+			 			   t1.handled_by as stockin_handled_by,
+			 			   t1.handled_date as stockin_handled_date,
+			 			   t1.prepared_by as stockin_prepared_by,
+			 			   t1.prepared_time as stockin_prepared_time,
+			 			   t1.remark as stockin_remark,
+			 			   t1.handling_status as stockin_handling_status,
+			 			   t1.enabled as stockin_enabled,
+			 			   t1.finished_time as stockin_finished_time,
+			 			   t2.id as detail_id,
+			 			   t2.batch_number as detail_batch_number,
+			 			   t2.quantity as detail_quantity,
+			 			   t2.remark as detail_remark,
+			 			   t2.measure_unit as detail_measure_unit,
+			 			   t2.indiv_enabled as detail_indiv_enabled,
+			 			   t2.indiv_finished as detail_indiv_finished,
+			 			   t2.wares_status as detail_wares_status,
+			 			   t2.original_code as detail_original_code,
+			 			   t3.id as sku_id,
+			 			   t3.sku_code as sku_code,
+			 			   t3.sku_name as sku_name,
+			 			   t3.sku_barcode as sku_barcode,
+			 			   t4.id as warehouse_id,
+			 			   t4.warehouse_code as warehouse_code,
+			 			   t4.warehouse_name as warehouse_name
+					  from wms_stockin t1
+					  join wms_stockin_goods t2
+					    on t2.stockin_code = t1.stockin_code
+					  join wms_sku t3
+					    on t2.sku_id = t3.id
+				 left join wms_warehouse t4
+    					on t1.warehouse_code= t4.warehouse_code
+				   <where>
+				   		<if test="stockInId != null">t1.id=#{stockInId}</if>
+				   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+				   		<if test="stockInItemId != null">and t2.id=#{stockInItemId}</if>
+				   		<if test="handlingStatus != null">and t1.handling_status=#{handlingStatus}</if>
+				   		<if test="warehouseCode != null">and t4.warehouse_code=#{warehouseCode}</if>
+				   		<if test="skuCode != null">and t3.sku_code=#{skuCode}</if>
+				   		<if test="skuName != null">and t3.sku_name like '%${skuName}%'</if>
+				   		<if test="waresStatus != null">and t2.wares_status=#{waresStatus}</if>
+				   		<if test="finishedTimeBegin != null">and t1.finished_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+						<if test="finishedTimeEnd != null">and trunc(t1.finished_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+				   </where> 
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 获取入库明细列表总数. -->
+	<select id="queryStockInDetailListTotal" parameterType="map" resultType="int">
+		select count(1) as total
+		  from wms_stockin t1
+		  join wms_stockin_goods t2
+		    on t2.stockin_code = t1.stockin_code
+		  join wms_sku t3
+		    on t2.sku_id = t3.id
+	 left join wms_warehouse t4
+			on t1.warehouse_code = t4.warehouse_code
+	   <where>
+	   		<if test="stockInId != null">t1.id=#{stockInId}</if>
+	   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+	   		<if test="stockInItemId != null">and t2.id=#{stockInItemId}</if>
+	   		<if test="handlingStatus != null">and t1.handling_status=#{handlingStatus}</if>
+	   		<if test="warehouseCode != null">and t4.warehouse_code=#{warehouseCode}</if>
+	   		<if test="skuCode != null">and t3.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t3.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t2.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t1.finished_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t1.finished_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+	   </where> 
+	</select>
+	
+	<!-- 获取出库汇总列表. -->
+	<select id="queryStockInSummaryList" parameterType="map" resultType="ReceiveSummary">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select t1.warehouse_code        as warehouseCode,
+		  	  			   t3.id                  as skuId,
+		  	  		       t2.wares_status        as waresStatus,
+		  	  		       max(t4.warehouse_name) as warehouseName,
+		  	  		       max(t3.sku_code)       as skuCode,
+		  	  		       max(t3.sku_name)       as skuName,
+		  	  		       max(t2.measure_unit)   as measureUnit,  
+		  	  		       sum(t2.quantity)       as quantity
+					  from wms_stockin t1
+					  join wms_stockin_goods t2
+					    on t2.stockin_code = t1.stockin_code
+					  join wms_sku t3
+					    on t2.sku_id = t3.id
+					  join wms_warehouse t4
+    					on t1.warehouse_code = t4.warehouse_code
+				   <where>
+				   		<if test="handlingStatus != null">t1.handling_status=#{handlingStatus}</if>
+				   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+				   		<if test="warehouseCode != null">and t4.warehouse_code=#{warehouseCode}</if>
+				   		<if test="skuCode != null">and t3.sku_code=#{skuCode}</if>
+				   		<if test="skuName != null">and t3.sku_name like '%${skuName}%'</if>
+				   		<if test="waresStatus != null">and t2.wares_status=#{waresStatus}</if>
+				   		<if test="finishedTimeBegin != null">and t1.finished_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+	   					<if test="finishedTimeEnd != null">and trunc(t1.finished_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+				   </where>
+				    group by t1.warehouse_code, t3.id, t2.wares_status
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 获取出库明细汇总列表总数-->
+	<select id="queryStockInSummaryListTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		 from (select 1
+		  from wms_stockin t1
+		  join wms_stockin_goods t2
+		    on t2.stockin_code = t1.stockin_code
+		  join wms_sku t3
+		    on t2.sku_id = t3.id
+		  join wms_warehouse t4
+			on t1.warehouse_code = t4.warehouse_code
+	   <where>
+	   		<if test="handlingStatus != null">t1.handling_status=#{handlingStatus}</if>
+	   		<if test="stockInCode != null">and t1.stockin_code=#{stockInCode}</if>
+	   		<if test="warehouseCode != null">and t4.warehouse_code=#{warehouseCode}</if>
+	   		<if test="skuCode != null">and t3.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t3.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t2.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t1.finished_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t1.finished_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+	   </where>
+	    group by t1.warehouse_code, t3.sku_code
+	    )
+		
+	</select>
+	
+	<!-- 添加入库单信息 -->
+	<insert id="addStockIn" parameterType="StockIn">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_stockin
+		  (id, stockin_type, opposite,warehouse_code,original_code,handled_by,handled_date,prepared_by,prepared_time,remark,handling_status,enabled)
+		values
+		  (#{id},#{stockInType},#{opposite},#{warehouse.warehouseCode},#{originalCode},#{handledBy},#{handledDate},#{preparedBy},#{preparedTime},#{remark},#{handlingStatus},#{enabled})
+	</insert>
+	
+	<!-- 添加初始化的入库单 -->
+	<insert id="addInitialStockIn" parameterType="StockIn">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_stockin
+		  (id, stockin_type, stockin_code,handling_status,prepared_by,prepared_time,enabled)
+		values
+		  (#{id},#{stockInType},#{stockInCode},#{handlingStatus},#{preparedBy},#{preparedTime},#{enabled})
+	</insert>
+	
+	<!-- 更新入库单信息 -->
+	<update id="updateStockIn" parameterType="StockIn">
+  		update wms_stockin
+  		<set>
+			<if test="opposite!=null">opposite=#{opposite},</if>
+			<if test="warehouse.warehouseCode!=null">warehouse_code=#{warehouse.warehouseCode},</if>
+			<if test="originalCode!=null">original_code=#{originalCode},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="handledDate!=null">handled_date=#{handledDate},</if>
+			<if test="finishedTime!=null">finished_Time=#{finishedTime},</if>
+			<if test="handlingStatus!=null">handling_status=#{handlingStatus},</if>
+			<if test="enabled!=null">enabled=#{enabled},</if>
+			<if test="remark!=null">remark=#{remark},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+  	
+  	<!-- 删除指定的入库单 -->
+	<delete id="deleteStockIn" parameterType="long">
+		delete from wms_stockin 
+	 	 where id = #{id}
+	 	   and handling_status=0
+	</delete>
+  	
+	<!-- 添加入库明细 -->
+	<insert id="addStockInDetail" parameterType="list">
+ 		insert into wms_stockin_goods(id, stockin_code, sku_id,quantity,batch_number,remark)
+		select WMS_SEQ_COMMON.nextval,A.* from(
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.stockIn.stockInCode},#{item.sku.id},#{item.quantity},#{item.batchNumber},#{item.remark} from dual
+		</foreach>
+		  )A
+	</insert>
+	
+	<!-- 添加指定的入库明细项 -->
+	<insert id="addStockInItem" parameterType="StockInItem">
+ 		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_stockin_goods
+ 			(id, stockin_code, sku_id,quantity,measure_unit,batch_number,remark,indiv_enabled,indiv_finished,wares_status,original_code)
+ 		values
+ 			(#{id},#{stockIn.stockInCode},#{skuId},#{quantity},#{measureUnit},#{batchNumber, jdbcType=VARCHAR},#{remark, jdbcType=VARCHAR},#{indivEnabled},#{indivFinished, jdbcType=VARCHAR},#{waresStatus},#{originalCode, jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 更新指定的入库明细项 -->
+	<update id="updateStockInItem" parameterType="StockInItem">
+  		update wms_stockin_goods
+  		<set>
+			<if test="quantity!=null">quantity=#{quantity},</if>
+			<if test="batchNumber!=null">batch_number=#{batchNumber},</if>
+			<if test="waresStatus!=null">wares_status=#{waresStatus},</if>
+			<if test="remark!=null">remark=#{remark},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+  	
+  	<!-- 删除指定入库编号的所有明细项 -->
+	<delete id="deleteStockInItems" parameterType="String">
+		delete from wms_stockin_goods 
+	 	 where stockin_code = #{stockInCode}
+	</delete>
+	
+	<!-- 删除指定入库明细项 -->
+	<delete id="deleteStockInItem" parameterType="long">
+		delete from wms_stockin_goods 
+	 	 where id = #{id}
+	</delete>
+	
+	<!-- 入库单明细 -->
+	<resultMap id="stockInDetailMap" type="StockInItem">
+		<id property="id" column="detail_id" />
+		<result property="batchNumber" column="detail_batch_number"/>
+		<result property="quantity" column="detail_quantity"/>
+		<result property="remark" column="detail_remark"/>
+		<result property="measureUnit" column="detail_measure_unit"/>
+		<result property="indivEnabled" column="detail_indiv_enabled"/>
+		<result property="indivFinished" column="detail_indiv_finished"/>
+		<result property="waresStatus" column="detail_wares_status"/>
+		<result property="originalCode" column="detail_original_code"/>
+		<association property="stockIn" javaType="StockIn">
+			<id property="id" column="stockin_id" />
+			<result property="stockInCode" column="stockin_code" />
+			<result property="stockInType" column="stockin_type" />
+			<result property="opposite" column="stockin_opposite"/>
+			<result property="originalCode" column="stockin_original_code"/>
+			<result property="handledBy" column="stockin_handled_by"/>
+			<result property="handledDate" column="stockin_handled_date"/>
+			<result property="preparedBy" column="stockin_prepared_by"/>
+			<result property="preparedTime" column="stockin_prepared_time"/>
+			<result property="remark" column="stockin_remark"/>
+			<result property="handlingStatus" column="stockin_handling_status"/>
+			<result property="enabled" column="stockin_enabled"/>
+			<result property="finishedTime" column="stockin_finished_time"/>
+			<association property="warehouse" column="warehouse_id" javaType="Warehouse">
+				<id property="id" column="warehouse_id"/>
+				<result property="warehouseCode" column="warehouse_code"/>
+				<result property="warehouseName" column="warehouse_name"/>
+			</association>
+		</association>
+		<association property="sku" column="sku_id" javaType="Sku">
+			<id property="id" column="sku_id"/>
+			<result property="skuCode" column="sku_code"/>
+			<result property="skuName" column="sku_name"/>
+			<result property="skuBarcode" column="sku_barcode"/>
+		</association>
+	</resultMap>
+
+  		
+	
+ </mapper>

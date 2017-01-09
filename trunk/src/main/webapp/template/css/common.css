@@ -1,0 +1,389 @@
+﻿@charset "utf-8";
+/* ==========================================================
+	* Name: 全站通用样式库
+	* Date: 2010/10/10
+	* User: Colin
+============================================================*/
+body {
+	font-family: "宋体", Arail, verdana;
+	font-size: 12px;
+	line-height: 180%;
+}
+
+a:focus /*取消链接的虚线*/ {
+	outline: none;
+	-moz-outline: none;
+}
+
+input {
+	vertical-align: middle;
+	font-family: arial;
+}
+/*表单样式*/
+.inp22 {
+	height: 20px;
+	line-height: 20px;
+	border: 1px solid #cfcfcf;
+	padding: 0 5px;
+}
+
+.inp24 {
+	height: 22px;
+	line-height: 22px;
+	border: 1px solid #cfcfcf;
+	padding: 0 5px;
+}
+
+.ttabd {
+	border: 1px solid #cfcfcf;
+	font-family: arial;
+}
+/*表单固定样式*/
+.inpBlue {
+	border: 1px solid #a0b4c5;
+	padding: 0 5px;
+}
+
+.inpGray {
+	border: 1px solid #a1a7ac;
+	padding: 0 5px;
+}
+
+.inpData /*日期*/ {
+	width: 106px;
+	height: 20px;
+	line-height: 20px;
+	cursor: pointer;
+	border: none;
+	padding: 0 3px;
+	background: url(/template/img/library01.gif) 0px 0px no-repeat;
+}
+
+.inpCity /*城市*/ {
+	width: 176px;
+	height: 24px;
+	line-height: 24px;
+	cursor: pointer;
+	border: none;
+	padding: 0 3px;
+	background: url(/template/img/library01.gif) 0px -30px no-repeat;
+	color: #666;
+}
+
+.inpArea /*地区1*/ {
+	width: 75px;
+	padding: 0px 22px 0px 3px;
+	height: 22px;
+	cursor: pointer;
+	background: url(/template/img/library01.gif) 0px -60px no-repeat;
+}
+
+.inpArea input {
+	border: none;
+	height: 20px;
+	line-height: 20px;
+	width: 75px;
+	background: none;
+	margin: 0px;
+	color: #666;
+	padding: 0px;
+}
+
+.inpArea input:focus {
+	border: none;
+	height: 20px;
+	line-height: 20px;
+	width: 75px;
+	background: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.inpArea02 /*地区2*/ {
+	width: 75px;
+	padding: 0px 22px 0px 3px;
+	height: 24px;
+	line-height: 22px;
+	cursor: pointer;
+	background: url(/template/img/library01.gif) 0px -90px no-repeat;
+}
+
+.inpArea02 input {
+	border: none;
+	height: 22px;
+	line-height: 22px;
+	width: 75px;
+	background: none;
+	margin: 0px;
+	color: #666;
+	padding: 0px;
+}
+
+.inpArea02 input:focus {
+	border: none;
+	height: 22px;
+	line-height: 22px;
+	width: 75px;
+	background: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+/*ul 表内列表*/
+.ul_list {
+	
+}
+
+.ul_list li {
+	width: 120px;
+	padding-right: 10px;
+	line-height: 24px;
+	height: 24px;
+	overflow: hidden;
+	float: left;
+}
+/*td 样式*/
+.tdImg img {
+	padding: 1px;
+	border: 1px solid #c2c1c1;
+}
+
+.tdBtop {
+	border-top: 1px solid #ddd;
+}
+/*bg 背景色*/
+.bgBlue {
+	background: #eef6fe;
+}
+
+.bgGray {
+	background: #f7f7f7;
+}
+
+.cBlue {
+	color: #087dc8;
+}
+
+/*table 边框和背景*/
+.table_bg01 {
+	
+}
+
+.table_bg01 th {
+	border: 1px solid #ddd;
+	background: url(/template/img/admin_topbg01.gif) left top repeat-x;
+	text-align: center;
+	font-weight: bold;
+	color: #087dc8;
+}
+
+.table_bg01 td {
+	border: 1px solid #ddd;
+}
+
+.table_bg02 {
+	
+}
+
+.table_bg02 .thTitle {
+	width: 100px;
+	border: 1px solid #ddd;
+	text-align: right;
+	font-weight: bold;
+	padding: 8px 0;
+	background: #f7f7f7;
+	line-height: 18px;
+}
+
+.table_bg02 .tdBox {
+	border: 1px solid #ddd;
+	padding: 8px 10px;
+	line-height: 18px;
+}
+
+.table_bg03 {
+	
+}
+
+.table_bg03 .thTitle {
+	border: 1px solid #ddd;
+	padding: 10px 0px;
+	background: url(/template/img/admin_topbg01.gif) left top repeat-x;
+}
+
+.table_bg03 .thList {
+	width: 200px;
+	border: 1px solid #ddd;
+	text-align: right;
+	font-weight: bold;
+	padding: 8px 0;
+	background: #f7f7f7;
+	line-height: 18px;
+}
+
+.table_bg03 .tdBox {
+	border: 1px solid #ddd;
+	padding: 8px 10px;
+	line-height: 18px;
+}
+
+.table_bg04 {
+	
+}
+
+.table_bg04 .thTitle {
+	width: 150px;
+	border: 1px solid #ddd;
+	text-align: right;
+	font-weight: bold;
+	padding: 8px 0;
+	background: #f7f7f7;
+	line-height: 18px;
+}
+
+.table_bg04 .tdBox {
+	border: 1px solid #ddd;
+	padding: 8px 10px;
+	line-height: 18px;
+}
+
+.table_bg05 {
+	
+}
+
+.table_bg05 .thTitle {
+	border: 1px solid #ddd;
+	padding: 10px 0px;
+	background: url(/template/img/admin_topbg01.gif) left top repeat-x;
+}
+
+.table_bg05 .thList {
+	width: 150px;
+	border: 1px solid #ddd;
+	text-align: right;
+	font-weight: bold;
+	padding: 8px 0;
+	background: #f7f7f7;
+	line-height: 18px;
+}
+
+.table_bg05 .tdBox {
+	border: 1px solid #ddd;
+	padding: 8px 10px;
+	line-height: 18px;
+}
+/*table 行高和间距和对齐*/
+.table_hg01 {
+	
+}
+
+.table_hg01 th {
+	line-height: 20px;
+	padding-top: 8px;
+	padding-bottom: 5px;
+	text-align: center;
+}
+
+.table_hg01 td {
+	line-height: 20px;
+	padding-top: 8px;
+	padding-bottom: 5px;
+	text-align: center;
+}
+
+.table_hg01 .tdLe {
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: left;
+}
+
+/*=========================UI模版库样式全站通用===============================*/
+/*弹出页模版*/
+.pop_wMold {
+	width: 50%;
+	border: 1px solid #39c;
+	top: 30%;
+	left: 2%;
+	text-align: left;
+	position: absolute;
+	z-index: 100;
+	background: #fff;
+}
+
+.pop_wMold .popTitle {
+	height: 20px;
+	padding: 7px 0 8px 0;
+	line-height: 20px;
+	background: url(/template/img/p_t_bg.gif) left top repeat-x;
+}
+
+.pop_wMold .popTitle h3 {
+	color: #369;
+}
+
+.pop_wMold .popTitle p {
+	background: url("/template/img/p_t_exit.gif") left top no-repeat;
+	margin-right: 10px;
+}
+
+.pop_wMold .popTitle p img {
+	vertical-align: top;
+}
+
+.pop_wMold .popTitle a {
+	
+}
+
+.pop_wMold .popBox {
+	color: #464646;
+}
+
+.pop_wMoldBg {
+	background-color: #000;
+	position: absolute;
+	z-index: 88;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 1000px;
+	opacity: 0.5;
+	filter: alpha(opacity = 50);
+	-moz-opacity: 0.5;
+}
+/*弹出层模版*/
+.pop_lmold {
+	width: 50%;
+	border: 2px solid #39c;
+	text-align: left;
+	position: absolute;
+	z-index: 110;
+	background: #fff;
+}
+
+.pop_lmold .popTitle {
+	height: 20px;
+	padding: 7px 0 8px 0;
+	line-height: 20px;
+	background: url(/template/img/p_t_bg.gif) left top repeat-x;
+}
+
+.pop_lmold .popTitle h3 {
+	color: #369;
+}
+
+.pop_lmold .popTitle p {
+	background: url("/template/img/p_t_exit.gif") left top no-repeat;
+	margin-right: 10px;
+}
+
+.pop_lmold .popTitle p img {
+	vertical-align: top;
+}
+
+.pop_lmold .popTitle a {
+	
+}
+
+.pop_lmold .popBox {
+	
+}

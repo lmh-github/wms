@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.CategoryDao" >
+
+	<!-- 查询所有分类(包括商品)-->
+	<select id="queryCategoryVoList" parameterType="map" resultType="CategoryVo">
+   select id,catPid,catName,waresCode,isLeaf
+  from (select id,
+               cat_pid as catPid,
+               cat_name as catName,
+               '' waresCode,
+               0 isLeaf
+          from wms_wares_category
+        
+        UNION ALL
+        
+        select id,
+               cat_id as catPid,
+               wares_name as catName,
+               wares_code waresCode,
+               1 isLeaf
+          from wms_wares
+        
+        ) cat
+  start with id = #{catId}
+  connect by catPid = prior id
+
+
+	 </select>
+	 
+	<!-- 查询所有分类-->
+	<select id="queryCategoryList" resultType="Category">
+		select id,
+			   cat_name as catName,
+			   cat_desc as catDesc,
+			   cat_pid as catPid,
+			   cat_path as catPath,
+			   enabled
+  		  from wms_wares_category
+          start with id = 0
+          connect by cat_pid = prior id
+	 </select>
+	 
+	 <!-- 查询指定分类-->
+	<select id="queryCategory" resultType="Category">
+		select id,
+			   cat_name as catName,
+			   cat_desc as catDesc,
+			   cat_pid as catPid,
+			   cat_path as catPath,
+			   enabled
+  		  from wms_wares_category
+          where id = #{id}
+	 </select>
+
+	<!-- 更新指定的分类基本信息 -->
+	<update id="updateCategoryInfo" parameterType="Category">
+  		update wms_wares_category
+  		<set>
+			<if test="catName!=null">cat_name=#{catName},</if>
+			<if test="catDesc!=null">cat_desc=#{catDesc},</if>
+			<if test="catPid!=null">cat_pid=#{catPid},</if>
+		</set>
+  	     where id=#{id} 
+  	     <if test="catName!=null">
+  	       and not exists (select 1 from wms_wares_category where id!=#{id} and cat_name=#{catName})
+  	     </if>
+  	</update>
+  	
+  	<!-- 更新包括子孙节点在内的分类节点路径 -->
+  	<update id="updateCategoryPath" parameterType="Category">
+  		update wms_wares_category
+		   set cat_path = replace(cat_path,
+		                          #{catPath},
+		                          (select cat_path
+		                             from wms_wares_category
+		                            where id = #{catPid})||','||#{id})
+		 where instr(cat_path,#{catPath}) = 1
+  	</update>
+  
+	<!-- 添加新的分类 -->
+	<insert id="addCategory" parameterType="Category">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_wares_category
+		  (id, cat_name, cat_desc, cat_pid, cat_path)
+		select #{id},#{catName},#{catDesc},#{catPid},(select cat_path from wms_wares_category where id = #{catPid}) || ',' || #{id} from dual
+		 where not exists (select 1 from wms_wares_category where cat_name = #{catName})
+	</insert>
+  
+	<!-- 根据id删除商品分类 -->
+	<delete id="deleteCategory" parameterType="long">
+		delete from wms_wares_category 
+	 	 where id = #{id}
+   		   and not exists (select 1 from wms_wares_category where cat_pid = #{id})
+   		   and not exists (select 1 from wms_wares where cat_id = #{id})
+	</delete>
+ 
+ </mapper>

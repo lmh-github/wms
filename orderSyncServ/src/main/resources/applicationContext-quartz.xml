@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xmlns:mvc="http://www.springframework.org/schema/mvc"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+        http://www.springframework.org/schema/beans/spring-beans.xsd  
+        http://www.springframework.org/schema/context  
+        http://www.springframework.org/schema/context/spring-context.xsd  
+        http://www.springframework.org/schema/mvc  
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- 同步淘宝订单任务 -->
+	<bean id="syncOrderTask" class="com.gionee.top.job.SyncOrderTask">
+	</bean>
+	
+	<!-- 调度同步淘宝订单任务 -->
+	<bean id="syncOrderJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="syncOrderTask" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	
+	<!-- 同步淘宝订单任务调度触发器 -->
+	<bean id="syncOrderTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="syncOrderJob" />
+		<!-- 调度间隔为每2分钟执行一次 -->
+		<property name="cronExpression" value="0 0/2 * * * ?"/>
+	</bean>
+	
+	<!-- 同步淘宝分销订单任务 -->
+	<bean id="syncFxOrderTask" class="com.gionee.top.job.SyncFxOrderTask">
+	</bean>
+	
+	<!-- 调度同步淘宝分销订单任务 -->
+	<bean id="syncFxOrderJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="syncFxOrderTask" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	
+	<!-- 同步淘宝分销订单任务调度触发器 -->
+	<bean id="syncFxOrderTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="syncFxOrderJob" />
+		<!-- 调度间隔为每2分钟执行一次 -->
+		<property name="cronExpression" value="0 0/2 * * * ?"/>
+	</bean>
+	
+	<!-- 调度 -->
+	<bean id="quartz"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="syncOrderTrigger" />
+				<!-- <ref bean="syncFxOrderTrigger" /> -->
+			</list>
+		</property>
+	</bean>
+</beans>

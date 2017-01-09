@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT excelImport (onceImport | repeatImport | (onceImport, repeatImport) | (repeatImport, onceImport))>
+<!ELEMENT onceImport (#PCDATA)>
+<!ELEMENT repeatImport (#PCDATA | endCode)*>
+<!ELEMENT endCode (#PCDATA)>

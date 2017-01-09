@@ -1,0 +1,11 @@
+#wms.properties新增如下配置
+
+#SF WebServer
+wms.sf.ws.url=http://219.134.187.154:9154/bsp-wms/ws/OutsideToLscmServiceImpl?wsdl
+wms.sf.ws.username=
+wms.sf.ws.password=
+wms.sf.ws.checkword=01f18980363f40e48416464baf4cc7c0
+wms.sf.ws.company=GNEE
+wms.sf.ws.warehouse=571DCF
+wms.sf.ws.monthly_account=7550144315
+wms.sf.ws.vendor=GNEE

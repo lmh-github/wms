@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SalesOrderImeiDao">
+
+  <insert id="add" parameterType="com.gionee.wms.entity.SalesOrderImei">
+    <selectKey keyProperty="id" resultType="long" order="BEFORE">
+      SELECT WMS_SEQ_COMMON.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO WMS_SALES_ORDER_IMEI(
+    "ID",
+    "ORDER_CODE",
+    "SF_ERP_ORDER",
+    "IMEI"
+    )
+    VALUES(
+    #{id},
+    #{order_code, jdbcType=VARCHAR},
+    #{sf_erp_order, jdbcType=VARCHAR},
+    #{imei}
+    )
+  </insert>
+
+  <insert id="batchAdd">
+    INSERT INTO WMS_SALES_ORDER_IMEI(
+    "ID",
+    "ORDER_CODE",
+    "SF_ERP_ORDER",
+    "IMEI"
+    )
+    SELECT WMS_SEQ_COMMON.NEXTVAL, T.* FROM (
+    <foreach collection="salesOrderImeis" item="item" index="index" separator="UNION ALL">    
+      SELECT '${item.order_code}' "ORDER_CODE", '${item.sf_erp_order}' "SF_ERP_ORDER", '${item.imei}' "IMEI" FROM DUAL
+    </foreach>
+    ) T
+  </insert>
+
+  <select id="getSalesOrderByErpOrder" resultType="com.gionee.wms.entity.SalesOrder">
+    SELECT O.* FROM WMS_SALES_ORDER O, WMS_SALES_ORDER_MAP OM
+    WHERE O.ORDER_CODE = OM.ORDER_CODE
+    AND OM.SF_ERP_ORDER = #{param}
+  </select>
+
+  <select id="queryAllImeis" resultType="com.gionee.wms.entity.SalesOrderImei">
+    SELECT * FROM WMS_SALES_ORDER_IMEI
+  </select>
+
+  <select id="queryImeis" resultType="com.gionee.wms.entity.SalesOrderImei" parameterType="map">
+    SELECT * FROM WMS_SALES_ORDER_IMEI O
+    <where>
+      <if test="order_code != null">
+        O.ORDER_CODE = #{order_code}
+      </if>
+      <if test="sf_erp_order != null">
+        AND O.SF_ERP_ORDER = #{sf_erp_order}
+      </if>
+    </where>
+  </select>
+
+
+</mapper>

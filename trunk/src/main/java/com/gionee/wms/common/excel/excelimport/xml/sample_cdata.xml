@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excelImport>
+
+	<onceImport>
+		<![CDATA[
+			C3 = ORDER_NBR,
+			H3 = CUST_NAME,
+			N3 = CUST_LINK_INFO,
+			C4 = CUST_ID,
+			H4 = CUST_ADDR,
+			N4 = ONCE_TYPE,
+			C5 = CONTACT_ID,
+			H5 = CUST_FILE,
+			N5 = LOOP_TYPE,
+			C6 = PRO_NAME,
+			H6 = OPPO_ORDER_NBR,
+			N6 = COOPERATE_MODE,
+			C11 = AUD_MANGER,
+			N11 = BM,
+			C12 = ORDER_COMMENT,,,
+		]]>
+	</onceImport>
+
+	<repeatImport>
+		<![CDATA[
+			A9 = STRNUM,
+			B9 = FRI_AREA,
+			C9 = OPP_A,
+			D9 = SEC_AREA,
+			E9 = OPP_B,
+			F9 = NUM,
+			G9 = SERV_NBR,
+			H9 = SPEED,
+			I9 = FRI_ADDR,
+			J9 = PORT_TYPE_A,
+			K9 = FRI_LINK_A,
+			L9 = SEC_ADDR,
+			M9 = PORT_TYPE_B,
+			N9 = FRI_LINK_B,
+			O9 = APPLY_INFO,
+			P9 = ORDER_DATE,
+			Q9 = HIRE_TIME,
+			R9 = DISCOUNT_MID,
+			S9 = BILL_DATE,
+			T9 = OLD_BILL_DATE,
+			U9 = LINE_COMMENT,,,
+		]]>
+		<endCode>
+			<![CDATA[
+				End
+			]]>
+		</endCode>
+	</repeatImport>
+
+</excelImport>

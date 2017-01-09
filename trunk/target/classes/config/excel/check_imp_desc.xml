@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excelImport>
+	<onceImport>
+		<![CDATA[
+			C2 = WAREHOUSE_NAME,
+			F2 = CHECK_TIME
+		]]>
+	</onceImport>
+
+	<repeatImport>
+		<![CDATA[
+			B4 = SKU_CODE,
+			C4 = SKU_NAME,
+			D4 = MEASURE_UNIT,
+			E4 = NON_DEFECTIVED,
+			F4 = DEFECTIVED
+		]]>
+		<endCode>End</endCode>
+	</repeatImport>
+	
+</excelImport>

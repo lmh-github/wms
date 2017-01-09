@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.DeliveryDao" >
+
+	<!-- 发货商品嵌套对象 
+	<resultMap id="deliveryGoodsMap" type="DeliveryGoods">
+		<id property="id" column="goods_id" />
+		<result property="deliveryId" column="goods_deliveryId" />
+		<result property="deliveryCode" column="goods_deliveryCode" />
+		<result property="originalCode" column="goods_originalCode" />
+		<result property="warehouseCode" column="goods_warehouseCode" />
+		<result property="warehouseName" column="goods_warehouseName" />
+		<result property="quantity" column="goods_quantity"/>
+		<result property="measureUnit" column="goods_measureUnit"/>
+		<result property="skuId" column="goods_skuId"/>
+		<result property="skuCode" column="goods_skuCode"/>
+		<result property="skuName" column="goods_skuName"/>
+		<result property="indivEnabled" column="goods_indivEnabled"/>
+		<result property="indivFinished" column="goods_indivFinished"/>
+		<result property="waresStatus" column="goods_waresStatus"/>
+		<result property="enabled" column="goods_enabled"/>
+		<association property="delivery" javaType="Delivery">
+			<id property="id" column="goods_deliveryId" />
+			<result property="handlingStatus" column="delivery_handlingStatus" />
+			<result property="handledTime" column="delivery_handledTime" />
+		</association>
+	</resultMap>-->
+	
+	<sql id="sql_deliveryColumns">
+			   t1.id                as id,
+		       t1.delivery_code     as deliveryCode,
+		       t1.batch_id          as batchId,
+		       t1.batch_code        as batchCode,
+		       t1.warehouse_id      as warehouseId,
+		       t1.warehouse_name    as warehouseName,
+		       t1.original_id       as originalId,
+		       t1.original_code     as originalCode,
+		       t1.payment_type      as paymentType,
+		       t1.consignee         as consignee,
+		       t1.province          as province,
+		       t1.city              as city,
+		       t1.district          as district,
+		       t1.address           as address,
+		       t1.zipcode           as zipcode,
+		       t1.tel               as tel,
+		       t1.mobile            as mobile,
+		       t1.best_time         as best_time,
+		       t1.postscript        as postscript,
+		       t1.shipping_id       as shippingId,
+		       t1.shipping_name     as shippingName,
+		       t1.shipping_no       as shippingNo,
+		       t1.invoice_enabled   as invoiceEnabled,
+		       t1.invoice_status    as invoiceStatus,
+		       t1.handling_status   as handlingStatus,
+		       t1.handled_by        as handledBy,
+		       t1.handled_time      as handledTime,
+		       t1.prepared_by       as preparedBy,
+		       t1.prepared_time     as preparedTime,
+		       t1.remark            as order_remark
+	</sql>
+	
+	<sql id="sql_deliveryWhere">
+		<where>
+	   		<if test="id != null">t1.id=#{id}</if>
+	   		<if test="deliveryCode != null">and t1.delivery_code=#{deliveryCode}</if>
+	   		<if test="batchId != null">and t1.batch_id=#{batchId}</if>
+	   		<if test="batchCode != null and batchCode != ''">and t1.batch_code=#{batchCode}</if>
+	   		<if test="originalId != null">and t1.original_id=#{originalId}</if>
+	   		<if test="originalCode != null and originalCode != ''">and t1.original_code=#{originalCode}</if>
+	   		<if test="consignee != null and consignee != ''">and t1.consignee=#{consignee}</if>
+	   		<if test="handlingStatus != null">and t1.handling_status=#{handlingStatus}</if>
+	   		<if test="shippingId != null and shippingId != ''">and t1.shipping_id=#{shippingId}</if>
+	   		<if test="mobile != null and mobile != ''">and t1.mobile=#{mobile}</if>
+	   </where>
+	</sql>
+	
+	<sql id="sql_deliveryGoodsColumns">
+		       t1.id                as id,
+			   t1.sku_id            as skuId,
+		       t1.sku_code          as skuCode,
+		       t1.sku_name          as skuName,
+		       t1.quantity          as quantity,
+		       t1.measure_unit      as measureUnit,
+		       t1.wares_status      as waresStatus,
+		       t1.indiv_enabled     as indivEnabled,
+		       t1.indiv_finished    as indivFinished,
+		       t1.enabled           as enabled,
+		       t1.delivery_id       as "delivery.id",
+		       t2.delivery_code     as "delivery.deliveryCode",
+		       t2.warehouse_id      as "delivery.warehouseId",
+		       t2.warehouse_name    as "delivery.warehouseName",
+		       t2.handling_status   as "delivery.handlingStatus",
+		       t2.handled_time      as "delivery.handledTime",
+		       t2.original_id       as "delivery.originalId",
+		       t2.original_code     as "delivery.originalCode"
+	</sql>
+	
+	<sql id="sql_deliveryGoodsWhere">
+		<where>
+	   		<if test="warehouseId != null">and t2.warehouse_id=#{warehouseId}</if>
+	   		<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t1.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t2.handled_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t2.handled_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+			<if test="handlingStatus != null">and t2.handling_status=#{handlingStatus}</if>
+		</where>
+	</sql>
+	
+	<sql id="sql_goodsSummaryColumns">
+		       t2.warehouse_id            as warehouseId,
+		       t1.sku_id                  as skuId,
+		       max(t2.warehouse_name)     as warehouseName,
+		       max(t1.sku_code)           as skuCode,
+		       max(t1.sku_name)           as skuName,
+		       max(t1.measure_unit)       as measureUnit,
+		       sum(t1.quantity)           as quantity
+	</sql>
+	
+	<sql id="sql_goodsSummaryWhere">
+		<where>
+	   		<if test="handlingStatus != null">t2.handling_status=#{handlingStatus}</if>
+	   		<if test="batchId != null">and t2.batch_id=#{batchId}</if>
+	   		<if test="warehouseId != null">and t2.warehouse_id=#{warehouseId}</if>
+	   		<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t1.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t1.handled_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t1.handled_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+	   </where>
+	</sql>
+
+	<!-- 分页查询符合条件的发货单列表. -->
+	<select id="queryDeliveryByPage" parameterType="map" resultType="Delivery">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_deliveryColumns"/>
+		  	  		  from wms_delivery t1
+				  <include refid="sql_deliveryWhere"/> 
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的发货单总数-->
+	<select id="queryDeliveryTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_delivery t1
+	  <include refid="sql_deliveryWhere"/>  
+	</select>
+	
+	<!-- 查询符合条件的发货单列表. -->
+	<select id="queryDeliveryList" parameterType="map" resultType="Delivery">
+		select <include refid="sql_deliveryColumns"/>
+		  from wms_delivery t1
+	  <include refid="sql_deliveryWhere"/> 
+	</select>
+
+	<!-- 查询符合条件的发货单列表. -->
+	<select id="queryDeliveryListSearch" parameterType="map"
+		resultType="Delivery">
+		select distinct * from(
+		select c.*
+		from (select a.*
+		from (
+		select
+		<include refid="sql_deliveryColumns" />
+		from wms_delivery t1
+		<include refid="sql_deliveryWhere" />
+		) a
+		left join wms_sales_order b
+		on a.originalId = b.id
+		where 1=1
+		<if test="originalCode != null and originalCode != ''">
+			and b.order_code = #{originalCode}
+		</if>
+		<if test="orderTimeBegin != null and orderTimeBegin != ''">
+			and b.order_time <![CDATA[>=]]>
+			#{orderTimeBegin}
+		</if>
+		<if test="orderTimeEnd != null and orderTimeEnd != ''">
+			and b.order_time <![CDATA[<=]]>
+			#{orderTimeEnd}
+		</if>
+		) c
+		left join wms_indiv d
+		on (c.originalId = d.order_id)
+		where 1=1
+		<if test="indivCode != null and indivCode != ''">
+			and d.indiv_code = #{indivCode}
+		</if>
+		<if test="skuName != null and skuName != ''">
+			and d.sku_name like '%${skuName}%'
+		</if>
+		)
+	</select>
+	
+	<!-- 根据批量源单ID获取发货单列表. -->
+	<select id="queryDeliveryListByOriginalIds" parameterType="list" resultType="Delivery">
+		select <include refid="sql_deliveryColumns"/>
+		  from wms_delivery t1
+	     where t1.original_id in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item}
+	 	</foreach>
+	</select>
+	
+	<!-- 根据批量源单号获取发货单列表. -->
+	<select id="queryDeliveryListByOriginalCodes" parameterType="list" resultType="Delivery">
+		select <include refid="sql_deliveryColumns"/>
+		  from wms_delivery t1
+	     where t1.original_code in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item}
+	 	</foreach>
+	</select>
+	
+	<!-- 根据ID获取发货单. -->
+	<select id="queryDelivery" parameterType="long" resultType="Delivery">
+		select <include refid="sql_deliveryColumns"/>
+		  from wms_delivery t1
+	     where t1.id=#{id} 
+	</select>
+	
+	<!-- 根据源单ID获取发货单. -->
+	<select id="queryDeliveryByOriginalId" parameterType="long" resultType="Delivery">
+		select <include refid="sql_deliveryColumns"/>
+		  from wms_delivery t1
+	     where t1.original_id=#{originalId}
+	</select>
+	
+	<!-- 判断出库批次是否是可取消的(不存在发票、配送单号、编码的操作)-->
+	<select id="queryBatchWhetherIsCancelable" parameterType="long"  resultType="string">
+		select 1
+		  from dual
+		 where (select count(1)
+		          from wms_delivery t1
+		         where t1.batch_id = #{batchId}
+		           and (t1.invoice_status = 1 or t1.shipping_no is not null)) = 0
+		   and (select count(1)
+		          from wms_delivery_goods t1, wms_delivery t2
+		         where t1.delivery_id = t2.id
+		           and t2.batch_id = #{batchId}
+		           and t1.indiv_finished = 1) = 0
+	</select>
+
+	<!-- 批量添加发货单 -->
+	<insert id="addDeliveryList" parameterType="list">
+ 		insert into wms_delivery
+ 		  (id, delivery_code,batch_id, batch_code,warehouse_id,warehouse_name,original_id,original_code,payment_type,consignee,province,city,district,address,zipcode,tel,mobile,best_time,postscript,shipping_id,shipping_name,invoice_enabled,invoice_status,handling_status,prepared_by,prepared_time)
+		select WMS_SEQ_COMMON.nextval,A.* from(
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.deliveryCode},#{item.batchId},#{item.batchCode},#{item.warehouseId},#{item.warehouseName},#{item.originalId},#{item.originalCode},#{item.paymentType},#{item.consignee},#{item.province},#{item.city},#{item.district, jdbcType=VARCHAR},#{item.address},#{item.zipcode, jdbcType=VARCHAR},#{item.tel, jdbcType=VARCHAR},#{item.mobile, jdbcType=VARCHAR},#{item.bestTime, jdbcType=VARCHAR},#{item.postscript, jdbcType=VARCHAR},#{item.shippingId},#{item.shippingName},#{item.invoiceEnabled},#{item.invoiceStatus},#{item.handlingStatus},#{item.preparedBy},#{item.preparedTime} from dual
+		</foreach>
+		  )A
+	</insert>
+	
+	<!-- 批量更新发货单的配送信息 -->
+  	<update id="updateDeliveryList" parameterType="list"> 
+         update wms_delivery 
+         <set>
+         	<trim prefix="shipping_id =case" suffix="end,">
+            <foreach collection="list" item="i"  index="index">
+	            <if test="i.shippingId!=null">
+	             when (id=#{i.id}) then #{i.shippingId}
+	            </if>
+            </foreach>
+          	</trim>
+          	<trim prefix="shipping_name =case" suffix="end,">
+            <foreach collection="list" item="i"  index="index">
+	            <if test="i.shippingName!=null">
+	             when (id=#{i.id}) then #{i.shippingName}
+	            </if>
+            </foreach>
+          	</trim>
+          	<trim prefix="shipping_no =case" suffix="end,">
+            <foreach collection="list" item="i"  index="index">
+	            <if test="i.shippingNo!=null">
+	             when (id=#{i.id}) then #{i.shippingNo}
+	            </if>
+            </foreach>
+          	</trim>
+          </set>
+         where id in
+         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item.id}
+	 	 </foreach>
+	</update>
+	
+  	<!-- 更新发货单的配送信息 -->
+	<update id="updateShippingInfo" parameterType="Delivery">
+  		update wms_delivery
+  		   set shipping_id=#{shippingId},
+  		       shipping_name=#{shippingName},
+  		       shipping_no=#{shippingNo}
+  		 where id=#{id}
+  	</update>
+  	
+  	<!-- 更新发货单的发票信息 -->
+	<update id="updateInvoiceInfo" parameterType="Delivery">
+  		update wms_delivery
+  		   set invoice_status=#{invoiceStatus}
+  		 where id=#{id}
+  	</update>
+  	
+  	<!-- 获取出库批次内未完成配送信息和发票操作的发货单总数-->
+	<select id="queryUnfinishedDeliveryTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+	      from wms_delivery t1
+		 where t1.batch_id=#{batchId}
+		   and t1.handling_status=0
+		   and ((t1.invoice_enabled=1 and t1.invoice_status=0) or t1.shipping_no is null)
+	</select>
+	
+	<!-- 更新发货单的确认信息 -->
+	<update id="updateDeliveryConfirmInfo" parameterType="map">
+  		update wms_delivery
+  		   set handling_status = '1',
+  		       handled_time = #{handledTime},
+  		       handled_by = #{handledBy}
+  		 where batch_id = #{batchId}
+  		   and handling_status='0'
+  	</update>
+  	
+  	<!-- 根据发货批次ID删除所有发货单 -->
+	<update id="deleteDeliveryByBatchId" parameterType="long">
+  		delete from wms_delivery
+  		 where batch_id=#{batchId}
+  		   and handling_status=0
+  		   and (select count(1)
+		          from wms_delivery t1
+		         where t1.batch_id = #{batchId}
+		           and (t1.invoice_status = 1 or t1.shipping_no is not null)) = 0
+		   and (select count(1)
+		          from wms_delivery_goods t1, wms_delivery t2
+		         where t1.delivery_id = t2.id
+		           and t2.batch_id = #{batchId}
+		           and t1.indiv_finished = 1) = 0
+  	</update>
+  	
+	<!-- ==============发货商品========================== -->
+	
+	<!-- 根据销售订单ID批量添加发货商品清单 -->
+	<insert id="addDeliveryGoodsListByOrderIds" parameterType="list">
+ 		insert into wms_delivery_goods
+ 		   (id,delivery_id,sku_id,sku_code,sku_name,quantity,measure_unit,indiv_enabled,indiv_finished,wares_status,enabled)
+		select WMS_SEQ_COMMON.NEXTVAL,t2.id,t1.sku_id,t1.sku_code,t1.sku_name,t1.quantity,t1.measure_unit,indiv_enabled,'0','1','0'
+		from wms_sales_order_goods t1,wms_delivery t2 
+	   where t1.order_id=t2.original_id 
+	     and t1.order_id in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{item}
+	 	</foreach>
+	</insert>
+	
+	<!-- 分页获取发货商品列表. -->
+	<select id="queryDeliveryGoodsByPage" parameterType="map" resultType="DeliveryGoods">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  	    select <include refid="sql_deliveryGoodsColumns"/>
+		  	  		  from wms_delivery_goods t1
+					  join wms_delivery t2
+						on t1.delivery_id=t2.id
+				  <include refid="sql_deliveryGoodsWhere"/>
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 获取发货商品总数-->
+	<select id="queryDeliveryGoodsTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_delivery_goods t1
+	      join wms_delivery t2
+	        on t1.delivery_id=t2.id
+	  <include refid="sql_deliveryGoodsWhere"/>
+	</select>
+	
+	<!-- 根据销售订单号批量获取商品清单. -->
+	<select id="queryDeliveryGoodsList" parameterType="map" resultType="DeliveryGoods">
+		select <include refid="sql_deliveryGoodsColumns"/>
+ 	      from wms_delivery_goods t1
+		  join wms_delivery t2
+			on t1.delivery_id=t2.id
+		  <where>
+		  	<if test="deliveryId!=null">t1.delivery_id=#{deliveryId}</if>
+		  	<if test="originalId!=null">t2.original_id=#{originalId}</if>
+		  </where>
+	</select>
+	
+	<!-- 获取指定的发货商品. -->
+	<select id="queryDeliveryGoods" parameterType="long" resultType="DeliveryGoods">
+		select <include refid="sql_deliveryGoodsColumns"/>
+ 	  	  from wms_delivery_goods t1
+		  join wms_delivery t2
+			on t1.delivery_id=t2.id
+		 where t1.id=#{id} 
+	</select>
+	
+	<!-- 获取出库批次内未完成商品编码录入的商品数目 -->
+	<select id="queryIndivUnfinishedGoodsTotal" parameterType="map" resultType="int">
+		select count(1) as total
+		  from wms_delivery_goods t1
+		  join wms_delivery t2
+		    on t1.delivery_id=t2.id 
+		 where t2.batch_id=#{batchId} 
+		   and t2.handling_status=0
+		   and t1.indiv_enabled=1 
+		   and t1.indiv_finished=0
+	</select>
+	
+	<!-- 分页查询符合条件的发货商品汇总列表. -->
+	<select id="queryDeliverySummaryByPage" parameterType="map" resultType="DeliverySummary">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_goodsSummaryColumns"/>
+					  from wms_delivery_goods t1
+					  join wms_delivery t2
+					    on t1.delivery_id = t2.id
+				  <include refid="sql_goodsSummaryWhere"/>
+				    group by t2.warehouse_id, t1.sku_id
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的发货商品汇总列表总数-->
+	<select id="queryDeliverySummaryTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		 from (select 1
+				 from wms_delivery_goods t1
+				 join wms_delivery t2
+				   on t1.delivery_id = t2.id
+			 <include refid="sql_goodsSummaryWhere"/>
+	    group by t2.warehouse_code, t1.sku_id
+	    )
+	</select>
+	
+	<!-- 查询符合条件的发货商品汇总列表. -->
+	<select id="queryDeliverySummaryList" parameterType="map" resultType="DeliverySummary">
+		select <include refid="sql_goodsSummaryColumns"/>
+		  from wms_delivery_goods t1
+		  join wms_delivery t2
+		    on t1.delivery_id = t2.id
+	  <where>
+   		 <if test="batchId != null">and t2.batch_id=#{batchId}</if>	   		
+      </where>
+	    group by t2.warehouse_id, t1.sku_id
+	</select>
+	
+	<!-- 更新发货商品 -->
+	<update id="updateDeliveryGoods" parameterType="DeliveryGoods">
+  		update wms_delivery_goods
+		<set>
+			<if test="indivFinished!=null">indiv_finished=#{indivFinished},</if>
+		</set>
+		where id=#{id}
+  	</update>
+  	
+  	<!-- 根据发货单ID更新发货商品 -->
+	<update id="updateDeliveryGoodsByDeliveryId" parameterType="map">
+  		update wms_delivery_goods
+		<set>
+			<if test="goods.indivFinished!=null">indiv_finished=#{goods.indivFinished},</if>
+		</set>
+		where delivery_id=#{deliveryId}
+  	</update>
+  	
+  	<!-- 批量更新发货商品的确认状态 -->
+	<update id="updateDeliveryGoodsConfirmStatus" parameterType="map">
+  		update wms_delivery_goods t1
+		   set t1.enabled = 1
+		 where exists (select 1
+		          from wms_delivery
+		         where id = t1.delivery_id
+		           and batch_id = #{batchId})
+	</update>
+	
+	<!-- 删除批次内的所有发货商品 -->
+	<delete id="deleteDeliveryGoodsByBatchId" parameterType="long">
+		delete from wms_delivery_goods t1
+	 	 where t1.enabled=0
+	 	   and exists (select 1
+		          from wms_delivery
+		         where id = t1.delivery_id
+		           and batch_id = #{batchId}
+		           and handling_status=0)
+	</delete>		
+	
+	<!-- 添加发货单 -->
+	<insert id="addDelivery" parameterType="map">
+ 		insert into wms_delivery
+ 		  (id, batch_code, warehouse_id ,original_code, original_id, shipping_no)
+ 		values(WMS_SEQ_COMMON.nextval, #{batchCode, jdbcType=VARCHAR}, #{warehouseId}, #{originalCode, jdbcType=VARCHAR}, #{originalId, jdbcType=VARCHAR}, #{shippingNo, jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 根据批次code删除 -->
+	<update id="deleteDeliveryByBatchCode" parameterType="string">
+  		delete from wms_delivery
+  		 where batch_code=#{batchCode}
+  	</update>
+  	
+  	<delete id="deleteDeliveryByOrderCode" parameterType="string">
+  		delete from wms_delivery where original_code=#{orderCode}
+  	</delete>
+</mapper>

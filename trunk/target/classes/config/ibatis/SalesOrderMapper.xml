@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SalesOrderDao">
+
+	<resultMap id="salesOrderVoMap" type="com.gionee.wms.vo.SalesOrderVo">
+		<id column="order_id" property="id" />
+		<result column="order_code" property="orderCode" />
+		<result column="order_user" property="orderUser" />
+		<result column="order_time" property="orderTime" />
+		<result column="payment_type" property="paymentType" />
+		<result column="payment_code" property="paymentCode" />
+		<result column="payment_name" property="paymentName" />
+		<result column="payment_time" property="paymentTime" />
+		<result column="pay_no" property="payNo" />
+		<result column="paid_amount" property="paidAmount" />
+		<result column="consignee" property="consignee" />
+		<result column="province" property="province" />
+		<result column="city" property="city" />
+		<result column="district" property="district" />
+		<result column="address" property="address" />
+		<result column="zipcode" property="zipcode" />
+		<result column="tel" property="tel" />
+		<result column="mobile" property="mobile" />
+		<result column="best_time" property="bestTime" />
+		<result column="postscript" property="postscript" />
+		<result column="invoice_enabled" property="invoiceEnabled" />
+		<result column="invoice_type" property="invoiceType" />
+		<result column="invoice_title" property="invoiceTitle" />
+		<result column="invoice_amount" property="invoiceAmount" />
+		<result column="invoice_content" property="invoiceContent" />
+		<result column="invoice_status" property="invoiceStatus" />
+		<result column="shipping_id" property="shippingId" />
+		<result column="shipping_name" property="shippingName" />
+		<result column="shipping_no" property="shippingNo" />
+		<result column="shipping_time" property="shippingTime" />
+		<result column="goods_amount" property="goodsAmount" />
+		<result column="order_amount" property="orderAmount" />
+		<result column="payable_amount" property="payableAmount" />
+		<result column="join_time" property="joinTime" />
+		<result column="order_status" property="orderStatus" />
+		<result column="order_notify_status" property="orderNotifyStatus" />
+		<result column="order_notify_time" property="orderNotifyTime" />
+		<result column="order_notify_count" property="orderNotifyCount" />
+		<result column="stockout_code" property="stockoutCode" />
+		<result column="remark" property="remark" />
+		<result column="delivery_code" property="deliveryCode" />
+		<result column="batch_id" property="batchId" />
+		<result column="batch_code" property="batchCode" />
+		<result column="order_source" property="orderSource" />
+		<result column="weight" property="weight" />
+		<result column="rownum" property="rownum" />
+		<!--goodsList属性是个集合类型 -->
+		<collection property="goodsList" ofType="SalesOrderGoods">
+			<id column="goods_id" property="id" />
+			<result column="sku_id" property="skuId" />
+			<result column="sku_code" property="skuCode" />
+			<result column="sku_name" property="skuName" />
+			<result column="unit_price" property="unitPrice" />
+			<result column="quantity" property="quantity" />
+			<result column="subtotal_price" property="subtotalPrice" />
+			<result column="measure_unit" property="measureUnit" />
+			<result column="indiv_enabled" property="indivEnabled" />
+		</collection>
+	</resultMap>
+
+	<sql id="sql_orderColumns">
+		t1.id as id,
+		t1.order_code as orderCode,
+		t1.order_user as orderUser,
+		t1.order_time as orderTime,
+		t1.payment_type as paymentType,
+		t1.payment_code as paymentCode,
+		t1.payment_name as paymentName,
+		t1.payment_time as paymentTime,
+		t1.pay_no as payNo,
+		t1.paid_amount as paidAmount,
+		t1.consignee as consignee,
+		t1.province as province,
+		t1.city as city,
+		t1.district as district,
+		t1.address as address,
+		t1.zipcode as zipcode,
+		t1.tel as tel,
+		t1.mobile as mobile,
+		t1.best_time as bestTime,
+		t1.postscript as postscript,
+		t1.invoice_enabled as invoiceEnabled,
+		t1.invoice_type as invoiceType,
+		t1.invoice_title as invoiceTitle,
+		t1.invoice_amount as invoiceAmount,
+		t1.invoice_content as invoiceContent,
+		t1.invoice_status as invoiceStatus,
+		t1.shipping_id as shippingId,
+		t1.shipping_name as shippingName,
+		t1.shipping_no as shippingNo,
+		t1.shipping_time as shippingTime,
+		t1.goods_amount as goodsAmount,
+		t1.order_amount as orderAmount,
+		t1.payable_amount as payableAmount,
+		t1.join_time as joinTime,
+		t1.order_status as orderStatus,
+		t1.order_notify_status as orderNotifyStatus,
+		t1.order_notify_time as orderNotifyTime,
+		t1.order_notify_count as orderNotifyCount,
+		t1.stockout_code as stockoutCode,
+		t1.remark as remark,
+		t1.delivery_code as deliveryCode,
+		t1.batch_id as batchId,
+		t1.batch_code as batchCode,
+		t1.order_source as orderSource,
+		t1.remark_backing as remarkBacking,
+		t1.remark_backed as remarkBacked,
+		t1.weight as weight,
+        t1.ORDER_PUSH_STATUS as orderPushStatus,
+        t1.order_push_time as orderPushTime
+	</sql>
+
+	<sql id="sql_orderWhere">
+		<where>
+            <if test="skuCodeInclude != null">and t2.sku_code in<foreach item="item" index="index" collection="skuCodeInclude" open="(" separator="," close=")">#{item}</foreach></if>
+            <if test="skuCode != null">and t2.sku_code = #{skuCode}</if>
+            <if test="eliminate_sf_order != null and eliminate_sf_order == true">and (t1.order_push_status is null or t1.order_push_status &lt; 1)</if>
+            <if test="order_push_status != null">and t1.order_push_status &gt;= #{order_push_status}</if>
+			<if test="id != null and id != ''">t1.id=#{id}</if>
+			<if test="orderCode != null and orderCode != ''">and t1.order_code=#{orderCode}</if>
+			<if test="stockOutCode != null and stockOutCode != ''">and t1.stockout_code=#{stockOutCode}</if>
+			<if test="orderUser != null and orderUser != ''">and t1.order_user=#{orderUser}</if>
+			<if test="consignee != null and consignee != ''">and t1.consignee=#{consignee}</if>
+			<if test="orderStatus != null">and t1.order_status=#{orderStatus}</if>
+			<if test="orderTimeBegin != null">and
+				t1.order_time<![CDATA[>=]]>#{orderTimeBegin}
+			</if>
+			<if test="orderTimeEnd != null">and
+				t1.order_time<![CDATA[<=]]>#{orderTimeEnd}
+			</if>
+			<if test="paymentTimeBegin != null">and
+				t1.payment_time<![CDATA[>=]]>#{paymentTimeBegin}
+			</if>
+			<if test="paymentTimeEnd != null">and
+				t1.payment_time<![CDATA[<=]]>#{paymentTimeEnd}
+			</if>
+			<if test="shippingTimeBegin != null">and
+				t1.shipping_time<![CDATA[>=]]>#{shippingTimeBegin}
+			</if>
+			<if test="shippingTimeEnd != null">and
+				t1.shipping_time<![CDATA[<=]]>#{shippingTimeEnd}
+			</if>
+            <if test="paymentType != null">
+              and t1.PAYMENT_TYPE = #{paymentType}
+            </if>
+            <if test="paymentName != null">
+              and t1.PAYMENT_NAME = #{paymentName}
+            </if>
+			<if test="shippingId != null and shippingId!= ''">and t1.shipping_id=#{shippingId}</if>
+			<if test="batchId != null and batchId != ''">and t1.batch_id=#{batchId}</if>
+			<if test="batchCode != null and batchCode != ''">and t1.batch_code=#{batchCode}</if>
+			<if test="mobile != null and mobile != ''">and t1.mobile=#{mobile}</if>
+			<if test="shippingNo!=null and shippingNo!=''">and t1.shipping_no=#{shippingNo}</if>
+			<if test="orderSource != null and orderSource != ''">and t1.order_source=#{orderSource}</if>
+			<if test="invoiceEnabled != null and invoiceEnabled != ''">and t1.invoice_enabled=#{invoiceEnabled}</if>
+            <if test="orderPushStatus != null">AND (T1.ORDER_PUSH_STATUS = #{orderPushStatus} <if test="include_orderPushStatus_null != null">OR T1.ORDER_PUSH_STATUS IS NULL</if>)</if>
+		</where>
+	</sql>
+
+	<sql id="sql_orderWhere_goods">
+		<where>
+			t1.id=t2.order_id
+            <if test="eliminate_sf_order != null and eliminate_sf_order == true">and (t1.order_push_status is null or t1.order_push_status &lt; 1)</if>
+            <if test="order_push_status != null">and t1.order_push_status &gt;= #{order_push_status}</if>
+            <if test="orderPushTimeBegin != null">and t1.order_push_time &gt;= #{orderPushTimeBegin}</if>
+            <if test="orderPushTimeEnd != null">and t1.order_push_time &lt;= #{orderPushTimeEnd}</if>
+			<if test="id != null and id != ''">and t1.id=#{id}</if>
+			<if test="orderCode != null and orderCode != ''">and t1.order_code=#{orderCode}</if>
+			<if test="stockOutCode != null and stockOutCode != ''">and t1.stockout_code=#{stockOutCode}</if>
+			<if test="orderUser != null and orderUser != ''">and t1.order_user=#{orderUser}</if>
+			<if test="consignee != null and consignee != ''">and t1.consignee=#{consignee}</if>
+			<if test="orderStatus != null">and t1.order_status=#{orderStatus}</if>
+			<if test="orderTimeBegin != null">and
+				t1.order_time<![CDATA[>=]]>#{orderTimeBegin}
+			</if>
+			<if test="orderTimeEnd != null">and
+				t1.order_time<![CDATA[<=]]>#{orderTimeEnd}
+			</if>
+			<if test="paymentTimeBegin != null">and
+				t1.payment_time<![CDATA[>=]]>#{paymentTimeBegin}
+			</if>
+			<if test="paymentTimeEnd != null">and
+				t1.payment_time<![CDATA[<=]]>#{paymentTimeEnd}
+			</if>
+			<if test="shippingTimeBegin != null">and
+				t1.shipping_time<![CDATA[>=]]>#{shippingTimeBegin}
+			</if>
+			<if test="shippingTimeEnd != null">and
+				t1.shipping_time<![CDATA[<=]]>#{shippingTimeEnd}
+			</if>
+            <if test="paymentType != null">
+              and t1.PAYMENT_TYPE = #{paymentType}
+            </if>
+            <if test="paymentName != null">
+              and t1.PAYMENT_NAME = #{paymentName}
+            </if>
+			<if test="shippingId != null and shippingId!= ''">and t1.shipping_id=#{shippingId}</if>
+			<if test="batchId != null and batchId != ''">and t1.batch_id=#{batchId}</if>
+			<if test="batchCode != null and batchCode != ''">and t1.batch_code=#{batchCode}</if>
+			<if test="mobile != null and mobile != ''">and t1.mobile=#{mobile}</if>
+			<if test="shippingNo!=null and shippingNo!=''">and t1.shipping_no=#{shippingNo}</if>
+			<if test="orderSource != null and orderSource != ''">and t1.order_source=#{orderSource}</if>
+			<if test="invoiceEnabled != null and invoiceEnabled != ''">and t1.invoice_enabled=#{invoiceEnabled}</if>
+			<if test="skuCode != null and skuCode != ''">and t2.sku_code = #{skuCode}</if>
+			<if test="skuCodeInclude != null">
+				and t2.sku_code in
+				<foreach item="item" index="index" collection="skuCodeInclude"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="skuCodeNotInclude != null">
+				and t2.sku_code not in
+				<foreach item="item" index="index" collection="skuCodeNotInclude"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+
+	<sql id="sql_deliveryOrderColumns">
+		select t1.id as id,
+		t1.order_code as orderCode,
+		t1.order_user as orderUser,
+		t1.order_time as orderTime,
+		t1.payment_type as paymentType,
+		t1.payment_code as paymentCode,
+		t1.payment_name as paymentName,
+		t1.pay_no as payNo,
+		t1.paid_amount as paidAmount,
+		t1.consignee as consignee,
+		t1.province as province,
+		t1.city as city,
+		t1.district as district,
+		t1.address as address,
+		t1.zipcode as zipcode,
+		t1.tel as tel,
+		t1.mobile as mobile,
+		t1.best_time as bestTime,
+		t1.postscript as postscript,
+		t1.invoice_enabled as invoiceEnabled,
+		t1.invoice_type as invoiceType,
+		t1.invoice_title as invoiceTitle,
+		t1.invoice_amount as invoiceAmount,
+		t1.invoice_content as invoiceContent,
+		t1.invoice_status as invoiceStatus,
+		t1.shipping_id as shippingId,
+		t1.shipping_name as shippingName,
+		t1.shipping_no as shippingNo,
+		t1.goods_amount as goodsAmount,
+		t1.order_amount as orderAmount,
+		t1.payable_amount as payableAmount,
+		t1.join_time as joinTime,
+		t1.order_status as orderStatus,
+		t1.order_notify_status as orderNotifyStatus,
+		t1.order_notify_time as orderNotifyTime,
+		t1.order_notify_count as orderNotifyCount,
+		t1.stockout_code as stockoutCode,
+		t1.remark as remark,
+		t1.delivery_code as deliveryCode,
+		t1.order_source as orderSource
+	</sql>
+
+	<sql id="sql_goodsColumns">
+		t1.id as id,
+		t1.sku_id as skuId,
+		t1.sku_code as skuCode,
+		t1.sku_name as skuName,
+		t1.quantity as quantity,
+		t1.measure_unit as measureUnit,
+		t1.unit_price as unitPrice,
+		t1.subtotal_price as subtotalPrice,
+		t1.indiv_enabled as indivEnabled,
+		t1.prepared_num as preparedNum,
+		t1.goods_sid as goodsSid,
+		t1.order_id as "order.id",
+		t2.order_code as "order.orderCode"
+	</sql>
+
+	<!-- 分页获取销售订单列表. -->
+	<select id="queryOrderByPage" parameterType="map" resultType="SalesOrder">
+		SELECT *
+		FROM(
+		SELECT A.*, rownum r
+		FROM(
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where exists (
+		<if test="skuCodeEqual == null">
+			select * from wms_sales_order_goods t2
+			<include refid="sql_orderWhere_goods" />
+		</if>
+		<if test="skuCodeEqual != null">
+			SELECT t2.order_id FROM WMS_SALES_ORDER_GOODS t2
+			<include refid="sql_orderWhere_goods" />
+			GROUP BY t2.order_id HAVING COUNT(t2.order_id)=1
+			INTERSECT
+			SELECT t2.order_id FROM WMS_SALES_ORDER_GOODS t2
+			<include refid="sql_orderWhere_goods" />
+			AND t2.sku_code=#{skuCodeEqual}
+		</if>
+		)
+		order by t1.payment_time
+		<if test="sort == null">desc</if>
+		<if test="sort != null">${sort}</if>
+        ,t1.order_code desc
+		) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+
+	<!-- 获取销售订单列表总数 -->
+	<select id="queryOrderTotal" parameterType="map" resultType="int">
+		select count(1) as total
+		from wms_sales_order t1
+		where exists (
+		<if test="skuCodeEqual == null">
+			select * from wms_sales_order_goods t2
+			<include refid="sql_orderWhere_goods" />
+		</if>
+		<if test="skuCodeEqual != null">
+			SELECT t2.order_id FROM WMS_SALES_ORDER_GOODS t2
+			<include refid="sql_orderWhere_goods" />
+			GROUP BY t2.order_id HAVING COUNT(t2.order_id)=1
+			INTERSECT
+			SELECT
+			t2.order_id FROM WMS_SALES_ORDER_GOODS t2
+			<include refid="sql_orderWhere_goods" />
+			AND t2.sku_code=#{skuCodeEqual}
+		</if>
+		)
+	</select>
+
+	<!-- 根据订单ID批量获取销售订单. -->
+	<select id="queryOrderListByIds" parameterType="list"
+		resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where t1.id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by t1.order_time desc
+	</select>
+
+	<!-- 根据订单号批量获取销售订单. -->
+	<select id="queryOrderListByOrderCodes" parameterType="list"
+		resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where t1.order_code in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 获取指定发货批次内的所有销售订单及发货信息. -->
+	<select id="queryOrderListByDelyBatchId" parameterType="long"
+		resultType="SalesOrder">
+		<include refid="sql_deliveryOrderColumns" />
+		from wms_sales_order t1
+		where t1.batch_id = #{batchId}
+	</select>
+
+	<!-- 获取待通知(已发货或已退货)的销售订单列表. -->
+	<select id="queryOrderListNeedToBeNotified" parameterType="map"
+		resultType="SalesOrder">
+		<include refid="sql_deliveryOrderColumns" />
+		from wms_sales_order t1
+		where t1.order_status in(1,2,4,5,7,10) and t1.order_notify_status != 1 and
+		t1.order_source in(1,3) AND T1.ORDER_TIME > (sysdate - 3)
+	</select>
+
+	<!-- 根据订单ID获取销售订单. -->
+	<select id="queryOrder" parameterType="long" resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where t1.id=#{id}
+	</select>
+
+	<!-- 根据订单号获取销售订单. -->
+	<select id="queryOrderByOrderCode" parameterType="string"
+		resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where t1.order_code=#{orderCode}
+	</select>
+
+	<!-- 添加销售订单 -->
+	<insert id="addOrder" parameterType="SalesOrder">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select
+			WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+		insert into wms_sales_order
+		(id, order_code, order_source,
+		order_user,order_time,payment_type,payment_code,payment_name,pay_no,paid_amount,consignee,province,city,district,address,zipcode,tel,mobile,best_time,shipping_id,shipping_name,invoice_enabled,invoice_type,invoice_amount,invoice_title,invoice_content,invoice_status,postscript,goods_amount,order_amount,payable_amount,join_time,order_notify_status,order_notify_count,order_status,delivery_code,remark,handled_by,handled_time,payment_time
+        ,ORDER_PUSH_STATUS)
+		select
+		#{id},
+		#{orderCode, jdbcType=VARCHAR},
+		#{orderSource, jdbcType=VARCHAR},
+		#{orderUser, jdbcType=VARCHAR},
+		#{orderTime, jdbcType=TIME},
+		#{paymentType, jdbcType=VARCHAR},
+		#{paymentCode, jdbcType=VARCHAR},
+		#{paymentName, jdbcType=VARCHAR},
+		#{payNo, jdbcType=VARCHAR},
+		#{paidAmount, jdbcType=DECIMAL},
+		#{consignee, jdbcType=VARCHAR},
+		#{province, jdbcType=VARCHAR},
+		#{city, jdbcType=VARCHAR},
+		#{district, jdbcType=VARCHAR},
+		#{address, jdbcType=VARCHAR},
+		#{zipcode, jdbcType=VARCHAR},
+		#{tel, jdbcType=VARCHAR},
+		#{mobile, jdbcType=VARCHAR},
+		#{bestTime, jdbcType=VARCHAR},
+		#{shippingId, jdbcType=VARCHAR},
+		#{shippingName, jdbcType=VARCHAR},
+		#{invoiceEnabled, jdbcType=VARCHAR},
+		#{invoiceType, jdbcType=VARCHAR},
+		#{invoiceAmount, jdbcType=VARCHAR},
+		#{invoiceTitle, jdbcType=VARCHAR},
+		#{invoiceContent, jdbcType=VARCHAR},
+		#{invoiceStatus, jdbcType=INTEGER},
+		#{postscript, jdbcType=VARCHAR},
+		#{goodsAmount, jdbcType=DECIMAL},
+		#{orderAmount, jdbcType=DECIMAL},
+		#{payableAmount, jdbcType=DECIMAL},
+		#{joinTime, jdbcType=TIME},
+		#{orderNotifyStatus, jdbcType=VARCHAR},
+		#{orderNotifyCount, jdbcType=VARCHAR},
+		#{orderStatus, jdbcType=VARCHAR},
+		#{deliveryCode, jdbcType=VARCHAR},
+		#{remark, jdbcType=VARCHAR},
+		#{handledBy, jdbcType=VARCHAR},
+		#{handledTime, jdbcType=TIME},
+		#{paymentTime, jdbcType=TIME},
+        <if test="orderPushStatus != null">
+        #{orderPushStatus, jdbcType=VARCHAR}
+        </if>
+        <if test="orderPushStatus == null">
+        0
+        </if>
+        from dual
+		where not exists (select 1 from wms_sales_order where
+		order_code=#{orderCode})
+	</insert>
+
+	<!-- 更新订单信息 -->
+	<update id="updateSalesOrder" parameterType="SalesOrder">
+		update wms_sales_order
+		<set>
+			order_source=#{orderSource, jdbcType=VARCHAR},
+			order_user=#{orderUser, jdbcType=VARCHAR},
+			order_time=#{orderTime, jdbcType=TIME},
+			payment_type=#{paymentType, jdbcType=VARCHAR},
+			payment_code=#{paymentCode, jdbcType=VARCHAR},
+			payment_name=#{paymentName, jdbcType=VARCHAR},
+			pay_no=#{payNo, jdbcType=VARCHAR},
+			paid_amount=#{paidAmount, jdbcType=DECIMAL},
+			consignee=#{consignee, jdbcType=VARCHAR},
+			province=#{province, jdbcType=VARCHAR},
+			city=#{city, jdbcType=VARCHAR},
+			district=#{district, jdbcType=VARCHAR},
+			address=#{address, jdbcType=VARCHAR},
+			zipcode=#{zipcode, jdbcType=VARCHAR},
+			tel=#{tel, jdbcType=VARCHAR},
+			mobile=#{mobile, jdbcType=VARCHAR},
+			best_time=#{bestTime, jdbcType=VARCHAR},
+			shipping_id=#{shippingId, jdbcType=VARCHAR},
+			shipping_name=#{shippingName, jdbcType=VARCHAR},
+			invoice_enabled=#{invoiceEnabled, jdbcType=VARCHAR},
+			invoice_type=#{invoiceType, jdbcType=VARCHAR},
+			invoice_amount=#{invoiceAmount, jdbcType=VARCHAR},
+			invoice_title=#{invoiceTitle, jdbcType=VARCHAR},
+			invoice_content=#{invoiceContent, jdbcType=VARCHAR},
+			invoice_status=#{invoiceStatus, jdbcType=INTEGER},
+			postscript=#{postscript, jdbcType=VARCHAR},
+			goods_amount=#{goodsAmount, jdbcType=DECIMAL},
+			order_amount=#{orderAmount, jdbcType=DECIMAL},
+			payable_amount=#{payableAmount, jdbcType=DECIMAL},
+			shipping_no=#{shippingNo, jdbcType=VARCHAR},
+			remark=#{remark, jdbcType=VARCHAR},
+			handled_by=#{handledBy, jdbcType=VARCHAR},
+			handled_time=#{handledTime, jdbcType=TIME},
+			payment_time=#{paymentTime, jdbcType=TIME}
+		</set>
+		where order_code=#{orderCode}
+	</update>
+
+
+	<!-- 更新订单信息 -->
+	<update id="updateOrder" parameterType="map">
+		update wms_sales_order
+		<set>
+			<if test="shippingNo!=null">shipping_no=#{shippingNo},</if>
+			<if test="orderStatus!=null">order_status=#{orderStatus},</if>
+			<if test="weight!=null">weight=#{weight},</if>
+			<if test="orderNotifyStatus!=null">order_notify_status=#{orderNotifyStatus},</if>
+			<if test="remarkBacked!=null">remark_backed=#{remarkBacked, jdbcType=VARCHAR},</if>
+            <if test="orderPushStatus != null">ORDER_PUSH_STATUS = #{orderPushStatus},</if>
+            <if test="orderPushTime != null">ORDER_PUSH_TIME = #{orderPushTime}</if>
+		</set>
+		where order_code=#{orderCode}
+		<if test="orderStatusWhere!=null"> and order_status=#{orderStatusWhere}</if>
+	</update>
+
+	<!-- 批量更新销售订单 -->
+	<update id="batchUpdateOrder" parameterType="list">
+		update wms_sales_order
+		<set>
+			<trim prefix="order_status =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.orderStatus!=null">
+						when (order_code=#{i.orderCode}) then #{i.orderStatus}
+					</if>
+				</foreach>
+			</trim>
+			<trim prefix="order_notify_status =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.orderNotifyStatus!=null">
+						when (order_code=#{i.orderCode}) then #{i.orderNotifyStatus}
+					</if>
+				</foreach>
+			</trim>
+			<trim prefix="order_notify_time =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.orderNotifyTime!=null">
+						when (order_code=#{i.orderCode}) then #{i.orderNotifyTime}
+					</if>
+				</foreach>
+			</trim>
+			<trim prefix="order_notify_count =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.orderNotifyCount!=null">
+						when (order_code=#{i.orderCode}) then #{i.orderNotifyCount}
+					</if>
+				</foreach>
+			</trim>
+		</set>
+		where id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item.id}
+		</foreach>
+	</update>
+
+	<!-- 更新出库批次内销售订单的已发货信息 -->
+	<update id="updateShippedInfoByDelyBatchId" parameterType="map">
+		update wms_sales_order t1
+		set t1.shipping_time = #{shippingTime, jdbcType=TIME},
+		t1.order_status = 1,
+		t1.shipping_no =
+		(select shipping_no
+		from wms_delivery
+		where original_id = t1.id
+		and batch_id = #{batchId}),
+		t1.invoice_status =
+		(select invoice_status
+		from wms_delivery
+		where original_id = t1.id
+		and batch_id = #{batchId})
+		where t1.order_status = 3
+		and exists (select 1
+		from wms_delivery
+		where original_id = t1.id
+		and batch_id = #{batchId})
+	</update>
+
+	<!-- 更新出库批次内的订单配送状态为未发货状态 -->
+	<update id="updateToUnshippedByDelyBatchId" parameterType="long">
+		update wms_sales_order t1
+		set order_status = 0
+		where t1.order_status = 3
+		and exists (select 1
+		from wms_delivery
+		where original_id = t1.id
+		and batch_id = #{delyBatchId})
+	</update>
+
+	<!-- ================销售订单商品========================= -->
+	<!-- 根据销售订单ID获取商品清单. -->
+	<select id="queryGoodsListByOrderId" parameterType="long"
+		resultType="SalesOrderGoods">
+		select
+		<include refid="sql_goodsColumns" />
+		from wms_sales_order_goods t1
+		join wms_sales_order t2
+		on t1.order_id=t2.id
+		where t1.order_id=#{orderId}
+	</select>
+
+	<!-- 根据销售订单号批量获取商品清单. -->
+	<select id="queryGoodsListByOrderCodes" parameterType="list"
+		resultType="SalesOrderGoods">
+		select
+		<include refid="sql_goodsColumns" />
+		from wms_sales_order_goods t1
+		join wms_sales_order t2
+		on t1.order_id=t2.id
+		where t2.order_code in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 根据销售订单ID获取商品清单. -->
+	<select id="queryGoodsListForPrepare" parameterType="long"
+		resultType="SalesOrderGoods">
+		select t1.id as id,
+		t1.sku_id as skuId,
+		t1.sku_code as skuCode,
+		t1.sku_name as skuName,
+		t1.quantity as quantity,
+		t1.measure_unit as measureUnit,
+		t1.unit_price as unitPrice,
+		t1.subtotal_price as subtotalPrice,
+		t1.indiv_enabled as indivEnabled,
+		case t1.indiv_enabled when '1' then
+		(select count(1) from wms_indiv where sku_id=t1.sku_id and
+		prepare_id=t1.order_id and stock_status=3)
+		else t1.prepared_num end as preparedNum,
+		t1.order_id as "order.id"
+		from wms_sales_order_goods t1
+		where t1.order_id=#{orderId}
+	</select>
+
+	<!-- 获取指定发货批次内的销售订单(包含商品清单)列表. -->
+	<select id="queryOrderListByOrderIds" parameterType="list"
+		resultMap="salesOrderVoMap">
+		select t1.id goods_id,
+		t1.sku_id,
+		t1.sku_code,
+		t1.sku_name,
+		t1.unit_price,
+		t1.quantity,
+		t1.subtotal_price,
+		t1.measure_unit,
+		t1.indiv_enabled,
+		t2.pay_no,
+		t2.id order_id,
+		t2.order_code,
+		t2.order_user,
+		t2.order_time,
+		t2.payment_type,
+		t2.consignee,
+		t2.province,
+		t2.city,
+		t2.district,
+		t2.address,
+		t2.batch_id,
+		t2.batch_code,
+		t2.delivery_code,
+		t2.shipping_id,
+		t2.shipping_no,
+		t2.order_notify_count,
+		t2.order_source,
+		t2.invoice_amount,
+		t2.order_amount,
+		t2.goods_amount,
+		t2.invoice_title,
+		t2.order_status,
+		t2.invoice_enabled,
+		t2.invoice_status,
+		rownum
+		from wms_sales_order_goods t1
+		join
+		wms_sales_order t2 on t1.order_id = t2.id
+		where t2.id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 获取销售订单(包含商品清单)列表. -->
+	<!-- 获取销售订单(包含商品清单)列表. -->
+	<select id="queryOrderListAndGoods" parameterType="map"
+		resultMap="salesOrderVoMap">
+		select t2.id goods_id,
+		t2.sku_id,
+		t2.sku_code,
+		t2.sku_name,
+		t2.unit_price,
+		t2.quantity,
+		t2.subtotal_price,
+		t2.measure_unit,
+		t2.indiv_enabled,
+		t1.id order_id,
+		t1.order_code,
+		t1.order_user,
+		t1.order_time,
+		t1.payment_type,
+		t1.consignee,
+		t1.province,
+		t1.city,
+		t1.district,
+		t1.address,
+		t1.batch_code,
+		t1.delivery_code,
+		t1.shipping_id,
+		t1.shipping_no,
+		t1.order_notify_count,
+		t1.order_source,
+		t1.payment_code,
+		t1.payment_name,
+		t1.pay_no,
+		t1.order_amount,
+        t1.payable_amount,
+		t1.shipping_name,
+		t1.shipping_time,
+		t1.tel,
+		t1.mobile,
+		t1.weight,
+		t1.remark,
+		t1.order_status,
+		t1.invoice_enabled,
+		t1.invoice_type,
+		t1.invoice_title,
+		t1.invoice_amount,
+		t1.invoice_content,
+		t1.invoice_status,
+		t1.payment_time,
+		(select l.op_time
+		from wms_sales_order_log l where l.order_status=5 and
+		l.order_id=t2.id and rownum=1) as op_time,
+		rownum
+		from wms_sales_order_goods t2
+		join
+		wms_sales_order t1 on t2.order_id = t1.id
+		<include refid="sql_orderWhere" />
+		order by t1.order_time desc
+	</select>
+
+	<!-- 根据订单ID获取购物商品清单(商品数量以实际发货数量为准). <select id="queryShoppingListByOrderId" 
+		parameterType="long" resultType="SalesOrderGoods"> select t1.id as id, t1.order_code 
+		as orderCode, t1.sku_id as skuId, t1.sku_code as skuCode, t1.sku_name as 
+		skuName, t1.unit_price as unitPrice, t2.quantity as quantity, t1.measure_unit 
+		as measureUnit, t1.subtotal_price*t2.quantity as subtotalPrice from wms_sales_order_goods 
+		t1 join wms_delivery t3 on t1.order_id=t3.original_id join wms_delivery_goods 
+		t2 on t2.delivery_id=t3.id and t1.sku_id=t2.sku_id where t1.order_id=#{orderId} 
+		</select> -->
+
+	<!-- 批量添加订单商品 -->
+	<insert id="batchAddOrderGoods" parameterType="list">
+		insert into wms_sales_order_goods(id, order_id,sku_id,
+		sku_code,sku_name,unit_price,quantity,measure_unit,subtotal_price,indiv_enabled,goods_sid)
+		select WMS_SEQ_COMMON.nextval,A.* from
+		(
+		<foreach item="item" collection="list" index="index"
+			separator="UNION ALL">
+			select
+			#{item.order.id},#{item.skuId},#{item.skuCode},#{item.skuName},#{item.unitPrice},#{item.quantity},#{item.measureUnit},#{item.subtotalPrice},#{item.indivEnabled},#{item.goodsSid, jdbcType=VARCHAR}
+			from dual
+		</foreach>
+		)A
+	</insert>
+
+	<!-- 批量更新发货单的配送信息 -->
+	<update id="updateShippingInfoList" parameterType="list">
+		update wms_sales_order
+		<set>
+			<trim prefix="shipping_id =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.shippingId!=null">
+						when (id=#{i.id}) then #{i.shippingId}
+					</if>
+				</foreach>
+			</trim>
+			<trim prefix="shipping_name =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.shippingId!=null">
+						when (id=#{i.id}) then (select shipping_name from wms_shipping where
+						id=#{i.shippingId})
+					</if>
+				</foreach>
+			</trim>
+			<trim prefix="shipping_no =case" suffix="end,">
+				<foreach collection="list" item="i" index="index">
+					<if test="i.shippingNo!=null">
+						when (id=#{i.id}) then #{i.shippingNo}
+					</if>
+				</foreach>
+			</trim>
+		</set>
+		where id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item.id}
+		</foreach>
+	</update>
+
+	<!-- 批量更新发票状态 -->
+	<update id="setInvoiceStatus" parameterType="list">
+		update wms_sales_order
+		set invoice_status = '1'
+		where id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 根据销售订单IDS获取商品汇总 -->
+	<select id="queryGoodsListByOrderIds" parameterType="string"
+		resultType="SalesOrderGoods">
+		select t1.sku_id as skuId,
+		max(t1.sku_code) as skuCode,
+		max(t1.sku_name) as skuName,
+		max(t1.measure_unit) as measureUnit,
+		sum(t1.quantity) as quantity
+		from wms_sales_order_goods t1
+		join
+		wms_sales_order t2
+		on t1.order_id = t2.id
+		WHERE t2.id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		group by t1.sku_id
+	</select>
+
+	<!-- 根据订单ID批量更新销售订单 -->
+	<update id="updateOrderByIds" parameterType="map">
+		update wms_sales_order
+		set batch_id=#{batchId}, batch_code=#{batchCode}
+		where id in
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 查询符合条件的订单列表. -->
+	<select id="queryOrderList" parameterType="map" resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		<include refid="sql_orderWhere" />
+		order by t1.order_time desc
+	</select>
+
+	<!-- 搜索订单列表 -->
+	<select id="queryOrderListSearch" parameterType="map"
+		resultMap="salesOrderVoMap">
+		select distinct * from(
+		select c.*
+		from (select b.*
+		from (
+		select t2.id
+		goods_id,
+		t2.sku_id,
+		t2.sku_code,
+		t2.sku_name,
+		t2.unit_price,
+		t2.quantity,
+		t2.subtotal_price,
+		t2.measure_unit,
+		t1.id order_id,
+		t1.order_code,
+		t1.order_user,
+		t1.order_time,
+		t1.payment_type,
+		t1.consignee,
+		t1.province,
+		t1.city,
+		t1.district,
+		t1.address,
+		t1.batch_code,
+		t1.delivery_code,
+		t1.shipping_id,
+		t1.shipping_no,
+		t1.order_notify_count,
+		t1.order_source,
+		t1.payment_name,
+		t1.order_amount,
+		t1.shipping_name,
+		t1.tel,
+		t1.mobile,
+		t1.weight,
+		t1.remark,
+		t1.order_status,
+		t1.invoice_enabled,
+		t1.invoice_type,
+		t1.invoice_title,
+		t1.invoice_amount,
+		t1.invoice_content,
+		t1.invoice_status,
+		rownum
+		from wms_sales_order_goods
+		t2
+		join wms_sales_order t1 on t2.order_id = t1.id
+		<include refid="sql_orderWhere" />
+		) b
+		where 1=1
+		<if test="orderCode != null and orderCode != ''">
+			and b.order_code = #{orderCode}
+		</if>
+		<if test="mobile != null and mobile != ''">
+			and b.mobile = #{mobile}
+		</if>
+		<if test="orderTimeBegin != null and orderTimeBegin != ''">
+			and b.order_time <![CDATA[>=]]>
+			#{orderTimeBegin}
+		</if>
+		<if test="orderTimeEnd != null and orderTimeEnd != ''">
+			and b.order_time <![CDATA[<=]]>
+			#{orderTimeEnd}
+		</if>
+		) c
+		left join wms_indiv d
+		on (c.order_id = d.order_id)
+		where 1=1
+		<if test="indivCode != null and indivCode != ''">
+			and d.indiv_code = #{indivCode}
+		</if>
+		<if test="skuName != null and skuName != ''">
+			and d.sku_name like '%${skuName}%'
+		</if>
+		)
+		order by order_time desc
+	</select>
+
+	<!-- 根据发货单号获取销售订单. -->
+	<select id="queryOrderByDeliveryCode" parameterType="string"
+		resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		where t1.delivery_code=#{deliveryCode}
+		  <![CDATA[and rownum<2]]>
+	</select>
+
+	<!-- 根据条件获取销售订单. -->
+	<select id="queryOrderByShippingNo" parameterType="map"
+		resultType="SalesOrder">
+		select
+		<include refid="sql_orderColumns" />
+		from wms_sales_order t1
+		<include refid="sql_orderWhere" />
+	</select>
+
+	<!-- 根据ids更新订单为出货 -->
+	<update id="updateOrderOutByIds" parameterType="map">
+		update wms_sales_order
+		<set>
+			order_status=1,
+			<if test="shippingTime!=null">shipping_time=#{shippingTime, jdbcType=TIME},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="handledTime!=null">handled_time=#{handledTime}</if>
+		</set>
+		where id in
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		and order_status=9
+	</update>
+
+	<!-- 更新订单状态为已打单 -->
+	<update id="updateSalesOrderFilterStatus" parameterType="list">
+		update wms_sales_order t1 set t1.order_status=2,
+		t1.order_notify_status=0
+		where t1.id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		and t1.order_status=0
+	</update>
+
+	<!-- 更新订单信息 -->
+	<update id="updateASalesOrder" parameterType="SalesOrder">
+		update wms_sales_order
+		<set>
+			<if test="consignee!=null">consignee=#{consignee},</if>
+			<if test="province!=null">province=#{province},</if>
+			<if test="city!=null">city=#{city},</if>
+			<if test="district!=null">district=#{district},</if>
+			<if test="address!=null">address=#{address},</if>
+			<if test="tel!=null">tel=#{tel},</if>
+			<if test="mobile!=null">mobile=#{mobile},</if>
+			<if test="invoiceTitle!=null">invoice_title=#{invoiceTitle},</if>
+			<if test="shippingId!=null">shipping_id=#{shippingId},</if>
+			<if test="shippingName!=null">shipping_name=#{shippingName},</if>
+			<if test="shippingNo!=null">shipping_no=#{shippingNo},</if>
+			<if test="orderStatus!=null">order_status=#{orderStatus},</if>
+			<if test="weight!=null">weight=#{weight},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="handledTime!=null">handled_time=#{handledTime, jdbcType=TIME},</if>
+			<if test="remark!=null">remark=#{remark}</if>
+			<!--if test="orderNotifyStatus!=null">order_notify_status=#{orderNotifyStatus}</if -->
+		</set>
+		where id=#{id}
+	</update>
+
+	<!-- 删除订单商品清单 -->
+	<delete id="deleteOrderGoodsList" parameterType="long">
+		delete from WMS_SALES_ORDER_GOODS where order_id=#{orderId}
+	</delete>
+
+	<!-- 更新订单状态 -->
+	<update id="updateSalesOrderStatus" parameterType="map">
+		update wms_sales_order t1 set t1.order_status=#{orderStatus}
+		where
+		t1.order_code=#{orderCode}
+		<if test="orderStatusWhere!=null"> and t1.order_status=#{orderStatusWhere}</if>
+	</update>
+
+	<!--查询最后一次同步入库时间，并增加一秒返回 -->
+	<select id="queryLastSyncOrderTime" parameterType="map"
+		resultType="string">
+		select to_char(t2.order_time+1/24/60/60,'yyyy-MM-dd hh24:mi:ss')
+		from (select t.order_time, t.order_source
+		from wms_sales_order t
+		where t.order_source = #{orderSource}
+		order by t.order_time desc) t2
+		where rownum = 1
+	</select>
+
+	<!--按照物流公司和订单状态分组查询 -->
+	<select id="queryOrderStatusAndCountGroupByShippingName"
+		parameterType="map" resultType="com.gionee.wms.vo.OrderStatusVo">
+		select t2.shipping_id shippingId,
+		t3.shipping_name shippingName,
+		t2.order_status orderStatus,
+		t2.orderCount
+		from (select t.shipping_id, t.order_status, count(1) orderCount
+		from wms_sales_order t
+		where t.shipping_name is not null
+		<if test="orderTimeBegin != null">
+			and t.order_time<![CDATA[>=]]>#{orderTimeBegin}
+		</if>
+		<if test="orderTimeEnd != null">
+			and t.order_time<![CDATA[<=]]>#{orderTimeEnd}
+		</if>
+		<if test="orderSource != null and orderSource != ''">
+			and t.order_source=#{orderSource}
+		</if>
+		<if test="skuCode != null and skuCode != ''">
+			and exists (
+			select * from wms_sales_order_goods goods where t.id=goods.order_id and
+			goods.sku_code=#{skuCode}
+			)
+		</if>
+		group by t.shipping_id, t.order_status
+		order by t.shipping_id, t.order_status
+
+		) t2
+		join wms_shipping t3 on t2.shipping_id = t3.id
+	</select>
+
+	<update id="updateOrderGoods" parameterType="map">
+		update wms_sales_order_goods
+		<set>
+			<if test="preparedNum!=null">prepared_num=#{preparedNum}</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<select id="queryGoodsById" parameterType="long" resultType="SalesOrderGoods">
+		select
+		<include refid="sql_goodsColumns" />
+		from wms_sales_order_goods t1
+		join wms_sales_order t2
+		on t1.order_id=t2.id
+		where t1.id=#{id}
+	</select>
+  
+</mapper>

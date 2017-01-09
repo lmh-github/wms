@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.DeliveryBatchDao" >
+	
+	<sql id="sql_batchSelect">
+		       t1.id                as id,
+		       t1.batch_code        as batchCode,
+		       t1.warehouse_id      as warehouseId,
+		       t1.warehouse_name    as warehouseName,
+		       t1.prepared_by       as preparedBy,
+		       t1.prepared_time     as preparedTime,
+		       t1.handling_status   as handlingStatus,
+		       t1.handled_time      as handledTime,
+		       t1.handled_by        as handledBy,
+		       t1.remark            as remark
+	</sql>
+	
+	<sql id="sql_batchWhere">
+		<where>
+	   		<if test="batchCode != null">and t1.batch_code=#{batchCode}</if>
+	   		<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
+	   		<if test="handlingStatus != null">and t1.handling_status=#{handlingStatus}</if>
+	   		<if test="preparedTimeBegin != null">and t1.prepared_time<![CDATA[>=]]>#{preparedTimeBegin}</if>
+	   		<if test="preparedTimeEnd != null">and t1.prepared_time<![CDATA[<=]]>#{preparedTimeEnd}</if>
+	   </where>
+	</sql>
+	
+	<!-- 分页查询符合条件的发货批次列表. -->
+	<select id="queryDeliveryBatchByPage" parameterType="map" resultType="DeliveryBatch">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_batchSelect"/>
+					  from wms_delivery_batch t1
+				  <include refid="sql_batchWhere"/>
+				  order by t1.prepared_time desc 
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的发货批次总数-->
+	<select id="queryDeliveryBatchTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_delivery_batch t1
+	  <include refid="sql_batchWhere"/>
+	</select>
+	
+	<!-- 根据ID获取发货批次 -->
+	<select id="queryDeliveryBatch" parameterType="long" resultType="DeliveryBatch">
+		select <include refid="sql_batchSelect"/>
+		  from wms_delivery_batch t1
+		 where t1.id=#{id}
+	</select>
+	
+	<!-- 添加发货批次 -->
+	<insert id="addDeliveryBatch" parameterType="DeliveryBatch">
+ 		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_delivery_batch
+		  (id,batch_code, warehouse_id,warehouse_name,prepared_time,prepared_by,handling_status,remark)
+		values
+		  (#{id},
+		   #{batchCode},
+		   #{warehouseId},
+		   #{warehouseName},
+		   #{preparedTime},
+		   #{preparedBy},
+		   #{handlingStatus},
+		   #{remark, jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 更新发货批次 -->
+	<update id="updateDeliveryBatch" parameterType="DeliveryBatch">
+  		update wms_delivery_batch
+  		<set>
+			<if test="handlingStatus!=null">handling_status=#{handlingStatus},</if>
+			<if test="handledTime!=null">handled_time=#{handledTime},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="remark!=null">remark=#{remark, jdbcType=VARCHAR}</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+  	
+  	<!-- 删除发货批次 -->
+	<delete id="deleteDeliveryBatch" parameterType="long">
+		delete from wms_delivery_batch 
+	 	 where id = #{id}
+	 	   and handling_status=0
+	</delete>
+	
+ </mapper>

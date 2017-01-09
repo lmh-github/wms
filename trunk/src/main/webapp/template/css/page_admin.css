@@ -1,0 +1,132 @@
+﻿@charset "utf-8";
+/* ==========================================================
+	* Name: 头部样式
+	* Date: 2010/10/10
+	* User: Colin
+============================================================*/
+HTML {
+	SCROLLBAR-FACE-COLOR: #ededed;
+	SCROLLBAR-HIGHLIGHT-COLOR: #cbcbcb;
+	SCROLLBAR-SHADOW-COLOR: #ccc;
+	SCROLLBAR-3DLIGHT-COLOR: #fff;
+	SCROLLBAR-ARROW-COLOR: #000;
+	SCROLLBAR-TRACK-COLOR: #fff;
+	SCROLLBAR-DARKSHADOW-COLOR: #fff
+}
+
+a {
+	color: #369;
+}
+
+a:hover {
+	color: #f60;
+}
+
+a:focus /*取消链接的虚线*/ {
+	outline: none;
+	-moz-outline: none;
+}
+
+body {
+	font-size: 12px;
+}
+
+img {
+	vertical-align: top;
+}
+/*头部*/
+.adminTop {
+	width: 100%;
+	min-width: 960px;
+	height: 58px;
+	background: url(../img/admin_topbg.gif) center top repeat-x;
+	overflow: hidden;
+	display: inline-table;
+}
+
+.adminTop_left {
+	float: left;
+	height: 58px;
+}
+
+.adminTop_right {
+	width: 512px;
+	float: right;
+	height: 58px;
+	background: url(../img/admin_topbg_right.gif) right top no-repeat;
+}
+
+.adminTop_right .rTop {
+	text-align: center;
+}
+
+.adminTop_right .rTop span {
+	display: inline;
+	padding: 0 5px;
+	line-height: 25px;
+	color: #fff;
+}
+
+.adminTop_right .rTop span strong {
+	color: #ff0;
+}
+
+.adminTop_right .rTop a {
+	color: #fff;
+}
+
+.adminTop_right .rTop a:hover {
+	color: #ff0;
+}
+/*左部菜单*/
+.adminLeft_top {
+	width: 180px;
+	height: 40px;
+}
+
+.adminLeft {
+	width: 100%;
+}
+
+.adminLeft h3.trigger {
+	padding-left: 22px;
+	font-size: 12px;
+	height: 30px;
+	line-height: 30px;
+	font-weight: bold;
+	color: #636363;
+	cursor: pointer;
+	background: url(../img/admin_left_titlebg.gif) left -30px repeat-x;
+}
+
+.adminLeft h3.sole {
+	color: #fff;
+	cursor: pointer;
+	background: url(../img/admin_left_titlebg.gif) left top repeat-x;
+}
+
+.adminLeft .list {
+	padding-bottom: 3px;
+	padding-top: 3px;
+}
+
+.adminLeft .list li {
+	border-bottom: 1px solid #dadada;
+}
+
+.adminLeft .list li a {
+	height: 16px;
+	display: block;
+	line-height: 16px;
+	padding: 5px 5px 5px 35px;
+	text-decoration: none;
+	color: #636363;
+	background: url(../img/admin_left_listbg.gif) 18px 5px no-repeat;
+}
+
+.adminLeft .list li a:hover {
+	background: url(../img/admin_left_listbg.gif) 18px -31px no-repeat
+		#f3f3f3;
+	color: #3c76ba;
+	font-weight: bold;
+}

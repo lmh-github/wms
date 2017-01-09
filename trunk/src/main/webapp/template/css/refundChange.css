@@ -1,0 +1,13 @@
+.subtration {
+	background: url("../img/_.gif") repeat scroll 0 0 transparent;
+	display: block;
+	height: 11px;
+	width: 11px;
+}
+
+.addition {
+	background: url("../img/+.gif") repeat scroll 0 0 transparent;
+	display: block;
+	height: 11px;
+	width: 11px;
+}

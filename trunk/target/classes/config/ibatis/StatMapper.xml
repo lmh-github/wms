@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.StatDao">
+    
+    <resultMap id="SalesStatVoMap" type="com.gionee.wms.vo.SalesStatVo">
+		<id column="order_id" property="id" />
+		<result column="order_code" property="orderCode" />
+		<result column="order_user" property="orderUser" />
+		<result column="order_time" property="orderTime" />
+		<result column="payment_type" property="paymentType" />
+		<result column="payment_code" property="paymentCode" />
+		<result column="payment_name" property="paymentName" />
+		<result column="payment_time" property="paymentTime" />
+		<result column="pay_no" property="payNo" />
+		<result column="paid_amount" property="paidAmount" />
+		<result column="consignee" property="consignee" />
+		<result column="province" property="province" />
+		<result column="city" property="city" />
+		<result column="district" property="district" />
+		<result column="address" property="address" />
+		<result column="zipcode" property="zipcode" />
+		<result column="tel" property="tel" />
+		<result column="mobile" property="mobile" />
+		<result column="best_time" property="bestTime" />
+		<result column="postscript" property="postscript" />
+		<result column="invoice_enabled" property="invoiceEnabled" />
+		<result column="invoice_type" property="invoiceType" />
+		<result column="invoice_title" property="invoiceTitle" />
+		<result column="invoice_amount" property="invoiceAmount" />
+		<result column="invoice_content" property="invoiceContent" />
+		<result column="invoice_status" property="invoiceStatus" />
+		<result column="shipping_id" property="shippingId" />
+		<result column="shipping_name" property="shippingName" />
+		<result column="shipping_no" property="shippingNo" />
+		<result column="shipping_time" property="shippingTime" />
+		<result column="goods_amount" property="goodsAmount" />
+		<result column="order_amount" property="orderAmount" />
+		<result column="payable_amount" property="payableAmount" />
+		<result column="join_time" property="joinTime" />
+		<result column="order_status" property="orderStatus" />
+		<result column="order_notify_status" property="orderNotifyStatus" />
+		<result column="order_notify_time" property="orderNotifyTime" />
+		<result column="order_notify_count" property="orderNotifyCount" />
+		<result column="stockout_code" property="stockoutCode" />
+		<result column="remark" property="remark" />
+		<result column="delivery_code" property="deliveryCode" />
+		<result column="batch_id" property="batchId" />
+		<result column="batch_code" property="batchCode" />
+		<result column="order_source" property="orderSource" />
+		<result column="weight" property="weight" />
+		<result column="sku_id" property="skuId" />
+		<result column="sku_code" property="skuCode" />
+		<result column="sku_name" property="skuName" />
+		<result column="unit_price" property="unitPrice" />
+		<result column="quantity" property="quantity" />
+		<result column="subtotal_price" property="subtotalPrice" />
+		<result column="measure_unit" property="measureUnit" />
+		<result column="indiv_enabled" property="indivEnabled" />
+		<result column="material_code" property="materialCode" />
+		<result column="biz_type" property="bizType" />
+	</resultMap>
+    
+    <resultMap id="TransferStatVoMap" type="com.gionee.wms.vo.TransferStatVo">
+		<id column="transfer_id" property="transferId" />
+		<result  column="warehouse_id" property="warehouseId"/>
+		<result  column="transfer_to" property="transferTo"/>
+		<result  column="remark" property="remark"/>
+		<result  column="status" property="status"/>
+		<result  column="logistic_no" property="logisticNo"/>
+		<result  column="create_time" property="createTime"/>
+		<result  column="handled_by" property="handledBy"/>
+		<result  column="gonsignee" property="gonsignee"/>
+		<result  column="contact" property="contact"/>
+		<result  column="po" property="po"/>
+		<result  column="logistic_name" property="logisticName"/>
+		<result  column="transfer_sale" property="transferSale"/>
+		<result  column="transfer_send" property="transferSend"/>
+		<result  column="transfer_invoice" property="transferInvoice"/>
+		<result  column="order_amount" property="orderAmount"/>
+		<result  column="shipping_time" property="shippingTime"/>
+		<result  column="trans_type" property="transType" />
+		<result column="sku_id" property="skuId" />
+		<result column="sku_code" property="skuCode" />
+		<result column="sku_name" property="skuName" />
+		<result column="quantity" property="quantity" />
+		<result column="measure_unit" property="measureUnit" />
+		<result column="unit_price" property="unitPrice" />
+		<result column="indiv_enabled" property="indivEnabled" />
+		<result column="material_code" property="materialCode" />
+		<result column="biz_type" property="bizType" />
+		<result column="transfer_sale" property="transferSale" />
+		<result column="transfer_send" property="transferSend" />
+		<result column="transfer_invoice" property="transferInvoice"/>
+	</resultMap>
+	    
+	<sql id="sql_saleStatColumns">
+		t1.id as id,
+		t1.order_type as orderType,
+		t1.sale_org as saleOrg,
+		t1.fx_channel as fxChannel,
+		t1.saler as saler,
+		t1.sender as sender,
+		t1.invoicer as invoicer,
+		t1.shipper as shipper,
+		t1.order_reason as orderReason,
+		t1.material_code as materialCode,
+		t1.order_num as orderNum,
+		t1.purchase_code as purchaseCode,
+		t1.purchase_date as purchaseDate,
+		t1.shipping_type as shippingType,
+		t1.invoice_type as invoiceType,
+		t1.use as use,
+		t1.po_code as poCode,
+		t1.po_pro_code as poProCode,
+		t1.unit_price as unitPrice,
+		t1.posting_date as postingDate,
+		t1.factory as factory,
+		t1.warehouse as warehouse,
+		t1.stat_date as statDate,
+		t1.create_time as createTime
+	</sql>
+	
+	<sql id="sql_saleStatWhere">
+		<where>
+	   		<if test="statTimeBegin != null">t1.stat_date<![CDATA[>=]]>#{statTimeBegin}</if>
+	   		<if test="statTimeEnd != null">and t1.stat_date<![CDATA[<=]]>#{statTimeEnd}</if>
+	   </where>
+	</sql>
+	
+	<!-- 批量增加销售统计记录 -->
+	<insert id="addSaleStats" parameterType="list">
+		insert into wms_sale_stat
+		(id,order_type,sale_org,fx_channel,saler,sender,
+		invoicer,shipper,order_reason,material_code,order_num,
+		purchase_code,purchase_date,shipping_type,invoice_type,
+		use,po_code,po_pro_code,unit_price,posting_date,factory,
+		warehouse,stat_date,create_time)
+		select
+		WMS_SEQ_COMMON.nextval,A.* from
+		(
+		<foreach item="item" collection="list" index="index"
+			separator="UNION ALL">
+			select #{item.orderType, jdbcType=VARCHAR},#{item.saleOrg,
+			jdbcType=VARCHAR},
+			#{item.fxChannel, jdbcType=VARCHAR}, #{item.saler,
+			jdbcType=VARCHAR},
+			#{item.sender, jdbcType=VARCHAR}, #{item.invoicer, jdbcType=VARCHAR},
+			#{item.shipper, jdbcType=VARCHAR}, #{item.orderReason,
+			jdbcType=VARCHAR},
+			#{item.materialCode, jdbcType=VARCHAR}, #{item.orderNum, jdbcType=NUMERIC},
+			#{item.purchaseCode, jdbcType=VARCHAR}, #{item.purchaseDate,
+			jdbcType=DATE},
+			#{item.shippingType, jdbcType=VARCHAR}, #{item.invoiceType, jdbcType=VARCHAR},
+			#{item.use, jdbcType=VARCHAR}, #{item.poCode, jdbcType=VARCHAR},
+			#{item.poProCode, jdbcType=VARCHAR}, #{item.unitPrice,
+			jdbcType=NUMERIC},
+			#{item.postingDate, jdbcType=DATE}, #{item.factory, jdbcType=VARCHAR},
+			#{item.warehouse, jdbcType=VARCHAR}, #{item.statDate, jdbcType=TIME},
+			sysdate from dual
+		</foreach>
+		)A
+	</insert>
+	
+	<!-- 获取销售统计列表 -->
+	<select id="querySaleStatList" parameterType="map" resultType="SaleStat">
+		select <include refid="sql_saleStatColumns"/>
+		from wms_sale_stat t1
+		<include refid="sql_saleStatWhere"/>
+	</select>
+		
+	<insert id="addSalesOutStat" parameterType="SalesOutStat">
+	    insert into wms_sales_out_stat(
+	    	sku_id,
+		  	sku_code,
+		  	sku_name,
+		  	quantity,
+		  	unit_price,
+		  	indiv_enabled,
+		  	order_id,
+		  	order_code,
+		  	pay_no,
+		  	shipping_time,
+		  	partner_code,
+		  	partner_name,
+		  	out_type,
+		  	invoice_status,
+		  	invoice_amount,
+		  	order_amount)
+		values(
+		 	#{skuId, jdbcType=VARCHAR},
+		 	#{skuCode, jdbcType=VARCHAR},
+		 	#{skuName, jdbcType=VARCHAR},
+		 	#{quantity, jdbcType=VARCHAR},
+		 	#{unitPrice, jdbcType=DECIMAL},
+		 	#{indivEnabled, jdbcType=VARCHAR},
+		 	#{orderId, jdbcType=VARCHAR},
+		 	#{orderCode, jdbcType=VARCHAR},
+		 	#{payNo, jdbcType=VARCHAR},
+		 	#{shippingTime, jdbcType=TIME},
+		 	#{partnerCode, jdbcType=VARCHAR},
+		 	#{partnerName, jdbcType=VARCHAR},
+		 	#{outType, jdbcType=VARCHAR},
+		 	#{invoiceStatus, jdbcType=VARCHAR},
+		 	#{invoiceAmount, jdbcType=DECIMAL},
+		 	#{orderAmount, jdbcType=DECIMAL}
+		 )
+	</insert>
+	
+	<select id="querySalesOutStatByPage" parameterType="map" resultType="SalesOutStat">
+	    SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+			    select 
+			       t.sku_id        as skuId,
+			       t.sku_code      as skuCode,
+			       t.sku_name      as skuName,
+			       t.quantity      as quantity,
+			       t.unit_price    as unitPrice,
+			       t.indiv_enabled as indivEnabled,
+			       t.order_id      as orderId,
+			       t.order_code    as orderCode,
+			       t.pay_no        as payNo,
+			       t.shipping_time as shippingTime,
+			       t.partner_code  as partnerCode,
+			       t.partner_name  as partnerName,
+			       t.out_type      as outType,
+			       t1.material_code as materialCode,
+			       t.invoice_status as invoiceStatus,
+			       t.invoice_amount as invoiceAmount,
+			       t.order_amount as orderAmount
+			  from WMS_sales_out_stat t
+			  join wms_sku t1 on t.sku_id=t1.id
+			<where>
+			    <if test="shippingTimeBegin != null">t.shipping_time<![CDATA[>=]]>#{shippingTimeBegin}</if>
+	   			<if test="shippingTimeEnd != null">and t.shipping_time<![CDATA[<=]]>#{shippingTimeEnd}</if>
+			</where>
+			) A
+		<![CDATA[
+			  WHERE rownum<=#{page.endRow}
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<select id="querySalesOutStatTotal" parameterType="map" resultType="int">
+	     select count(1) from WMS_sales_out_stat t
+			  join wms_sku t1 on t.sku_id=t1.id
+		<where>
+		    <if test="shippingTimeBegin != null">t.shipping_time<![CDATA[>=]]>#{shippingTimeBegin}</if>
+   			<if test="shippingTimeEnd != null">and t.shipping_time<![CDATA[<]]>#{shippingTimeEnd}</if>
+		</where>
+	</select>
+	
+	<!-- 销售出库统计，根据订单业务日志salesOrderLog来统计发生的出库退货记录 201: 出库 102: 退货 103: 拒收 -->
+	<select id="queryOrderListAndGoodsForStat" parameterType="map"	resultMap="SalesStatVoMap">
+		select k.id as sku_id,k.sku_code,k.sku_name, o.*,
+		(select unit_price from wms_sales_order_goods where order_id=o.id and sku_id=k.id) as unit_price,
+		(select indiv_enabled from wms_sales_order_goods where order_id=o.id and sku_id=k.id) as indiv_enabled,
+		t.quantity, t.biz_type, t.stock_type,
+		k.material_code
+		from WMS_STOCK_CHANGE t
+		join wms_stock s on t.stock_id=s.id
+		join wms_sku k on s.sku_id=k.id
+		join wms_sales_order o on t.original_code=o.order_code
+		<where>
+			t.biz_type in ('201', '102', '103') and t.stock_type in (1, 2, 3)
+			<if test="opTimeBegin!=null">and	t.create_time<![CDATA[>=]]>#{opTimeBegin}</if>
+			<if test="opTimeEnd!=null">and t.create_time<![CDATA[<]]>#{opTimeEnd}</if>
+		</where>
+		order by t.create_time
+	</select>
+	
+	<!-- 获取调拨(包含商品清单)列表. -->
+	<select id="getTransferAndGoodsForStat" parameterType="map" resultMap="TransferStatVoMap">
+		select t.stock_type,
+		t.biz_type,
+		t.create_time,
+		t.original_code,
+		t.quantity,
+		t1.*,
+		(select unit_price from wms_transfer_goods where transfer_id = t.original_code	and sku_id = k.id) as unit_price,
+		(select indiv_enabled	from wms_transfer_goods	where transfer_id = t.original_code	and sku_id = k.id) as indiv_enabled,
+		k.material_code
+		from wms_stock_change t
+		left join wms_transfer t1 on t.original_code = t1.id
+		join wms_stock s on t.stock_id = s.id
+		left join wms_sku k on s.sku_id = k.id
+		where t.stock_type in (1, 2, 3)
+		and t.biz_type in (202, 104)
+		<if test="shippingTimeBegin != null">and	t.create_time<![CDATA[>=]]>#{shippingTimeBegin}</if>
+		<if test="shippingTimeEnd != null">and t.create_time<![CDATA[<=]]>#{shippingTimeEnd}</if>
+		order by t1.shipping_time desc
+	</select>
+</mapper>

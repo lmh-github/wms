@@ -1,0 +1,15 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Header>
+	<tns:RequestSOAPHeader xmlns:tns="http://wms.gionee.com">
+		<tns:spId xmlns="http://wms.gionee.com">wdw</tns:spId>
+		<tns:spPassword xmlns="http://wms.gionee.com">wdwsb</tns:spPassword>
+	</tns:RequestSOAPHeader>
+</soap:Header>
+
+<soap:Body>
+	<ns2:login xmlns:ns2="http://wms.gionee.com">
+		<loginName></loginName>
+		<password></password>
+	</ns2:login>
+</soap:Body>
+</soap:Envelope>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.CommonDao" >
+	
+	<!-- 查询指定sequence的Currval -->
+	<select id="querySequenceCurrval" parameterType="String"  resultType="long">
+		select ${value}.currval from dual
+	</select>
+	
+	<!-- 查询指定sequence的Nextval -->
+	<select id="querySequenceNextval" parameterType="String"  resultType="long">
+		select ${value}.nextval from dual
+	</select>
+  		
+	
+ </mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<purchase-ws>
+		<ip>
+			<allowed></allowed>
+			<denied></denied>
+		</ip>
+	</purchase-ws>
+</module>
+

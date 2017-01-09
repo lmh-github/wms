@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<constant name="struts.i18n.encoding" value="utf-8"></constant>
+	<!-- 允许ognl表达式访问static方法 -->
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" />
+	<!-- 改用spring托管实例 -->
+	<constant name="struts.objectFactory" value="spring"></constant>
+	<!-- 排除被struts2拦截的URL 
+	<constant name="struts.action.excludePatter" value="/fckeditor/editor/filemanager/connectors"></constant>-->
+	
+	<!-- 定义全局默认sruts package -->
+	<package name="wms-default" extends="struts-default">
+		<!-- 添加paramsPrepareParamsStack拦截器,解决ModelDriven与Preparable接口取参的问题 -->
+		<interceptors>
+			<interceptor name="sessionOut" class="com.gionee.wms.web.filter.SessionIterceptor" />
+			<!-- 记录日志的拦截器 -->
+			<interceptor name="logInterceptor" class="com.gionee.wms.web.filter.LogInterceptor" />
+			<interceptor-stack name="wmsStack">
+				<interceptor-ref name="store">
+					<param name="operationMode">AUTOMATIC</param>
+				</interceptor-ref>
+				<interceptor-ref name="paramsPrepareParamsStack" />
+				<interceptor-ref name="sessionOut" />
+				<interceptor-ref name="logInterceptor" />
+			</interceptor-stack>
+		</interceptors>
+	
+		<default-interceptor-ref name="wmsStack" />
+		
+		<!-- 定义全局异常 -->
+		<global-results>
+		 	<result name="noauth">/WEB-INF/view/error/403.jsp</result>
+		 	<result name="error">/WEB-INF/view/error/500.jsp</result>
+		</global-results>
+		
+		<global-exception-mappings>
+			<exception-mapping result="error" exception="java.lang.Exception"></exception-mapping>
+		</global-exception-mappings>
+		
+	</package>
+	
+	
+	<include file="config/struts/struts-basis.xml"></include>
+	<include file="config/struts/struts-account.xml"></include>
+	<include file="config/struts/struts-wares.xml"></include>
+	<include file="config/struts/struts-stock.xml"></include>
+	<include file="config/struts/struts-report.xml"></include>
+	<include file="config/struts/struts-api.xml"></include>
+	<include file="config/struts/struts-log.xml"></include>
+	
+</struts>

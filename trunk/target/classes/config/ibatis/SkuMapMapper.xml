@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SkuMapDao" >
+  <resultMap id="BaseResultMap" type="com.gionee.wms.entity.SkuMap" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="SKU_CODE" property="skuCode" jdbcType="VARCHAR" />
+    <result column="OUTER_SKU_CODE" property="outerSkuCode" jdbcType="VARCHAR" />
+    <result column="OUTER_CODE" property="outerCode" jdbcType="VARCHAR" />
+    <result column="SKU_PUSH_STATUS" property="skuPushStatus" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, SKU_CODE, OUTER_SKU_CODE, OUTER_CODE,SKU_PUSH_STATUS
+  </sql>
+  
+  <select id="findSkuMapsByOuterSkuCodes" resultMap="BaseResultMap" parameterType="list" >
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_SKU_MAP
+    where 
+    OUTER_CODE='vip'
+    and OUTER_SKU_CODE in
+     <foreach item="outerSkuCode" index="index" collection="list" open="(" separator="," close=")">
+	 	 	#{outerSkuCode}
+	 </foreach>
+  </select>
+  
+  <select id="findSkuMapById" resultMap="BaseResultMap" parameterType="int" >
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_SKU_MAP
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectSkuMapsCount" resultType="int" parameterType="map" >
+    select 
+    count(1)
+    from WMS_SKU_MAP
+    <where>
+      <if test="skuCode != null" >
+         SKU_CODE = #{skuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerSkuCode != null" >
+        and OUTER_SKU_CODE = #{outerSkuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerCode != null" >
+        and OUTER_CODE = #{outerCode,jdbcType=VARCHAR}
+      </if>
+      <if test="skuPushStatus != null" >
+        and SKU_PUSH_STATUS = #{skuPushStatus,jdbcType=INTEGER}
+      </if>
+    </where>       
+  </select>
+  
+  <select id="selectPagedSkuMaps" resultMap="BaseResultMap" parameterType="map" >
+  	SELECT *
+	  FROM( 
+		SELECT t2.*, rownum r
+		FROM(
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_SKU_MAP
+    <where>
+      <if test="skuCode != null" >
+         SKU_CODE = #{skuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerSkuCode != null" >
+        and OUTER_SKU_CODE = #{outerSkuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerCode != null" >
+        and OUTER_CODE = #{outerCode,jdbcType=VARCHAR}
+      </if>
+    </where> 
+          order by id desc      
+      )t2
+    	<![CDATA[
+			  WHERE rownum<=#{endRow} 
+			)
+	    WHERE r >= #{startRow}
+	]]>
+  </select>
+  
+  <select id="selectSkuMaps" resultMap="BaseResultMap" parameterType="com.gionee.wms.entity.SkuMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_SKU_MAP
+    <where>
+      <if test="skuCode != null" >
+         SKU_CODE = #{skuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerSkuCode != null" >
+        and OUTER_SKU_CODE = #{outerSkuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="outerCode != null" >
+        and OUTER_CODE = #{outerCode,jdbcType=VARCHAR}
+      </if>
+      <if test="skuPushStatus != null" >
+        and SKU_PUSH_STATUS = #{skuPushStatus,jdbcType=INTEGER}
+      </if>
+    </where> 
+  </select>
+  
+  <select id="getSkuMapBySkuCode" resultType="com.gionee.wms.entity.SkuMap">
+    SELECT
+    ID, SKU_CODE as skuCode, OUTER_SKU_CODE as outerSkuCode, OUTER_CODE as outerCode
+    FROM WMS_SKU_MAP
+    WHERE SKU_CODE = #{skuCode} AND OUTER_CODE = #{outerCode}
+  </select>
+  
+  <select id="getSkuMapByOutSkuCode" resultType="com.gionee.wms.entity.SkuMap">
+    SELECT
+    ID, SKU_CODE as skuCode, OUTER_SKU_CODE as outerSkuCode, OUTER_CODE as outerCode
+    FROM WMS_SKU_MAP
+    WHERE OUTER_SKU_CODE = #{outerSkuCode} AND OUTER_CODE = #{outerCode}
+  </select>
+  
+  <select id="querySkuMapBySkuCodes" resultType="com.gionee.wms.entity.SkuMap">
+    SELECT
+    ID, SKU_CODE as skuCode, OUTER_SKU_CODE as outerSkuCode, OUTER_CODE as outerCode
+    FROM WMS_SKU_MAP
+    WHERE SKU_CODE IN  <foreach item="item" index="index" collection="skuCodes" open="(" separator="," close=")">#{item}</foreach>
+    AND OUTER_CODE = #{outerCode}
+  </select>
+  
+  <delete id="deleteSkuMapById" parameterType="int" >
+    delete from WMS_SKU_MAP
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.gionee.wms.entity.SkuMap" >
+  	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  WMS_SEQ_COMMON.nextval from dual
+	</selectKey>
+    insert into WMS_SKU_MAP (ID, SKU_CODE, OUTER_SKU_CODE, 
+      OUTER_CODE)
+    values (#{id,jdbcType=INTEGER}, #{skuCode,jdbcType=VARCHAR}, #{outerSkuCode,jdbcType=VARCHAR}, 
+      #{outerCode,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertSkuMap" parameterType="com.gionee.wms.entity.SkuMap" >
+  	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  WMS_SEQ_COMMON.nextval from dual
+	</selectKey>
+    insert into WMS_SKU_MAP
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        ID,
+      <if test="skuCode != null" >
+        SKU_CODE,
+      </if>
+      <if test="outerSkuCode != null" >
+        OUTER_SKU_CODE,
+      </if>
+      <if test="outerCode != null" >
+        OUTER_CODE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{id,jdbcType=INTEGER},
+      <if test="skuCode != null" >
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="outerSkuCode != null" >
+        #{outerSkuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="outerCode != null" >
+        #{outerCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateSkuMap" parameterType="com.gionee.wms.entity.SkuMap" >
+    update WMS_SKU_MAP
+    <set >
+      <if test="skuCode != null" >
+        SKU_CODE = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="outerSkuCode != null" >
+        OUTER_SKU_CODE = #{outerSkuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="outerCode != null" >
+        OUTER_CODE = #{outerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuPushStatus != null" >
+        SKU_PUSH_STATUS = #{skuPushStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.gionee.wms.entity.SkuMap" >
+    update WMS_SKU_MAP
+    set SKU_CODE = #{skuCode,jdbcType=VARCHAR},
+      OUTER_SKU_CODE = #{outerSkuCode,jdbcType=VARCHAR},
+      OUTER_CODE = #{outerCode,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

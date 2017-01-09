@@ -1,0 +1,24 @@
+#popImage_cache img{
+	border:4px solid #fff;
+	background:#fff;
+	display:block;
+	padding:4px;
+	position:absolute;
+	cursor:pointer;
+	z-index:9999;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 45px #888;
+	-webkit-box-shadow: 0 0 45px #888;
+	box-shadow: 0 0 45px #888;
+}
+.popImage_close{
+	background:url(../images/close.png) center no-repeat;
+	position:absolute;
+	height:40px;
+	width:40px;
+	z-index:9999;
+	cursor:pointer;
+	display:none;
+}

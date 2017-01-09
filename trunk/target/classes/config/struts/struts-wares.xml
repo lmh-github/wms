@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<package name="wares" namespace="/wares" extends="wms-default">
+	
+		<!-- 商品分类 -->
+		<action name="category" class="CategoryAction">
+			<result name="success">/WEB-INF/view/wares/categoryList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/categoryEdit.jsp</result>
+			<!-- <result name="list" type="redirect">/wares/category.action</result> -->
+		</action>
+		
+		<!-- 商品类型-->
+		<action name="attrSet" class="AttrSetAction">
+			<result name="success">/WEB-INF/view/wares/attrSetList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/attrSetEdit.jsp</result>
+		</action>
+		
+		<!-- 商品-->
+		<action name="wares" class="WaresAction">
+			<result name="success">/WEB-INF/view/wares/waresList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/waresEdit.jsp</result>
+		</action>
+		
+		<!-- SKU属性-->
+		<action name="skuAttr" class="SkuAttrAction">
+			<result name="success">/WEB-INF/view/wares/skuAttrList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/skuAttrEdit.jsp</result>
+		</action>
+		
+		<!-- SKU -->
+		<action name="sku" class="SkuAction">
+			<result name="success">/WEB-INF/view/wares/skuList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/skuEdit.jsp</result>
+			<result name="lookup">/WEB-INF/view/wares/skuLookup.jsp</result>
+		</action>
+		
+		<!-- 商品个体 -->
+		<action name="indiv" class="IndivAction">
+			<result name="success">/WEB-INF/view/wares/indivList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/indivEdit.jsp</result>
+		</action>
+
+        <!-- 金立sku与第三方sku映射关系 -->
+		<action name="skuMap" class="SkuMapAction">
+			<result name="success">/WEB-INF/view/wares/skuMapList.jsp</result>
+			<result name="input">/WEB-INF/view/wares/skuMapEdit.jsp</result>
+		</action>
+
+	</package>
+</struts>

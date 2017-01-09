@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.CheckDao" >
+	<!-- =============库存历史记录相关=============== -->
+	<sql id="sql_stockHistoryColumns">
+		       t3.id                  as "sku.wares.id",
+ 			   t3.wares_name          as "sku.wares.waresName",
+			   t3.measure_unit        as "sku.wares.measureUnit",
+			   t3.indiv_enabled       as "sku.wares.indivEnabled",
+ 			   t2.sku_code            as "sku.skuCode",
+ 			   t2.sku_name            as "sku.skuName",
+ 			   t2.material_code		as "sku.materialCode",
+ 			   t4.warehouse_code      as "warehouse.warehouseCode",
+ 			   t4.warehouse_name      as "warehouse.warehouseName",
+ 			   t5.cat_name		as "sku.wares.category.catName",
+ 			   t1.warehouse_id        as "warehouse.id",
+ 			   t1.sku_id              as "sku.id",
+ 			   t1.id                  as id,
+ 			   t1.total_quantity      as totalQuantity,
+ 			   t1.sales_quantity  	  as salesQuantity,
+ 			   t1.occupy_quantity 	  as occupyQuantity,
+ 			   t1.unsales_quantity    as unsalesQuantity,
+ 			   t1.check_code 		  as checkCode,
+  			   t1.nondefective_pl 	  as nondefectivePl,
+  			   t1.defective_pl 		  as defectivePl,
+  			   t1.limit_lower 		  as limitLower,
+  			   t1.limit_upper 		  as limitUpper,
+ 			   t1.ver 				  as ver,
+ 			   t1.sync_status		  as syncStatus
+	</sql>
+	
+	<sql id="sql_stockHistoryWhere">
+		<where>
+	   		<if test="id != null">and t1.id=#{id}</if>
+	   		<if test="warehouseId != null">and t1.warehouse_id = #{warehouseId}</if>
+	   		<if test="warehouseCode != null">and t1.warehouse_code = #{warehouseCode}</if>
+	   		<if test="skuId != null">and t1.sku_id=#{skuId}</if>
+	   		<if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
+	   		<if test="catPath != null">and instr(t5.cat_path,#{catPath}) = 1</if>
+	   		<if test="syncStatus != null">and t1.sync_status=#{syncStatus}</if>
+	   		<if test="checkId != null">and t1.check_id=#{checkId}</if>
+	   </where>
+	</sql>
+	<sql id="sql_checkColumns">
+		       t1.id               as id,
+ 	  		   t1.check_code       as checkCode,
+ 	  		   t1.warehouse_id     as warehouseId,
+ 			   t1.warehouse_name   as warehouseName,
+ 	  		   t1.planned_time     as plannedTime,
+ 			   t1.first_time       as firstTime,
+ 			   t1.second_time      as secondTime,
+ 			   t1.prepared_time    as preparedTime,
+ 			   t1.prepared_by      as preparedBy,
+ 			   t1.handling_status  as handlingStatus,
+ 			   t1.handled_time     as handledTime,
+		       t1.handled_by       as handledBy,
+ 			   t1.remark           as remark,
+ 			   t1.check_type       as checkType,
+ 			   t1.audit_status     as auditStatus,
+ 			   t1.stockdumpstatus  as stockDumpStatus
+	</sql>
+	<sql id="sql_checkWhere">
+		<where>
+		  	<if test="id != null">t1.id = #{id}</if>
+	   		<if test="checkCode != null">and t1.check_code = #{checkCode}</if>
+	    </where>
+	</sql>
+	
+	<sql id="sql_goodsColumns">
+				   t1.id                  	  as id,
+  	  			   t1.sku_id                  as skuId,
+  	  			   t1.sku_code                as skuCode,
+  	  			   t1.sku_name                as skuName,
+  	  			   t1.measure_unit            as measureUnit,
+	 			   t1.book_nondefective       as bookNondefective,
+	 			   t1.book_defective          as bookDefective,
+	 			   t1.first_nondefective      as firstNondefective,
+	 			   t1.first_nondefective_pl   as firstNondefectivePl,
+	 			   t1.first_defective         as firstDefective,
+	 			   t1.first_defective_pl      as firstDefectivePl,
+	 			   t1.second_nondefective     as secondNondefective,
+	 			   t1.second_nondefective_pl  as secondNondefectivePl,
+	 			   t1.second_defective        as secondDefective,
+	 			   t1.second_defective_pl     as secondDefectivePl,
+	 			   t1.check_result            as checkResult,
+	 			   t1.remark                  as remark,
+	 			   t1.remark_in				  as remarkIn,
+	 			   t1.remark_out			  as remarkOut,
+	 			   t1.check_id                as "check.id",
+  	  			   t2.check_code              as "check.checkCode",
+  	  			   t2.warehouse_id            as "check.warehouseId",
+  	  			   t2.warehouse_name          as "check.warehouseName",
+	 			   t2.first_time              as "check.firstTime",
+	 			   t2.second_time             as "check.secondTime",
+	 			   t2.handling_status         as "check.handlingStatus",
+	 			   t3.sales_quantity          as "stock.salesQuantity",
+	 			   t3.occupy_quantity         as "stock.occupyQuantity",
+	 			   t3.unsales_quantity        as "stock.unsalesQuantity"
+	</sql>
+	<sql id="sql_goodsWhere">
+		<where>
+	   	 	<if test="checkId != null">and t1.check_id=#{checkId}</if>
+	   	 	<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
+	     </where>
+	</sql>
+
+	<sql id="sql_checkItemColumns">
+		t1.id as id,
+		t1.check_id as checkId,
+		t1.sku_code as skuCode,
+		t1.sku_name as skuName,
+		t1.indiv_code as indivCode,
+		t1.num as num,
+		t1.indiv_enabled as indivEnabled,
+		t1.compare_type as compareType,
+		t1.wares_status as waresStatus
+	</sql>
+	
+	<sql id="sql_checkItemWhere">
+		<where>
+	   	 	<if test="checkId != null">and t1.check_id=#{checkId}</if>
+	   	 	<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   	 	<if test="compareType != null">and t1.compare_type=#{compareType}</if>
+	     </where>
+	</sql>
+	
+	<!-- 查询符合条件的盘点单列表. -->
+	<select id="queryCheckByPage" parameterType="map" resultType="Check">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_checkColumns"/>
+					  from wms_check t1
+				  <include refid="sql_checkWhere"/> 
+				  order by t1.prepared_time desc
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+ 	<!-- 查询符合条件的盘点单总数-->
+	<select id="queryCheckTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_check t1
+	  <include refid="sql_checkWhere"/> 
+	</select>
+	
+	<!-- 根据ID获取指定的盘点单. -->
+	<select id="queryCheck" parameterType="long" resultType="Check">
+		select <include refid="sql_checkColumns"/>
+		  from wms_check t1
+	     where t1.id=#{id}
+	</select>
+	
+	<!-- 添加盘点单 -->
+	<insert id="addCheck" parameterType="Check">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_check
+		  (id, check_code,warehouse_id,warehouse_name,planned_time,prepared_by,prepared_time,remark,handling_status, check_type,audit_status)
+		select #{id},#{checkCode}, #{warehouseId},#{warehouseName},#{plannedTime, jdbcType=DATE},#{preparedBy},#{preparedTime},#{remark, jdbcType=VARCHAR},#{handlingStatus},#{checkType},#{auditStatus} from dual
+		 where not exists (select 1 from wms_check where check_code=#{checkCode})
+	</insert>
+	
+	<!-- 更新盘点单 -->
+	<update id="updateCheck" parameterType="Check">
+  		update wms_check
+  		<set>
+			<if test="warehouseId!=null">warehouse_id=#{warehouseId},</if>
+			<if test="plannedTime!=null">planned_time=#{plannedTime},</if>
+			<if test="handlingStatus!=null">handling_status=#{handlingStatus},</if>
+			<if test="firstTime!=null">first_time=#{firstTime},</if>
+			<if test="secondTime!=null">second_time=#{secondTime},</if>
+			<if test="handledTime!=null">handled_time=#{handledTime},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="remark!=null">remark=#{remark},</if>
+			<if test="auditStatus!=null">audit_status=#{auditStatus},</if>
+			<if test="stockDumpStatus!=null">stockdumpstatus=#{stockDumpStatus},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+  	
+  	<!-- 删除指定的盘点单 -->
+	<delete id="deleteCheck" parameterType="long">
+		delete from wms_check 
+	 	 where id = #{id}
+	</delete>
+	
+	<!-- =============盘点商品================ -->
+  	<!-- 分页查询符合条件的盘点商品-->
+	<select id="queryGoodsByPage" parameterType="map" resultType="CheckGoods">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_goodsColumns"/>
+					  from wms_check_goods t1
+					  join wms_check t2
+					    on t1.check_id = t2.id
+            		  join(select sum(s.sales_quantity) as sales_quantity,
+   		              sum(s.unsales_quantity) as unsales_quantity,
+   		              sum(s.occupy_quantity) as occupy_quantity,s.sku_id as sku_id from wms_stock  s group by s.sku_id) t3
+            		    on t3.sku_id=t1.sku_id 
+				  <include refid="sql_goodsWhere"/> 
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的盘点商品总数-->
+	<select id="queryGoodsTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_check_goods t1
+		  join wms_check t2
+		    on t1.check_id = t2.id
+   		  join wms_stock t3
+   		    on t3.sku_id=t1.sku_id and t3.warehouse_id=t2.warehouse_id
+	  <include refid="sql_goodsWhere"/>  
+	</select>
+	
+	<!-- 根据盘点单ID获取商品清单 -->
+	<select id="queryGoodsListByCheckId" parameterType="long" resultType="CheckGoods">
+		select <include refid="sql_goodsColumns"/>
+		  from wms_check_goods t1
+		  join wms_check t2
+		    on t1.check_id = t2.id
+   		  join (select sum(s.sales_quantity) as sales_quantity,
+   		  sum(s.unsales_quantity) as unsales_quantity,
+   		  sum(s.occupy_quantity) as occupy_quantity,s.sku_id as sku_id from wms_stock  s group by s.sku_id) t3
+   		  on t3.sku_id=t1.sku_id 
+	     where t1.check_id=#{checkId}
+	</select>
+	
+	<!-- 根据ID获取指定的盘点单. -->
+	<select id="queryGoods" parameterType="long" resultType="CheckGoods">
+		select <include refid="sql_goodsColumns"/>
+		  from wms_check_goods t1
+		  join wms_check t2
+		    on t1.check_id = t2.id
+   		  join (select sum(s.sales_quantity) as sales_quantity,
+   		  sum(s.unsales_quantity) as unsales_quantity,
+   		  sum(s.occupy_quantity) as occupy_quantity,s.sku_id as sku_id from wms_stock  s group by s.sku_id) t3
+   		    on t3.sku_id=t1.sku_id  
+	     where t1.id=#{id}
+	</select>
+  	
+  	<!-- 根据盘点单ID删除对应商品清单 -->
+	<delete id="deleteGoodsListByCheckId" parameterType="long">
+		delete from wms_check_goods 
+	 	 where check_id = #{checkId}	 	   
+	</delete>
+	  	<!-- 根据盘点单ID删除对应对比清单 -->
+	<delete id="deleteCheckItemByCheckId" parameterType="long">
+		delete from wms_check_item
+	 	 where check_id = #{checkId}	 	   
+	</delete>
+	<!-- 删除指定的盘点商品 -->
+	<delete id="deleteGoods" parameterType="long">
+		delete from wms_check_goods 
+	 	 where id = #{id}
+	</delete>
+	
+	<!-- 更新指定的盘点明细项 -->
+	<update id="updateDetailItem" parameterType="CheckGoods">
+  		update wms_check_goods
+  		<set>
+  			<if test="bookNondefective!=null">book_nondefective=#{bookNondefective},</if>
+  			<if test="bookDefective!=null">book_defective=#{bookDefective},</if>
+			<if test="firstNondefective!=null">first_nondefective=#{firstNondefective},</if>
+			<if test="firstNondefectivePl!=null">first_nondefective_pl=#{firstNondefectivePl},</if>
+			<if test="firstDefective!=null">first_defective=#{firstDefective},</if>
+			<if test="firstDefectivePl!=null">first_defective_pl=#{firstDefectivePl},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+	
+	<!-- 添加盘点明细 -->
+	<insert id="addStockCheckDetail" parameterType="map">
+ 		insert into wms_check_goods(id, check_code, sku_id,warehouse_code)
+		select WMS_SEQ_COMMON.nextval,A.* from
+		 (
+		<foreach item="item" collection="skuIds" index="index" separator="UNION ALL">
+		   select #{checkCode},#{item},#{warehouseCode} from dual
+		</foreach>
+		  )A
+		  where not exists 
+	   (select 1 from wms_check_goods where check_code = #{checkCode} and sku_id in 
+		<foreach item="skuId" index="index" collection="skuIds" open="(" separator="," close=")">
+	 	 	#{skuId}
+	 	</foreach>
+	 	)
+	</insert>
+	<insert id="addGoodsList" parameterType="list">
+ 		insert into wms_check_goods
+ 			(id, check_id, sku_id,sku_code,sku_name,measure_unit)
+		select WMS_SEQ_COMMON.nextval,A.* from
+		 (
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.checkId},#{item.skuId},#{item.skuCode},#{item.skuName},#{item.measureUnit} from dual
+		</foreach>
+		  )A
+		  where not exists 
+	   (select 1 from wms_check_goods where check_id = #{list[0].checkId} and sku_id in 
+		<foreach item="item" collection="list" index="index" open="(" separator="," close=")">
+	 	 	#{item.skuId}
+	 	</foreach>
+	 	)
+	</insert>
+	
+	<!-- 添加盘点任务分配信息 -->
+	<insert id="addCheckTask" parameterType="CheckTask">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_check_task
+		  (id, check_code,task_type,task_user,task_date,task_status,create_time)
+		values
+		  (#{id},#{stockCheck.check_code},#{taskType},#{taskUser},#{taskDate},#{taskStatus},#{createTime})
+	</insert>
+	
+	<insert id="addCheckItemList" parameterType="list">
+ 		insert into wms_check_item
+ 			(id, check_id, sku_code, sku_name, indiv_code, num, indiv_enabled, compare_type,wares_status)
+		select WMS_SEQ_COMMON.nextval,A.* from
+		 (
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.checkId},#{item.skuCode},#{item.skuName},#{item.indivCode},#{item.num},#{item.indivEnabled},#{item.compareType},#{item.waresStatus} from dual
+		</foreach>
+		  )A
+		  where not exists (select 1 from wms_check_item where indiv_code=#{item.indivCode} and check_id=#{item.checkId})
+	</insert>
+	
+	<!-- 添加盘点异常信息 -->
+		<insert id="addCheckStatusExceptionsList" parameterType="list">
+ 		insert into wms_check_statusexpt
+ 			(id,indiv_code,bookstatus,checkstatus,check_id)
+		select WMS_SEQ_COMMON.nextval,A.* from
+		 (
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.indivCode},#{item.bookStatus},#{item.checkStatus},#{item.checkId} from dual
+		</foreach>
+		  )A
+	</insert>
+	<!-- 查询盘点异常信息 -->
+	<select id="getCheckStatusExceptionList" parameterType="long" resultType="CheckStatusException">
+	     select t1.id as id,t1.check_id  checkId, t1.indiv_code indivCode,t1.bookStatus bookStatus,t1.checkStatus checkStatus  from wms_check_statusexpt t1 where t1.check_id=#{checkId}
+	</select>
+	<delete id="deleteCheckStatusExceptions" parameterType="long">
+	     delete  from wms_check_statusexpt t1 where t1.check_id=#{checkId}
+	</delete>
+	
+	<!-- 根据盘点单ID获取商品清单 -->
+	<select id="queryCheckItemList" parameterType="long" resultType="CheckItem">
+		select <include refid="sql_checkItemColumns"/>
+		  from wms_check_item t1
+		  <include refid="sql_checkItemWhere"/> 
+	</select>
+	
+	<!-- 增加盘点商品 -->
+	<insert id="addCheckGoods" parameterType="CheckGoods">
+		insert into wms_check_goods
+ 			(id,check_id,sku_id,sku_code,sku_name,measure_unit,book_nondefective,first_nondefective,first_nondefective_pl,first_defective,first_defective_pl,book_defective)
+ 			values(WMS_SEQ_COMMON.nextval,#{checkId},#{skuId},#{skuCode},#{skuName},#{measureUnit},#{bookNondefective},#{firstNondefective},#{firstNondefectivePl},#{firstDefective},#{firstDefectivePl},#{bookDefective})
+	</insert>
+	
+	<!-- 更新盘点商品 -->
+	<update id="updateCheckGoods" parameterType="map">
+  		update wms_check_goods t1
+  		<set>
+  			<if test="remarkIn!=null">t1.remark_in=#{remarkIn},</if>
+  			<if test="remarkOut!=null">t1.remark_out=#{remarkOut},</if>
+		</set>
+		<include refid="sql_goodsWhere"/>
+  	</update>
+  	
+  	<!-- 获取盘点商品 -->
+	<select id="queryGoodsByMap" parameterType="map" resultType="CheckGoods">
+		select <include refid="sql_goodsColumns"/>
+		  from wms_check_goods t1
+		  join wms_check t2
+		    on t1.check_id = t2.id
+   		  join (select sum(s.sales_quantity) as sales_quantity,
+   		  sum(s.unsales_quantity) as unsales_quantity,
+   		  sum(s.occupy_quantity) as occupy_quantity,s.sku_id as sku_id from wms_stock  s group by s.sku_id) t3
+   		    on t3.sku_id=t1.sku_id  
+	     <include refid="sql_goodsWhere"/> 
+	</select>
+	<!-- 生成库存历史记录 -->
+	<insert id="addStockHistory" parameterType="Check">
+		insert into wms_stock_history
+ 			 (id, sku_id, warehouse_id,total_quantity,sales_quantity,unsales_quantity,occupy_quantity,limit_upper,limit_lower,nondefective_pl,defective_pl,check_id)
+ 			 select  WMS_SEQ_COMMON.nextval, t1.sku_id, t1.warehouse_id,t1.total_quantity,t1.sales_quantity,t1.unsales_quantity,t1.occupy_quantity,t1.limit_upper,t1.limit_lower,t1.nondefective_pl,t1.defective_pl,#{id} from
+ 			wms_stock t1
+	</insert>
+	 <!-- 查询库存历史记录列表总数-->
+	<select id="queryStockHistoryTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_stock_history t1
+		  join wms_sku t2
+		    on t1.sku_id = t2.id
+		  join wms_wares t3
+			on t2.wares_id = t3.id	    
+		  join wms_warehouse t4
+		    on t1.warehouse_id = t4.id
+	 left join wms_wares_category t5
+		    on t3.cat_id=t5.id
+      <include refid="sql_stockHistoryWhere"/>  
+	</select>
+	<!-- 获取库存历史记录 (商品、sku、仓库、库存). -->
+	<select id="queryStockHistoryList" parameterType="map" resultType="StockHistory">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  		select <include refid="sql_stockHistoryColumns"/>
+					  from wms_stock_history t1
+					  join wms_sku t2
+					    on t1.sku_id = t2.id
+					  join wms_wares t3
+						on t2.wares_id = t3.id	    
+					  join wms_warehouse t4
+					    on t1.warehouse_id = t4.id
+				 left join wms_wares_category t5
+					    on t3.cat_id=t5.id
+			      <include refid="sql_stockHistoryWhere"/> 
+			      order by sku_code
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	<!-- 入库单明细 
+	<resultMap id="stockInDetailMap" type="StockInItem">
+		<id property="id" column="detail_id" />
+		<association property="stockIn" column="stockin_id" javaType="StockIn">
+			<id property="id" column="stockin_id"/>
+		</association>
+		<association property="sku" column="sku_id" javaType="Sku">
+			<id property="id" column="sku_id"/>
+			<result property="skuCode" column="sku_code"/>
+			<result property="skuName" column="sku_name"/>
+			<result property="skuBarcode" column="sku_barcode"/>
+			<result property="measure_unit" column="sku_measure_unit"/>
+		</association>
+	</resultMap>-->
+	<!-- 查询指定的入库单明细列表 
+	<select id="queryStockInDetail" parameterType="map" resultMap="stockInDetailMap">
+		select t1.id as stockin_id,
+			   t2.id as detail_id,
+			   t3.id as sku_id,
+			   t3.sku_code as sku_code,
+			   t3.sku_name as sku_name,
+			   t3.sku_barcode as sku_barcode,
+			   t3.measure_unit as sku_measure_unit
+		  from wms_stockin t1
+		  join wms_stockin_goods t2
+		    on t2.stock_id = t2.id
+		  join wms_sku t3
+		    on t2.sku_id = t3.id
+		 where t2.stockin_id = #{id}
+	</select>
+  	-->
+  		
+	
+ </mapper>

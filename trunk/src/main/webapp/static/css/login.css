@@ -1,0 +1,21 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{background:#81bdee;padding:0;margin:0;font:normal 14px Tahoma, Geneva, sans-serif, "宋体";}
+ul{padding:0;margin:0;list-style:none;}
+.login_main{width:950px;margin:0 auto;overflow:hidden;}
+.login_main div{float:left;width:100%;}
+.login_tbg{background:url(../images/login_tbg.jpg) no-repeat left top;height:185px;}
+.login_mbg{background:url(../images/login_mbg.jpg) no-repeat left top;height:419px;}
+.login_mbg .login_frame{width:397px;height:264px;background:url(../images/login_frbg.gif) no-repeat left top;margin-left:40px;display:inline;}
+.login_mbg .login_frame ul{width:280px;margin:2em auto 0 auto;overflow:auto;}
+.login_mbg .login_frame li{margin:9px 0;}
+.login_mbg .login_frame li h4{font-size:14px;font-weight:normal;padding:0;margin:0;text-align:right;width:80px;height:26px;line-height:26px;}
+.login_mbg .login_frame li,.login_mbg .login_frame li span,.login_mbg .login_frame li h4,.login_mbg .login_frame li img{float:left;display:block;}
+.login_mbg .login_frame li input{background:#fff;border:#cac9c9 1px solid;width:180px;height:22px;line-height:22px;padding-left:3px;float:left;font-size:12px;}
+.login_mbg .login_frame li.code input{width:110px;}
+.login_mbg .login_frame li.error_tips{color:#f00;font-size:12px;width:200px;padding-left:80px;display:inline;margin:0;}
+.login_mbg .login_frame li.btn a{width:66px;height:28px;line-height:28px;background:url(../images/login_btn.gif) no-repeat left top;color:#fff;font-size:14px;padding-left:17px;font-weight:bold;border:0;display:block;text-decoration:none;}
+.login_mbg .login_frame li.btn{margin:25px 0 0 80px;display:inline;}
+.login_mbg .login_frame li.btn a:hover{background:url(../images/login_btn.gif) no-repeat left -28px;}
+.footer{text-align:center;font-size:12px;color:#727171;margin-top:3em;}

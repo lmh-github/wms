@@ -1,0 +1,8 @@
+-- Add/modify columns 
+alter table WMS_TRANSFER add trans_type VARCHAR2(2) default 0;
+-- Add comments to the columns 
+comment on column WMS_TRANSFER.trans_type
+  is '调拨类型：0 普通 , 1 次品出库';
+
+-- Add/modify columns 
+alter table WMS_SALES_ORDER modify invoice_content VARCHAR2(250);

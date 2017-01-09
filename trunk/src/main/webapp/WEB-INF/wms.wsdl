@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="PurchaseSoapService" targetNamespace="http://wms.cm.com/api/v1" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://wms.cm.com/api/v1" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://wms.cm.com/api/v1" version="1.0" xmlns:tns="http://wms.cm.com/api/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="helloWorld" type="tns:helloWorld"/>
+<xs:element name="helloWorldResponse" type="tns:helloWorldResponse"/>
+<xs:element name="purPreRecvDTO" type="tns:PurPreRecv"/>
+<xs:element name="purPreRecvGoodsDTO" type="tns:PurPreRecvGoods"/>
+<xs:element name="putPurPreRecv" type="tns:putPurPreRecv"/>
+<xs:element name="putPurPreRecvResponse" type="tns:putPurPreRecvResponse"/>
+<xs:element name="authInfo" type="tns:AuthInfo"/>
+<xs:complexType name="AuthInfo">
+	<xsd:sequence>
+    	<xsd:element name="userName" type="xs:string" />
+    	<xsd:element name="password" type="xsd:string" />
+	</xsd:sequence>
+</xs:complexType>
+<xs:complexType name="helloWorld">
+    <xs:sequence/>
+  </xs:complexType>
+<xs:complexType name="helloWorldResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="putPurPreRecv">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="purPreRecv" type="tns:PurPreRecv"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="PurPreRecv">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="goodsList">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="goods" type="tns:PurPreRecvGoods"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="postingNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="preparedBy" type="xs:string"/>
+      <xs:element minOccurs="0" name="preparedTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="purchaseCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="remark" type="xs:string"/>
+      <xs:element minOccurs="0" name="warehouseCode" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="PurPreRecvGoods">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="indivCodeList" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="productBatchNo" type="xs:string"/>
+      <xs:element minOccurs="0" name="quantity" type="xs:int"/>
+      <xs:element minOccurs="0" name="materialCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="materialName" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="putPurPreRecvResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:WSResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="WSResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="putPurPreRecvResponse">
+    <wsdl:part element="tns:putPurPreRecvResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="putPurPreRecv">
+    <wsdl:part element="tns:putPurPreRecv" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="helloWorld">
+    <wsdl:part element="tns:helloWorld" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="helloWorldResponse">
+    <wsdl:part element="tns:helloWorldResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="helloWorldAuthInfo">
+    <wsdl:part element="tns:authInfo" name="authInfo"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="putPurPreRecvAuthInfo">
+    <wsdl:part element="tns:authInfo" name="authInfo"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="PurchaseSoapService">
+    <wsdl:operation name="helloWorld">
+<wsdl:documentation>测试方法</wsdl:documentation>
+      <wsdl:input message="tns:helloWorld" name="helloWorld">
+    </wsdl:input>
+      <wsdl:output message="tns:helloWorldResponse" name="helloWorldResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="putPurPreRecv">
+<wsdl:documentation>提交采购预收单(即SAP借机发货单)。返回编号说明:1.成功,400.参数错误,401.仓库编号不存在,402.物料编号不存在,403.商品为空,404.商品个体编码为空,405.商品个体编码数量与对应SKU数量不一致,406.仓库已被禁用,500.系统错误,501.数据重复</wsdl:documentation>
+      <wsdl:input message="tns:putPurPreRecv" name="putPurPreRecv">
+    </wsdl:input>
+      <wsdl:output message="tns:putPurPreRecvResponse" name="putPurPreRecvResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PurchaseSoapServiceSoapBinding" type="tns:PurchaseSoapService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="helloWorld">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="helloWorld">
+      	<soap:header message="tns:helloWorldAuthInfo" part="authInfo" use="literal" wsdl:required="true"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="helloWorldResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="putPurPreRecv">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="putPurPreRecv">
+        <soap:header message="tns:putPurPreRecvAuthInfo" part="authInfo" use="literal" wsdl:required="true"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="putPurPreRecvResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PurchaseSoapService">
+    <wsdl:port binding="tns:PurchaseSoapServiceSoapBinding" name="PurchaseSoapServicePort">
+      <soap:address location="http://127.0.0.1:8080/wms/ws/purchaseService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

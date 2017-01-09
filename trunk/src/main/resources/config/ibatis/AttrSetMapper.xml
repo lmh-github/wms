@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.AttrSetDao" >
+
+	<!-- 查询商品类型列表-->
+	<select id="queryAttrSetList" parameterType="map" resultType="AttrSet">
+		select id,
+			   attr_set_name as attrSetName,
+			   remark as remark
+  		  from wms_attr_set
+	 </select>
+	 
+    <!-- 查询指定商品类型-->
+	<select id="queryAttrSet" resultType="AttrSet">
+		select id,
+			   attr_set_name as attrSetName,
+			   remark as remark
+  		  from wms_attr_set
+          where id = #{id}
+	 </select>
+	 
+
+	<!-- 更新指定的商品类型 -->
+	<update id="updateAttrSet" parameterType="AttrSet">
+  		update wms_attr_set
+  		<set>
+			<if test="attrSetName!=null">attr_set_name=#{attrSetName},</if>
+			<if test="remark!=null">remark=#{remark}</if>
+		</set>
+		<where>
+			id=#{id}
+			<if test="attrSetName!=null">and not exists (select 1 from wms_attr_set where id!=#{id} and attr_set_name = #{attrSetName})</if>
+		</where>
+  	</update>
+  	
+	<!-- 添加商品类型 -->
+	<insert id="addAttrSet" parameterType="AttrSet">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_attr_set
+		  (id, attr_set_name, remark)
+		select 
+		  #{id},#{attrSetName},#{remark} from dual
+		where not exists (select 1 from wms_attr_set where attr_set_name = #{attrSetName})
+	</insert>
+  
+	<!-- 根据id删除商品类型 -->
+	<delete id="deleteAttrSet" parameterType="long">
+		delete from wms_attr_set 
+	 	 where id = #{id}
+   		   and not exists (select 1 from wms_sku_attr where attr_set_id = #{id})
+	</delete>
+ 
+ </mapper>

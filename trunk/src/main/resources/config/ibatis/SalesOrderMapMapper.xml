@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SalesOrderMapDao">
+
+  <insert id="add" parameterType="com.gionee.wms.entity.SalesOrderMap">
+    <selectKey keyProperty="id" resultType="long" order="BEFORE">
+      SELECT WMS_SEQ_COMMON.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO WMS_SALES_ORDER_MAP(
+    "ID",
+    "ORDER_CODE",
+    "SF_ERP_ORDER",
+    "ACTUAL_SHIP_DATE_TIME",
+    "CARRIER",
+    "CARRIER_SERVICE"
+    )
+    VALUES(
+    #{id},
+    #{order_code, jdbcType=VARCHAR},
+    #{sf_erp_order, jdbcType=VARCHAR},
+    #{actual_ship_date_time, jdbcType=DATE},
+    #{carrier, jdbcType=VARCHAR},
+    #{carrier_service, jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <update id="update" parameterType="com.gionee.wms.entity.SalesOrderMap">
+    UPDATE WMS_SALES_ORDER_MAP
+    <set>
+      <if test="actual_ship_date_time != null">
+        ACTUAL_SHIP_DATE_TIME = #{actual_ship_date_time},
+      </if>
+      <if test="carrier != null">
+        CARRIER = #{carrier},
+      </if>
+      <if test="carrier_service != null">
+        CARRIER_SERVICE = #{carrier_service},
+      </if>
+      ORDER_CODE = ORDER_CODE
+    </set>
+    WHERE SF_ERP_ORDER = #{sf_erp_order}
+  </update>
+
+  <select id="getByOrderCode" resultType="com.gionee.wms.entity.SalesOrderMap">
+    SELECT * FROM WMS_SALES_ORDER_MAP WHERE ORDER_CODE = #{param}
+  </select>
+
+  <select id="getByErpOrderCode" resultType="com.gionee.wms.entity.SalesOrderMap">
+    SELECT * FROM WMS_SALES_ORDER_MAP WHERE SF_ERP_ORDER = #{param}
+  </select>
+
+</mapper>

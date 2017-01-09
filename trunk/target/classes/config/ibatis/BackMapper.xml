@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.BackDao">
+
+  <sql id="sql_backColumns">
+    t1.id as id,
+    t1.order_code as orderCode,
+    t1.back_code as backCode,
+    t1.shipping_code as shippingCode,
+    t1.shipping_no as shippingNo,
+    t1.remark_backing as remarkBacking,
+    t1.remark_backed as remarkBacked,
+    t1.handled_by as handledBy,
+    t1.handled_time as handledTime,
+    t1.create_time as createTime,
+    t1.back_status as backStatus,
+    t1.warehouse_code as warehouseCode,
+    t1.has_test_bill as hasTestBill,
+    t1.back_platform as backPlatform,
+    t1.exchange_shipping_no as exchangeShippingNo,
+    t1.bear_party as bearParty,
+    t1.back_money as backMoney,
+    t1.back_type as backType,
+    t1.remark as remark,
+    t1.invoice,
+    t1.mark
+  </sql>
+
+  <sql id="sql_backWhere">
+    <where>
+      <if test="id != null and id != ''">t1.id=#{id}</if>
+      <if test="orderCode != null and orderCode != ''">and t1.order_code=#{orderCode}</if>
+      <if test="backCode != null and backCode != ''">and t1.back_code=#{backCode}</if>
+      <if test="backStatus != null">and t1.back_status=#{backStatus}</if>
+      <if test="shippingNo != null and shippingNo != ''">and t1.shipping_no=#{shippingNo}</if>
+      <if test="hasTestBill != null">and t1.has_test_bill = #{hasTestBill}</if>
+      <if test="backPlatform != null">and t1.back_platform = #{backPlatform}</if>
+      <if test="exchangeShippingNo != null">and t1.exchange_shipping_no = #{exchangeShippingNo}</if>
+      <if test="bearParty != null">and t1.bear_party = #{bearParty}</if>
+      <if test="backType != null">and t1.back_type = #{backType}</if>
+      <if test="mark != null">and t1.mark = #{mark}</if>
+      <if test="backTimeBegin != null">and
+        t1.create_time<![CDATA[>=]]>#{backTimeBegin}
+      </if>
+      <if test="backTimeEnd != null">and
+        t1.create_time<![CDATA[<=]]>#{backTimeEnd}
+      </if>
+    </where>
+  </sql>
+
+  <!-- 添加退货单 -->
+  <insert id="addBack" parameterType="Back">
+    <selectKey keyProperty="id" resultType="long" order="BEFORE">
+      select
+      WMS_SEQ_COMMON.nextval from dual
+    </selectKey>
+    insert into wms_back(id, back_code, shipping_code, shipping_no,
+    order_code, remark_backing
+    ,has_test_bill, back_platform, exchange_shipping_no, bear_party, back_money, back_type, remark, invoice, handled_by, handled_time)
+    values(#{id}, #{backCode, jdbcType=VARCHAR},
+    #{shippingCode, jdbcType=VARCHAR},
+    #{shippingNo, jdbcType=VARCHAR},
+    #{orderCode, jdbcType=VARCHAR}, #{remarkBacking, jdbcType=VARCHAR}
+    ,#{hasTestBill, jdbcType=VARCHAR}, #{backPlatform, jdbcType=VARCHAR}, #{exchangeShippingNo, jdbcType=VARCHAR}, #{bearParty, jdbcType=VARCHAR}, #{backMoney, jdbcType=DECIMAL}, #{backType, jdbcType=VARCHAR}, #{remark, jdbcType=VARCHAR}
+    ,#{invoice}
+    ,#{handledBy, jdbcType=VARCHAR}, #{handledTime, jdbcType=VARCHAR})
+  </insert>
+
+  <!-- 添加退货商品 -->
+  <insert id="addBackGoods" parameterType="list">
+    insert into wms_back_goods
+    (id,sku_code,quantity,back_code,goods_sid, nondefective_quantity, defective_quantity)
+    select
+    WMS_SEQ_COMMON.nextval,A.* from
+    (
+    <foreach item="item" collection="list" index="index" separator="UNION ALL">
+      select #{item.skuCode, jdbcType=VARCHAR},#{item.quantity,
+      jdbcType=NUMERIC},#{item.backCode, jdbcType=VARCHAR},#{item.goodsSid, jdbcType=VARCHAR}, #{item.nonDefectiveQuantity, jdbcType=VARCHAR}, #{item.defectiveQuantity, jdbcType=VARCHAR} from dual
+    </foreach>
+    ) A
+  </insert>
+
+  <!-- 更新退货单 -->
+  <update id="updateBack" parameterType="Back">
+    update wms_back t1
+    <set>
+      <if test="backStatus != null">t1.back_status=#{backStatus},</if>
+      <if test="remarkBacked != null">t1.remark_backed=#{remarkBacked},</if>
+      <if test="warehouseCode != null">t1.warehouse_code=#{warehouseCode},</if>
+      <if test="handledBy != null">t1.handled_by=#{handledBy},</if>
+      t1.handled_time=sysdate,
+      <if test="remarkBacking != null">t1.remark_backing=#{remarkBacking},</if>
+      <if test="shippingCode != null">t1.shipping_code=#{shippingCode},</if>
+      <if test="shippingNo != null">t1.shipping_no=#{shippingNo},</if>
+      
+      <if test="hasTestBill != null">t1.has_test_bill=#{hasTestBill},</if>
+      <if test="backPlatform != null">t1.back_platform=#{backPlatform},</if>
+      <if test="exchangeShippingNo != null">t1.exchange_shipping_no=#{exchangeShippingNo},</if>
+      <if test="bearParty != null">t1.bear_party=#{bearParty},</if>
+      <if test="backMoney != null">t1.back_money=#{backMoney},</if>
+      <if test="backType != null">t1.back_type=#{backType},</if>
+      <if test="remark != null">t1.remark=#{remark}</if>
+      <if test="mark != null">t1.mark=#{mark}</if>
+      
+      <if test="backedTime != null">t1.BACKED_TIME=#{backedTime}</if>
+    </set>
+    where
+      <if test="id != null">t1.id = #{id, jdbcType=VARCHAR}</if>
+      <if test="id == null and backCode != null">t1.back_code=#{backCode, jdbcType=VARCHAR}</if>
+  </update>
+
+  <resultMap type="Back" id="backMap">
+    <id property="id" column="id" />
+    <result property="orderCode" column="order_code" />
+    <result property="backCode" column="back_code" />
+    <result property="shippingCode" column="shipping_code" />
+    <result property="shippingNo" column="shipping_no" />
+    <result property="remarkBacking" column="remark_backing" />
+    <result property="remarkBacked" column="remark_backed" />
+    <result property="handledBy" column="handled_by" />
+    <result property="handledTime" column="handled_time" />
+    <result property="createTime" column="create_time" />
+    <result property="backStatus" column="back_status" />
+    <result property="warehouseCode" column="warehouse_code" />
+    <result property="hasTestBill" column="has_test_bill" />
+    <result property="backPlatform" column="back_platform" />
+    <result property="exchangeShippingNo" column="exchange_shipping_no" />
+    <result property="bearParty" column="bear_party" />
+    <result property="backMoney" column="back_money" />
+    <result property="backType" column="back_type" />
+    <result property="remark" column="remark" />
+    <result property="orderSource" column="ORDER_SOURCE" />
+    <result property="backedTime" column="BACKED_TIME" />
+    <result property="invoice" column="INVOICE" />
+    <result property="mark" column="MARK" />
+    <association property="salesOrder" javaType="SalesOrder">
+      <id property="id" column="ORDER_ID" />
+      <result property="consignee" column="CONSIGNEE" />
+      <result property="province" column="PROVINCE" />
+      <result property="city" column="CITY" />
+      <result property="district" column="DISTRICT" />
+      <result property="address" column="ADDRESS" />
+      <result property="mobile" column="MOBILE" />
+    </association>
+    <collection property="backGoods" javaType="backGoods">
+      <id property="id" column="GOODS_ID" />
+      <result property="skuCode" column="SKU_CODE" />
+      <result property="skuName" column="SKU_NAME" />
+    </collection>
+  </resultMap>
+  
+  <select id="getBackListForCascade" parameterType="map" resultMap="backMap">
+      SELECT
+        WB.*,WO.ID ORDER_ID, WO.CONSIGNEE, WO.PROVINCE, WO.CITY, WO.DISTRICT, WO.ADDRESS, WO.MOBILE, WO.ORDER_SOURCE, WG.ID GOODS_ID, WS.SKU_CODE, WS.SKU_NAME
+      FROM
+        WMS_BACK WB
+      LEFT JOIN WMS_SALES_ORDER WO ON WB.ORDER_CODE = WO.ORDER_CODE
+      INNER JOIN WMS_BACK_GOODS WG ON WB.BACK_CODE = WG.BACK_CODE
+      INNER JOIN WMS_SKU WS ON WG.SKU_CODE = WS.SKU_CODE
+      <where>
+        <if test="skuCode != null">AND WG.SKU_CODE = #{skuCode})</if>
+        <if test="orderSource != null">AND WO.ORDER_SOURCE = #{orderSource}</if>
+        <if test="consignee != null">AND WO.CONSIGNEE LIKE '%' || #{consignee} || '%'</if>
+        <if test="mobile != null">AND WO.MOBILE = #{mobile}</if>
+        <if test="orderCode != null and orderCode != ''">AND WB.order_code = #{orderCode}</if>
+        <if test="shippingCode != null">AND Wb.shipping_code = #{shippingCode}</if>
+        <if test="shippingNo != null">AND Wb.shipping_no = #{shippingNo}</if>
+        <if test="backType != null">AND Wb.back_type = #{backType}</if>
+        <if test="backStatus != null">AND Wb.back_status = #{backStatus}</if>
+        <if test="createTimeBegin != null">AND Wb.create_time &gt;= #{createTimeBegin}</if>
+        <if test="createTimeEnd != null">AND Wb.create_time &lt;= #{createTimeEnd}</if>
+        <if test="handledTimeBegin != null">AND Wb.create_time &gt;= #{handledTimeBegin}</if>
+        <if test="handledTimeEnd != null">AND Wb.create_time &lt;= #{handledTimeEnd}</if>
+        <if test="backedTimeBegin != null">AND Wb.BACKED_TIME &gt;= #{backedTimeBegin}</if>
+        <if test="backedTimeEnd != null">AND Wb.BACKED_TIME &lt;= #{backedTimeEnd}</if>
+        <if test="mark != null">AND Wb.MARK = #{mark}</if>
+      </where>
+      ORDER BY WB.BACKED_TIME DESC,WB.CREATE_TIME DESC
+  </select>
+
+  <!-- 分页获取退货单列表. -->
+  <select id="getBackList" parameterType="map" resultMap="backMap">
+    SELECT *
+    FROM(
+    SELECT A.*, rownum r
+    FROM(
+      SELECT
+      	WB.*, WO.ORDER_SOURCE
+      FROM
+      	WMS_BACK WB
+      LEFT JOIN WMS_SALES_ORDER WO ON WB.ORDER_CODE = WO.ORDER_CODE
+      <where>
+        <if test="skuCode != null">AND EXISTS(SELECT 1 FROM WMS_BACK_GOODS WG WHERE WG.SKU_CODE = #{skuCode})</if>
+        <if test="orderSource != null">AND WO.ORDER_SOURCE = #{orderSource}</if>
+        <if test="consignee != null">AND WO.CONSIGNEE LIKE '%' || #{consignee} || '%'</if>
+        <if test="mobile != null">AND WO.MOBILE = #{mobile}</if>
+        <if test="orderCode != null and orderCode != ''">AND WB.order_code = #{orderCode}</if>
+        <if test="shippingCode != null">AND Wb.shipping_code = #{shippingCode}</if>
+        <if test="shippingNo != null">AND Wb.shipping_no = #{shippingNo}</if>
+        <if test="backType != null">AND Wb.back_type = #{backType}</if>
+        <if test="backStatus != null">AND Wb.back_status = #{backStatus}</if>
+        <if test="createTimeBegin != null">AND Wb.create_time &gt;= #{createTimeBegin}</if>
+        <if test="createTimeEnd != null">AND Wb.create_time &lt;= #{createTimeEnd}</if>
+        <if test="handledTimeBegin != null">AND Wb.create_time &gt;= #{handledTimeBegin}</if>
+        <if test="handledTimeEnd != null">AND Wb.create_time &lt;= #{handledTimeEnd}</if>
+        <if test="backedTimeBegin != null">AND Wb.BACKED_TIME &gt;= #{backedTimeBegin}</if>
+        <if test="backedTimeEnd != null">AND Wb.BACKED_TIME &lt;= #{backedTimeEnd}</if>
+        <if test="mark != null">AND Wb.MARK = #{mark}</if>
+      </where>
+      ORDER BY WB.BACKED_TIME DESC,WB.CREATE_TIME DESC
+    ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+  </select>
+
+  <!-- 获取退货单总数 -->
+  <select id="getBackTotal" parameterType="map" resultType="int">
+    SELECT
+      COUNT(1)
+    FROM
+      WMS_BACK WB
+    LEFT JOIN WMS_SALES_ORDER WO ON WB.ORDER_CODE = WO.ORDER_CODE
+    <where>
+      <if test="skuCode != null">AND EXISTS(SELECT 1 FROM WMS_BACK_GOODS WG WHERE WG.SKU_CODE = #{skuCode})</if>
+      <if test="orderSource != null">AND WO.ORDER_SOURCE = #{orderSource}</if>
+      <if test="consignee != null">AND WO.CONSIGNEE LIKE '%' || #{consignee} || '%'</if>
+      <if test="mobile != null">AND WO.MOBILE = #{mobile}</if>
+      <if test="orderCode != null and orderCode != ''">AND WB.order_code = #{orderCode}</if>
+      <if test="shippingCode != null">AND Wb.shipping_code = #{shippingCode}</if>
+      <if test="shippingNo != null">AND Wb.shipping_no = #{shippingNo}</if>
+      <if test="backType != null">AND Wb.back_type = #{backType}</if>
+      <if test="backStatus != null">AND Wb.back_status = #{backStatus}</if>
+      <if test="createTimeBegin != null">AND Wb.create_time &gt;= #{createTimeBegin}</if>
+      <if test="createTimeEnd != null">AND Wb.create_time &lt;= #{createTimeEnd}</if>
+      <if test="handledTimeBegin != null">AND Wb.create_time &gt;= #{handledTimeBegin}</if>
+      <if test="handledTimeEnd != null">AND Wb.create_time &lt;= #{handledTimeEnd}</if>
+      <if test="backedTimeBegin != null">AND Wb.BACKED_TIME &gt;= #{backedTimeBegin}</if>
+      <if test="backedTimeEnd != null">AND Wb.BACKED_TIME &lt;= #{backedTimeEnd}</if>
+      <if test="mark != null">AND Wb.MARK = #{mark}</if>
+    </where>
+  </select>
+
+  <!-- 获取退货单 -->
+  <select id="getBack" parameterType="map" resultType="Back">
+    select
+    <include refid="sql_backColumns" />
+    from wms_back t1
+    <include refid="sql_backWhere" />
+    and rownum=1
+  </select>
+
+  <!-- 获取退货商品 -->
+  <select id="getBackGoodsList" parameterType="map" resultType="BackGoodsVo">
+    select t1.id id, t1.sku_code skuCode, t1.quantity quantity,
+    t1.nondefective_quantity nonDefectiveQuantity,
+    t1.defective_quantity
+    defectiveQuantity, t1.back_code backCode,
+    t2.sku_name skuName, t3.measure_unit measureUnit,
+    t3.indiv_enabled indivEnabled,
+    t1.goods_sid as goodsSid
+    from wms_back_goods t1,
+    wms_sku t2, wms_wares t3
+    where t1.sku_code=t2.sku_code and t2.wares_id=t3.id
+    and t1.back_code=#{backCode}
+    <if test="goodIds != null">
+      and t1.id in
+      <foreach item="item" index="index" collection="goodIds" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <!-- 更新退货商品 -->
+  <update id="updateBackGoods" parameterType="map">
+    update wms_back_goods t1
+    <set>
+      <if test="nonDefectiveQuantity != null">t1.nondefective_quantity=#{nonDefectiveQuantity},</if>
+      <if test="defectiveQuantity != null">t1.defective_quantity=#{defectiveQuantity},</if>
+    </set>
+    <where>
+      <if test="goodId != null">t1.id=#{goodId}</if>
+    </where>
+  </update>
+  
+  <delete id="deleteBackGoods" parameterType="string">
+    DELETE WMS_BACK_GOODS WHERE BACK_CODE = #{backCode, jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="delete" parameterType="string">
+    DELETE WMS_BACK WHERE BACK_CODE = #{backCode, jdbcType=VARCHAR}
+  </delete>
+</mapper>

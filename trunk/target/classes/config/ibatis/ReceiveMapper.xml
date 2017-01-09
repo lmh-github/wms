@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.ReceiveDao" >
+	
+	<sql id="sql_receiveColumns">
+		       t1.id                as id,
+		       t1.receive_code      as receiveCode,
+		       t1.receive_type      as receiveType,
+		       t1.receive_mode      as receiveMode,
+		       t1.original_id       as originalId,
+		       t1.original_code     as originalCode,
+		       t1.warehouse_id      as warehouseId,
+		       t1.warehouse_name    as warehouseName,
+		       t1.supplier_id       as supplierId,
+		       t1.supplier_name     as supplierName,
+		       t1.prepared_by       as preparedBy,
+		       t1.prepared_time     as preparedTime,
+		       t1.handling_status   as handlingStatus,
+		       t1.handled_time      as handledTime,
+		       t1.handled_by        as handledBy,
+		       t1.remark            as remark
+	</sql>
+	<sql id="sql_receiveWhere">
+		<where>
+	   		<if test="id != null">t1.id=#{id}</if>
+	   		<if test="receiveCode != null">and t1.receive_code=#{receiveCode}</if>
+	   		<if test="receiveType != null">and t1.receive_type=#{receiveType}</if>
+	   		<if test="receiveMode != null">and t1.receive_mode=#{receiveMode}</if>
+	   		<if test="originalId != null">and t1.original_id=#{originalId}</if>
+	   		<if test="originalCode != null">and t1.original_code=#{originalCode}</if>
+	   		<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
+	   		<if test="supplierId != null">and t1.supplier_id=#{supplierId}</if>
+	   		<if test="handlingStatus != null">and t1.handling_status=#{handlingStatus}</if>
+	   		<if test="preparedTimeBegin != null">and t1.prepared_time<![CDATA[>=]]>#{preparedTimeBegin}</if>
+	   		<if test="preparedTimeEnd != null">and t1.prepared_time<![CDATA[<=]]>#{preparedTimeEnd}</if>
+	   </where>
+	</sql>
+	
+	<sql id="sql_goodsColumns">
+		       t1.id,
+		       t1.sku_id          as skuId,
+		       t1.sku_code        as skuCode,
+		       t1.sku_name        as skuName,
+		       t1.quantity        as quantity,
+		       t1.measure_unit    as measureUnit,
+		       t1.wares_status    as waresStatus,
+		       t1.product_batchno as productBatchNo,
+		       t1.indiv_enabled   as indivEnabled,
+		       t1.indiv_finished  as indivFinished,
+		       t1.enabled         as enabled,
+		       t1.receive_id      as "receive.id",
+		       t2.receive_code    as "receive.receiveCode",
+		       t2.warehouse_id    as "receive.warehouseId",
+		       t2.warehouse_name  as "receive.warehouseName",
+		       t2.supplier_id     as "receive.supplierId",
+		       t2.supplier_name   as "receive.supplierName",
+		       t2.handling_status as "receive.handlingStatus",
+		       t2.handled_time    as "receive.handledTime",
+		       t2.handled_by      as "receive.handledBy",
+		       t2.original_id     as "receive.originalId",
+		       t2.original_code   as "receive.originalCode"
+	</sql>
+	
+	<sql id="sql_goodsWhere">
+		<where>
+			<if test="receiveType != null">and t2.receive_type=#{receiveType}</if>
+	   		<if test="warehouseId != null">and t2.warehouse_id=#{warehouseId}</if>
+	   		<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t1.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t2.handled_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t2.handled_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+			<if test="handlingStatus != null">and t2.handling_status=#{handlingStatus}</if>
+		</where>
+	</sql>
+	
+	<sql id="sql_summaryColumns">
+		       t2.warehouse_id      as warehouseId,
+ 	  		   t1.sku_id              as skuId,
+ 	  		   t1.wares_status        as waresStatus,
+ 	  		   t1.goods_sid			as goodsSid,
+ 	  		   max(t2.warehouse_name) as warehouseName,
+ 	  		   max(t1.sku_code)       as skuCode,
+ 	  		   max(t1.sku_name)       as skuName,
+ 	  		   max(t1.measure_unit)   as measureUnit,  
+ 	  		   sum(t1.quantity)       as quantity
+	</sql>
+	
+	<sql id="sql_summaryWhere">
+		<where>
+	   		<if test="handlingStatus != null">t2.handling_status=#{handlingStatus}</if>
+	   		<if test="receiveCode != null">and t2.receive_code=#{receiveCode}</if>
+	   		<if test="warehouseId != null">and t2.warehouse_id=#{warehouseId}</if>
+	   		<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
+	   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
+	   		<if test="waresStatus != null">and t1.wares_status=#{waresStatus}</if>
+	   		<if test="finishedTimeBegin != null">and t2.handled_time<![CDATA[>=]]>#{finishedTimeBegin}</if>
+			<if test="finishedTimeEnd != null">and trunc(t2.handled_time)<![CDATA[<=]]>#{finishedTimeEnd}</if>
+	   </where>
+	</sql>
+	
+	<!-- 分页查询符合条件的收货单列表. -->
+	<select id="queryReceiveByPage" parameterType="map" resultType="Receive">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  	 	select <include refid="sql_receiveColumns"/>
+					  from wms_receive t1
+				  <include refid="sql_receiveWhere"/>
+				   order by t1.prepared_time desc 
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的收货单总数-->
+	<select id="queryReceiveTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+			from wms_receive t1
+	    <include refid="sql_receiveWhere"/>  
+	</select>
+	
+	<!-- 根据ID获取收货单 -->
+	<select id="queryReceive" parameterType="long" resultType="Receive">
+		select <include refid="sql_receiveColumns"/>
+		  from wms_receive t1
+		 where t1.id=#{id}
+	</select>
+	
+	<!-- 根据收货编号获取收货单 -->
+	<select id="queryReceiveByReceiveCode" parameterType="string" resultType="Receive">
+		select <include refid="sql_receiveColumns"/>
+		  from wms_receive t1
+		 where t1.receive_code=#{receiveCode}
+	</select>
+	
+	<!-- 根据源单ID获取收货单 -->
+	<select id="queryReceiveByOriginalId" parameterType="map" resultType="Receive">
+		select <include refid="sql_receiveColumns"/>
+		  from wms_receive t1
+		 where t1.receive_type=#{receiveType}
+		   and t1.original_id=#{originalId}
+	</select>
+	
+	<!-- 添加收货单 -->
+	<insert id="addReceive" parameterType="Receive">
+ 		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_receive
+		  (id,
+		   receive_code,
+		   receive_type,
+		   receive_mode,
+		   original_id,
+		   original_code,
+		   warehouse_id,
+		   warehouse_name,
+		   supplier_id,
+		   supplier_name,
+		   prepared_time,
+		   prepared_by,
+		   handling_status,
+		   handled_time,
+		   handled_by,
+		   remark)
+		values
+		  (#{id},
+		   #{receiveCode},
+		   #{receiveType},
+		   #{receiveMode},
+		   #{originalId, jdbcType=VARCHAR},
+		   #{originalCode, jdbcType=VARCHAR},
+		   #{warehouseId},
+		   #{warehouseName},
+		   #{supplierId, jdbcType=VARCHAR},
+		   #{supplierName, jdbcType=VARCHAR},
+		   #{preparedTime},
+		   #{preparedBy},
+		   #{handlingStatus},
+		   #{handledTime, jdbcType=DATE},
+		   #{handledBy, jdbcType=VARCHAR},
+		   #{remark, jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 更新收货单 -->
+	<update id="updateReceive" parameterType="Receive">
+  		update wms_receive
+  		<set>
+			<if test="handlingStatus!=null">handling_status=#{handlingStatus},</if>
+			<if test="handledTime!=null">handled_time=#{handledTime},</if>
+			<if test="handledBy!=null">handled_by=#{handledBy},</if>
+			<if test="remark!=null">remark=#{remark},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+	
+	<!-- ==============收货商品========================== -->
+	
+	<!-- 分页查询符合条件的收货商品列表. -->
+	<select id="queryReceiveGoodsByPage" parameterType="map" resultType="ReceiveGoods">
+		SELECT *
+		 FROM( 
+			  SELECT A.*, rownum r
+		  	  FROM(
+		  	  	    select <include refid="sql_goodsColumns"/>
+		  	  		  from wms_receive_goods t1
+					  join wms_receive t2
+						on t1.receive_id=t2.id
+				  <include refid="sql_goodsWhere"/>
+				  order by t2.handled_time desc
+		  	  	   ) A
+	<![CDATA[
+			  WHERE rownum<=#{page.endRow} 
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+	
+	<!-- 查询符合条件的收货商品总数-->
+	<select id="queryReceiveGoodsTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		  from wms_receive_goods t1
+	      join wms_receive t2
+	        on t1.receive_id=t2.id
+	  <include refid="sql_goodsWhere"/>
+	</select>
+	
+	<!-- 用户区域分布统计报表. -->
+	<select id="getUserAreaList"  parameterType="map" resultType="Map">
+		SELECT *
+		FROM(
+		SELECT A.*, rownum r
+		FROM(
+		SELECT a.province as "province"
+		,a.city as "city"
+		,a.district as "district"
+		,g.sku_name as "sku_name"
+		,count(*) as "num"
+		FROM wms_sales_order a
+		LEFT JOIN wms_sales_order_goods g ON a.id = g.order_id
+		<where>
+			<if test="province != null">AND a.province like '%${province}%'</if>
+			<if test="city != null">AND a.city  like '%${city}%'</if>
+			<if test="district != null">AND a.district= #{district}</if>
+			<if test="createTimeBegin != null">AND a.order_time &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND a.order_time &lt;= #{createTimeEnd}</if>
+			AND g.indiv_enabled = 1
+			AND trim(a.province) IS NOT NULL
+			AND trim(a.city) IS NOT NULL
+			AND trim(a.district) IS NOT NULL
+		</where>
+		GROUP BY a.province
+		,a.city
+		,a.district
+		,g.sku_name
+		) A
+		<![CDATA[
+				  WHERE rownum<=#{page.endRow}
+				)
+			WHERE r >= #{page.startRow}
+		]]>
+	</select>
+
+
+	<select id="getUserAreaForCascade"  parameterType="map" resultType="Map">
+		SELECT a.province as province
+		,a.city as city
+		,a.district as district
+		,g.sku_name as sku_name
+		,count(*) as num
+		FROM wms_sales_order a
+		LEFT JOIN wms_sales_order_goods g ON a.id = g.order_id
+		<where>
+			<if test="province != null">AND a.province like '%${province}%'</if>
+			<if test="city != null">AND a.city  like '%${city}%'</if>
+			<if test="district != null">AND a.district= #{district}</if>
+			<if test="createTimeBegin != null">AND a.order_time &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND a.order_time &lt;= #{createTimeEnd}</if>
+			AND g.indiv_enabled = 1
+			AND a.province IS NOT NULL
+			AND a.city IS NOT NULL
+			AND a.district IS NOT NULL
+		</where>
+		GROUP BY a.province
+		,a.city
+		,a.district
+		,g.sku_name
+	</select>
+
+	<!-- 查询符合条件的收货商品总数-->
+	<select id="getUserAreaTotle" parameterType="map"  resultType="int">
+		SELECT count(*)
+		FROM(
+		SELECT a.province as "province"
+		,a.city as "city"
+		,a.district as "district"
+		,g.sku_name as "sku_name"
+		,count(*) as "num"
+		FROM wms_sales_order a
+		LEFT JOIN wms_sales_order_goods g ON a.id = g.order_id
+		<where>
+			<if test="province != null">AND a.province = #{province}</if>
+			<if test="city != null">AND a.city = #{city}</if>
+			<if test="district != null">AND a.district= #{district}</if>
+			<if test="createTimeBegin != null">AND a.order_time &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND a.order_time &lt;= #{createTimeEnd}</if>
+			AND g.indiv_enabled = 1
+			AND a.province IS NOT NULL
+			AND a.city IS NOT NULL
+			AND a.district IS NOT NULL
+		</where>
+		GROUP BY a.province
+		,a.city
+		,a.district
+		,g.sku_name
+		) A
+	</select>
+
+	<!--正向订单时效统计报表-->
+	<select id="orderInFactList"  parameterType="map" resultType="Map">
+		SELECT *
+		FROM(
+		SELECT A.*, rownum r
+		FROM (
+		SELECT wa.ORDER_CODE
+		,wa.ORDER_SOURCE AS order_source
+		,wa.ORDER_TIME AS order_time
+		,wa.PAYMENT_TIME AS payfor_time
+		,wg.sku_name as sku_name
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 1
+		) AS shaidan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 2
+		AND rownum = 1
+		) AS dadan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 1
+		AND rownum = 1
+		) AS chuku_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 5
+		AND rownum = 1
+		) AS qianshou_time
+		,wa.address AS address
+		,wa.order_amount AS orderAmount
+		,wa.PAYMENT_TYPE AS paymentType
+		,wa.SHIPPING_NAME AS shippingName
+		,wa.SHIPPING_NO AS shippingNo
+		,wa.ORDER_SOURCE AS orderStatus
+		FROM wms_sales_order wa
+			left join wms_sales_order_goods wg on wa.id=wg.order_id
+		<where>
+			 wg.indiv_enabled=1
+			<if test="createTimeBegin != null">AND wa.PAYMENT_TIME &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND wa.PAYMENT_TIME &lt;= #{createTimeEnd}</if>
+			<if test="skuCode != null and skuCode != ''">and wg.sku_code = #{skuCode}</if>
+			<if test="skuName != null and skuName != ''">
+				and wg.sku_name like '%${skuName}%'
+			</if>
+			<if test="orderCode !=null">
+				and wa.ORDER_CODE =#{orderCode}
+			</if>
+			<if test="orderStatus !=null">
+				and wa.ORDER_SOURCE =#{orderStatus}
+			</if>
+		</where>
+		ORDER BY wa.order_time DESC
+		) a
+		WHERE 1=1
+		<![CDATA[
+				  and rownum<=#{page.endRow}
+				)
+			WHERE r >= #{page.startRow}
+		]]>
+	</select>
+
+
+	<select id="orderInFactTotle"  parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM (
+		SELECT wa.ORDER_CODE
+		,wa.ORDER_SOURCE AS order_source
+		,wa.ORDER_TIME AS order_time
+		,wa.PAYMENT_TIME AS payfor_time
+		,wg.sku_name as sku_name
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 1
+		) AS shaidan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 2
+		AND rownum = 1
+		) AS dadan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 1
+		AND rownum = 1
+		) AS chuku_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 5
+		AND rownum = 1
+		) AS qianshou_time
+		,wa.address AS address
+		,wa.order_amount AS orderAmount
+		,wa.PAYMENT_TYPE AS paymentType
+		,wa.SHIPPING_NAME AS shippingName
+		,wa.SHIPPING_NO AS shippingNo
+		,wa.ORDER_SOURCE AS orderStatus
+		FROM wms_sales_order wa
+		left join wms_sales_order_goods wg on wa.id=wg.order_id
+		<where>
+			wg.indiv_enabled=1
+			<if test="createTimeBegin != null">AND wa.PAYMENT_TIME &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND wa.PAYMENT_TIME &lt;= #{createTimeEnd}</if>
+			<if test="skuCode != null and skuCode != ''">and wg.sku_code = #{skuCode}</if>
+			<if test="skuName != null and skuName != ''">
+				and wg.sku_name like '%${skuName}%'
+			</if>
+			<if test="orderCode !=null">
+				and wa.ORDER_CODE =#{orderCode}
+			</if>
+			<if test="orderStatus !=null">
+				and wa.ORDER_SOURCE =#{orderStatus}
+			</if>
+		</where>
+		ORDER BY wa.order_time DESC
+		) a
+		WHERE 1=1
+	</select>
+
+	<select id="orderInFactCascade" parameterType="map" resultType="Map">
+		SELECT A.*
+		FROM (
+		SELECT wa.ORDER_CODE
+		,wa.ORDER_SOURCE AS order_source
+		,wa.ORDER_TIME AS order_time
+		,wa.PAYMENT_TIME AS payfor_time
+		,wg.sku_name as sku_name
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 1
+		) AS shaidan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 2
+		AND rownum = 1
+		) AS dadan_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 1
+		AND rownum = 1
+		) AS chuku_time
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE wa.id = la.ORDER_ID
+		AND la.order_status = 5
+		AND rownum = 1
+		) AS qianshou_time
+		,wa.address AS address
+		,wa.order_amount AS orderAmount
+		,wa.PAYMENT_TYPE AS paymentType
+		,wa.SHIPPING_NAME AS shippingName
+		,wa.SHIPPING_NO AS shippingNo
+		,wa.ORDER_SOURCE AS orderStatus
+		FROM wms_sales_order wa
+		left join wms_sales_order_goods wg on wa.id=wg.order_id
+		<where>
+			wg.indiv_enabled=1
+			<if test="createTimeBegin != null">AND wa.PAYMENT_TIME &gt;= #{createTimeBegin}</if>
+			<if test="createTimeEnd != null">AND wa.PAYMENT_TIME &lt;= #{createTimeEnd}</if>
+			<if test="skuCode != null and skuCode != ''">and wg.sku_code = #{skuCode}</if>
+			<if test="skuName != null and skuName != ''">
+				and wg.sku_name like '%${skuName}%'
+			</if>
+			<if test="orderCode !=null">
+				and wa.ORDER_CODE =#{orderCode}
+			</if>
+			<if test="orderStatus !=null">
+				and wa.ORDER_SOURCE =#{orderStatus}
+			</if>
+		</where>
+		ORDER BY wa.order_time DESC
+		) a
+		WHERE 1=1
+	</select>
+
+	<!--查询用户区域分布统计报表-->
+	<select id="queryReceiveSummaryByPage" parameterType="map" resultType="ReceiveSummary">
+		SELECT *
+		FROM(
+		SELECT A.*, rownum r
+		FROM(
+		select <include refid="sql_summaryColumns"/>
+		from wms_receive_goods t1
+		join wms_receive t2
+		on t1.receive_id = t2.id
+
+		group by t2.warehouse_id, t1.sku_id, t1.wares_status, t1.goods_sid
+		) A
+		<![CDATA[
+			  WHERE rownum<=#{page.endRow}
+			)
+	    WHERE r >= #{page.startRow}
+	]]>
+	</select>
+
+	<!-- 查询符合条件的收货汇总-->
+	<select id="queryReceiveSummaryTotal" parameterType="map"  resultType="int">
+		select count(1) as total
+		 from (select 1
+		  from wms_receive_goods t1
+		  join wms_receive t2
+		    on t1.receive_id = t2.id
+	   <include refid="sql_summaryWhere"/>
+	    group by t2.warehouse_id, t1.sku_id, t1.wares_status
+	    )
+		
+	</select>
+
+	<select id="listOrderInFact" parameterType="map" resultType="Map">
+		SELECT a.ORDER_CODE
+		,a.ORDER_SOURCE
+		,a.ORDER_TIME AS "order_time"
+		,a.ORDER_TIME AS "payfor_time"
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE a.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 0
+		) AS "shaidan_time"
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE a.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 2
+		) AS "dadan_time"
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE a.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 1
+		) AS "chuku_time"
+		,(
+		SELECT la.op_time
+		FROM WMS_SALES_ORDER_LOG la
+		WHERE a.id = la.ORDER_ID
+		AND la.order_status = 0
+		AND rownum = 5
+		) AS "qianshou_time"
+		,a.address AS address
+		,a.order_amount AS orderAmount
+		,a.PAYMENT_TYPE as paymentType
+		,a.SHIPPING_NAME as shippingName
+		,a.SHIPPING_NO as shippingNo
+		,a.ORDER_SOURCE as orderStatus
+		FROM wms_sales_order a
+		WHERE a.order_status = 5
+		ORDER BY a.order_time DESC;
+	</select>
+
+
+
+	<!-- 获取出库汇总列表. -->
+	<select id="queryReceiveSummaryByReceiveId" parameterType="map" resultType="ReceiveSummary">
+		select <include refid="sql_summaryColumns"/>
+		  from wms_receive_goods t1
+		  join wms_receive t2
+		    on t1.receive_id = t2.id
+		 where t1.receive_id=#{receiveId}
+	  group by t2.warehouse_id, t1.sku_id, t1.wares_status, t1.goods_sid
+	</select>
+	
+	<!-- 根据收货单ID获取商品清单 -->
+	<select id="queryGoodsListByReceiveId" parameterType="int" resultType="ReceiveGoods">
+		select <include refid="sql_goodsColumns"/>
+		  from wms_receive_goods t1
+		  join wms_receive t2
+		    on t1.receive_id=t2.id
+	     where t1.receive_id=#{receiveId}
+	</select>
+	
+	<!-- 根据ID获取收货商品 -->
+	<select id="queryGoods" parameterType="long" resultType="ReceiveGoods">
+		select <include refid="sql_goodsColumns"/>
+		  from wms_receive_goods t1
+		  join wms_receive t2
+		    on t1.receive_id=t2.id
+		 where t1.id=#{id}
+	</select>
+	
+	<!-- 添加收货商品清单 -->
+	<insert id="addGoodsList" parameterType="list">
+	 	insert into wms_receive_goods
+ 		   (id,receive_id,sku_id,sku_code,sku_name,quantity,measure_unit,wares_status,product_batchno,indiv_enabled,indiv_finished,enabled, goods_sid)
+		select WMS_SEQ_COMMON.nextval,A.* from(
+		<foreach item="item" collection="list" index="index" separator="UNION ALL">
+		   select #{item.receive.id},#{item.skuId},#{item.skuCode},#{item.skuName},#{item.quantity},#{item.measureUnit},#{item.waresStatus},#{item.productBatchNo, jdbcType=VARCHAR},#{item.indivEnabled},#{item.indivFinished, jdbcType=VARCHAR},#{item.enabled}, #{item.goodsSid, jdbcType=VARCHAR} from dual
+		</foreach>
+		  )A
+	</insert>
+	
+	<!-- 添加收货商品 -->
+	<insert id="addGoods" parameterType="ReceiveGoods">
+		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+	 	insert into wms_receive_goods
+ 		   (id,receive_id,sku_id,sku_code,sku_name,quantity,measure_unit,wares_status,product_batchno,indiv_enabled,indiv_finished,enabled)
+		values 
+		   (#{id},#{receive.id},#{skuId},#{skuCode},#{skuName},#{quantity},#{measureUnit},#{waresStatus},#{productBatchNo, jdbcType=VARCHAR},#{indivEnabled},#{indivFinished, jdbcType=VARCHAR},#{enabled})
+	</insert>
+	
+	<!-- 更新收货商品 -->
+	<update id="updateGoods" parameterType="ReceiveGoods">
+  		update wms_receive_goods
+  		<set>
+  			<if test="quantity!=null">quantity=#{quantity},</if>
+  			<if test="productBatchNo!=null">product_batchno=#{productBatchNo},</if>
+  			<if test="indivFinished!=null">indiv_finished=#{indivFinished},</if>
+  			<if test="waresStatus!=null">wares_status=#{waresStatus},</if>
+		</set>
+  	     where id = #{id}
+  	</update>
+  	
+  	<!-- 删除指定的收货商品 -->
+	<delete id="deleteGoods" parameterType="long">
+		delete from wms_receive_goods 
+	 	 where id = #{id}
+	</delete>
+ </mapper>

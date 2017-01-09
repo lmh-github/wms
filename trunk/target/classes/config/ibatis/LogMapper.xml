@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gionee.wms.dao.LogDao">
+  <resultMap id="BaseResultMap" type="com.gionee.wms.entity.Log">
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="TYPE" jdbcType="INTEGER" property="type" />
+    <result column="OP_NAME" jdbcType="VARCHAR" property="opName" />
+    <result column="CONTENT" jdbcType="VARCHAR" property="content" />
+    <result column="IP" jdbcType="VARCHAR" property="ip" />
+    <result column="OP_USER_ID" jdbcType="VARCHAR" property="opUserId" />
+    <result column="OP_USER_NAME" jdbcType="VARCHAR" property="opUserName" />
+    <result column="OP_TIME" jdbcType="TIMESTAMP" property="opTime" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ID, TYPE, OP_NAME, CONTENT, IP, OP_USER_ID, OP_USER_NAME, OP_TIME
+  </sql>
+ 
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_LOG
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  
+   <select id="selectLogsCount" resultType="int" parameterType="map" >
+  	SELECT count(1)
+    from WMS_LOG
+     <where>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=INTEGER}
+      </if>
+      <if test="opName != null">
+       and  OP_NAME like '%'||#{opName,jdbcType=VARCHAR}||'%'
+      </if>
+      <if test="content != null">
+       and  CONTENT like '%'||#{content,jdbcType=VARCHAR}||'%'
+      </if>
+      <if test="ip != null">
+       and IP = #{ip,jdbcType=VARCHAR}
+      </if>
+      <if test="opUserId != null">
+       and OP_USER_ID = #{opUserId,jdbcType=VARCHAR}
+      </if>
+      <if test="opUserName != null">
+       and OP_USER_NAME = #{opUserName,jdbcType=VARCHAR}
+      </if>
+      <if test="startDate != null">
+       and OP_TIME   <![CDATA[>=]]>  to_date(#{startDate,jdbcType=TIMESTAMP},'yyyy-MM-dd hh24:mi:ss')
+      </if>
+      <if test="endDate != null">
+       and OP_TIME   <![CDATA[<=]]>  to_date(#{endDate,jdbcType=TIMESTAMP},'yyyy-MM-dd hh24:mi:ss')
+      </if>
+    </where> 
+  </select>
+  
+  <select id="selectPagedLogs" resultMap="BaseResultMap" parameterType="map" >
+  	SELECT *
+	  FROM( 
+		SELECT t2.*, rownum r
+		FROM(
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_LOG
+     <where>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=INTEGER}
+      </if>
+      <if test="opName_hit != null">
+       and  OP_NAME = #{opName_hit,jdbcType=VARCHAR}
+      </if>
+      <if test="opName != null">
+       and  OP_NAME like '%'||#{opName,jdbcType=VARCHAR}||'%'
+      </if>
+      <if test="content != null">
+       and  CONTENT like '%'||#{content,jdbcType=VARCHAR}||'%'
+      </if>
+      <if test="ip != null">
+       and IP = #{ip,jdbcType=VARCHAR}
+      </if>
+      <if test="opUserId != null">
+       and OP_USER_ID = #{opUserId,jdbcType=VARCHAR}
+      </if>
+      <if test="opUserName != null">
+       and OP_USER_NAME = #{opUserName,jdbcType=VARCHAR}
+      </if>
+      <if test="startDate != null">
+       and OP_TIME   <![CDATA[>=]]>  to_date(#{startDate,jdbcType=TIMESTAMP},'yyyy-MM-dd hh24:mi:ss')
+      </if>
+      <if test="endDate != null">
+       and OP_TIME   <![CDATA[<=]]>  to_date(#{endDate,jdbcType=TIMESTAMP},'yyyy-MM-dd hh24:mi:ss')
+      </if>
+    </where> 
+          order by OP_TIME desc      
+      )t2
+    	<![CDATA[
+			  WHERE rownum<=#{endRow} 
+			)
+	    WHERE r >= #{startRow}
+	]]>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from WMS_LOG
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.gionee.wms.entity.Log">
+  	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  WMS_SEQ_COMMON.nextval from dual
+	</selectKey>
+    insert into WMS_LOG (ID, TYPE, OP_NAME, CONTENT, 
+      IP, OP_USER_ID, OP_USER_NAME, 
+      OP_TIME)
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{opName,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{opUserId,jdbcType=VARCHAR}, 
+      #{opUserName,jdbcType=VARCHAR}, #{opTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <insert id="insertLog" parameterType="com.gionee.wms.entity.Log">
+  	<selectKey keyProperty="id" resultType="int" order="BEFORE">
+		select  WMS_SEQ_COMMON.nextval from dual
+	</selectKey>
+    insert into WMS_LOG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        ID,
+      <if test="type != null">
+        TYPE,
+      </if>
+      <if test="opName != null">
+        OP_NAME,
+      </if>
+      <if test="content != null">
+        CONTENT,
+      </if>
+      <if test="ip != null">
+        IP,
+      </if>
+      <if test="opUserId != null">
+        OP_USER_ID,
+      </if>
+      <if test="opUserName != null">
+        OP_USER_NAME,
+      </if>
+      <if test="opTime != null">
+        OP_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        #{id,jdbcType=INTEGER},
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="opName != null">
+        #{opName,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="opUserId != null">
+        #{opUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="opUserName != null">
+        #{opUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="opTime != null">
+        #{opTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.gionee.wms.entity.Log">
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Wed Jan 08 16:05:51 GMT+08:00 2014.
+    -->
+    update WMS_LOG
+    <set>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        CONTENT = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        IP = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="opUserId != null">
+        OP_USER_ID = #{opUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="opUserName != null">
+        OP_USER_NAME = #{opUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="opTime != null">
+        OP_TIME = #{opTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.gionee.wms.entity.Log">
+    update WMS_LOG
+    set TYPE = #{type,jdbcType=INTEGER},
+      CONTENT = #{content,jdbcType=VARCHAR},
+      IP = #{ip,jdbcType=VARCHAR},
+      OP_USER_ID = #{opUserId,jdbcType=VARCHAR},
+      OP_USER_NAME = #{opUserName,jdbcType=VARCHAR},
+      OP_TIME = #{opTime,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

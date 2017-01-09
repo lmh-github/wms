@@ -1,0 +1,17 @@
+com\sf\SfTest1.class
+com\gionee\wms\service\TransferServiceTest.class
+com\gionee\wms\dao\IndivDaoTest.class
+com\sf\XmlTest.class
+com\routdata\GdWebservice.class
+com\sf\SkuMapJobTest.class
+com\qimen\QimenHttpclient.class
+com\sf\TransferStatusTest.class
+com\gionee\wms\action\WmsActionTest.class
+com\gionee\wms\dao\ShippingInfoDaoTest.class
+com\gionee\wms\dao\TransferGoodsDaoTest.class
+com\gionee\wms\service\ShippingInfoServiceTest.class
+com\qimen\QimenSign.class
+com\routdata\EmsTest.class
+com\gionee\wms\dao\SalesOrderDaoTest.class
+com\qimen\QimenSendTool.class
+com\sf\TransferJobTest.class

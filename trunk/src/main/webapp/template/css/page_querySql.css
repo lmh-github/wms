@@ -1,0 +1,26 @@
+﻿@charset "utf-8";
+
+.table_bg01 .headtr th {
+    background: url("../img/admin_topbg01.gif") repeat-x scroll left top transparent;
+    border:1px solid #ddd;
+    color: #087DC8;
+    font-weight: bold;
+    height: 28px;
+    line-height: 25px;
+    padding-left: 10px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.table_bg01 tr.headtr {
+    background: none repeat scroll 0 0 #EDEDED;
+    position:relative;top:expression(document.getElementById('colDiv').scrollTop);
+    font-size:15px;
+}
+
+.table_bg01 tr.ctr {
+    background: none repeat scroll 0 0 #EDEDED;
+}
+.table_bg01 .ctr td{
+	font-size:12px;white-space: nowrap;padding-left: 10px; line-height: 20px;
+}

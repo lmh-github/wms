@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.SupplierDao" >
+	
+	<!-- 获取供应商信息列表. -->
+	<select id="querySupplierList" parameterType="map" resultType="Supplier">
+		  	  		select t1.id                 as id,
+		  	  			   t1.supplier_code     as supplierCode,
+			 			   t1.supplier_name     as supplierName,
+			 			   t1.supplier_address  as supplierAddress,
+			 			   t1.supplier_phone    as supplierPhone,
+			 			   t1.supplier_contact  as supplierContact,
+			 			   t1.default_status     as defaultStatus,
+			 			   t1.create_time        as createTime,
+			 			   t1.remark             as remark,
+			 			   t1.enabled            as enabled
+					  from wms_supplier t1
+				  <where>
+				  	<if test="id != null">t1.id = #{id}</if>
+				  	<if test="supplierCode != null">and t1.supplier_code = #{supplierCode}</if>
+			   		<if test="supplierName != null">and t1.supplier_name = #{supplierName}</if>
+			   		<if test="defaultStatus != null">and t1.default_status = #{defaultStatus}</if>
+			   		<if test="enabled != null">and t1.enabled = #{enabled}</if>
+			      </where> 
+			      order by default_status desc
+	</select>
+	
+	<!-- 添加供应商 -->
+	<insert id="addSupplier" parameterType="Supplier">
+ 		<selectKey keyProperty="id" resultType="long" order="BEFORE">
+			select  WMS_SEQ_COMMON.nextval from dual
+		</selectKey>
+ 		insert into wms_supplier
+ 			(id, supplier_code, supplier_name,supplier_address,supplier_phone,supplier_contact,default_status,create_time,remark,enabled)
+ 		values
+ 			(#{id},#{supplierCode},#{supplierName},#{supplierAddress, jdbcType=VARCHAR},#{supplierPhone, jdbcType=VARCHAR},#{supplierContact, jdbcType=VARCHAR},#{defaultStatus, jdbcType=NUMERIC},#{createTime},#{remark, jdbcType=VARCHAR},#{enabled})
+	</insert>
+	
+	<!-- 更新供应商 -->
+	<update id="updateSupplier" parameterType="Supplier">
+		update wms_supplier
+		<set>
+			<if test="supplierAddress!=null">supplier_address=#{supplierAddress},</if>
+			<if test="supplierPhone">supplier_phone=#{supplierPhone},</if>
+			<if test="supplierContact!=null">supplier_contact=#{supplierContact},</if>
+			<if test="defaultStatus!=null">default_status=#{defaultStatus},</if>
+			<if test="remark!=null">remark=#{remark},</if>
+			<if test="enabled!=null">enabled=#{enabled},</if>
+		</set>
+		<where>
+	   		<if test="id != null">id = #{id}</if>
+	   		<if test="supplierCode != null">and supplier_code = #{supplierCode}</if>
+	     </where> 
+	</update>
+	
+	<!-- 更新所有供应商为非默认状态 -->
+	<update id="updateAllSupplierToUndefault">
+		update wms_supplier
+		   set default_status = 0
+		 where default_status = 1
+	</update>
+	
+ </mapper>

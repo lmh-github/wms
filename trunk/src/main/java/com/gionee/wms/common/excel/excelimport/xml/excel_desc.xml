@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excelImport>
+
+	<repeatImport>
+		<![CDATA[
+			A1 = DEPTNAME1,
+			B1 = DEPTNAME2,
+			C1 = NAME,
+			D1 = KEY,
+			E1 = MOBILE,
+			F1 = MAIL,
+			G1 = OFFICEPHONE,
+			H1 = CARDNUMBER
+		]]>
+		<endCode>End</endCode>
+	</repeatImport>
+	
+	<!-- 校验器定义 -->
+	<validators>
+		<validator name="validator1" value="cn.zhaoql.excelimport.validate.NotNullValidator" />
+		<validator name="validator2" value="cn.zhaoql.excelimport.validate.LengthValidator" />
+		<validator name="validator3" value="com.boco.iam3" />
+	</validators>
+
+	<!-- 需要校验的单元格 -->
+	<cell-validators>
+		<cell-validator cellname="A1">
+			<validator name="validator1" />
+			<validator name="validator3" />
+		</cell-validator>
+		<cell-validator cellname="D1">
+			<validator name="validator2" />
+			<validator name="validator3" />
+		</cell-validator>
+		<cell-validator cellname="F1">
+			<validator name="validator1" />
+			<validator name="validator2" />
+		</cell-validator>
+	</cell-validators>
+	
+</excelImport>

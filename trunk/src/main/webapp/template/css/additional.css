@@ -1,0 +1,90 @@
+
+ul.tab {
+	overflow: hidden;
+	padding: 0 0 0 50px;
+	margin: 5px 0;
+	border-bottom: 1px solid #ccc;
+	height: 32px;
+}
+
+ul.tab li {
+	float: left;
+	padding: 5px 10px;	
+	border: 1px solid #ccc;
+	border-bottom-width: 0px;
+	font-family: "microsoft yahei";
+	height: 32px;
+}
+
+ul.tab li.cur {
+	background: #eee;
+	font-weight:bold;
+}
+
+ul.tab li a {
+	text-decoration: none;
+}
+
+table.mytable th, table.mytable td {
+	padding: 2px 5px;
+}
+
+table.listtable {
+	border-collapse: collapse;
+	border: 1px solid #ccc;
+	width:100%;
+}
+
+table.listtable th, 
+table.listtable td {
+	border: 1px solid #ccc;
+	padding: 2px 5px;
+	line-height:2;
+}
+
+table.listtable th {
+	font-weight: bold;
+	text-align: center;
+	background: #eee;
+	white-space: nowrap;
+}
+
+table.listtable td {
+	text-align: left;
+}
+
+div.pagenav {
+	text-align: right;
+	line-height:18px;
+	font-family: "microsoft yahei";
+	margin: 5px 0;
+}
+
+div.pagenav a, 
+div.pagenav span.cur {
+	border: 1px solid #ccc;
+	padding: 3px 5px;
+}
+
+div.pagenav span.cur {
+	fong-weight: bold;
+	border-color: #FF6600;
+}
+
+.tlr {
+	text-align: right !important;
+}
+
+img.thumbnails {
+	width: 80px;
+	height: 80px;
+}
+
+.disabledlink {
+	color:#ccc;
+	text-decoration:underline;
+}
+
+.cred {
+	color: red;
+}

@@ -1,0 +1,3 @@
+wms.properties新增如下配置
+
+wms.printer.pre=\\\\\\\\WXSD027\\\\

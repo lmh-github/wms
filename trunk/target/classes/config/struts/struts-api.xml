@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<package name="api" namespace="/api" extends="wms-default">
+		<!--根据商品ID，获取SKU列表-->
+		<action name="querySkuListByWaresId" class="skuAction" method="querySkuListByWaresId">
+			<!--
+				<result type="json">
+					<param name="root">skus</param>
+				</result>   
+				-->
+		</action>
+		<!--根据商品Code，获取SKU列表-->
+		<action name="querySkuListByWaresCode" class="skuAction" method="querySkuListByWaresCode">
+			<!--
+				<result type="json">
+					<param name="root">skus</param>
+				</result>   
+				-->
+		</action>
+		<!--根据商品分类ID，获取子分类列表(包括商品)-->
+		<action name="queryCategoryVoList" class="waresCategoryAction" method="queryCategoryVoList">
+			<!--
+				<result type="json">
+					<param name="root">waresCats</param>
+				</result>   
+				-->
+		</action>
+		
+		<!--查询库存 -->
+		<action name="queryStock" class="WmsAction" method="queryStock">
+		</action>
+		
+		<!-- 同步订单 -->
+		<action name="syncOrder" class="WmsAction" method="syncOrder">
+		</action>
+		
+		<!-- 取消订单 -->
+		<action name="cancelOrder" class="WmsAction" method="cancelOrder">
+		</action>
+		
+		<!--查询订单 -->
+		<action name="queryOrder" class="WmsAction" method="queryOrder">
+		</action>
+		
+		<!--操作订单 -->
+		<action name="operateOrder" class="WmsAction" method="operateOrder">
+		</action>
+		
+		<!-- 同步订单 -->
+		<action name="syncOrderOc" class="WmsAction" method="syncOrderNew">
+		</action>
+		
+		<!-- 取消订单 -->
+		<action name="cancelOrderOc" class="WmsAction" method="cancelOrderNew">
+		</action>
+		
+		<!--根据快递公司编号和快递单编号，查询快递信息-->
+		<action name="queryShippingInfo" class="shippingAction" method="queryShippingInfo">
+		</action>
+		<!--根据快递公司编号和快递单编号,返回快递URL查询地址-->
+		<action name="queryHTMLShippingInfo" class="shippingAction" method="queryHTMLShippingInfo">
+		</action>
+		<!--根据快递公司编号和快递单编号，查询快递信息(合二为一，queryShippingInfo+queryHTMLShippingInfo=queryShippingInfoByComCodeAndBillCode)-->
+		<action name="queryShippingInfoByComCodeAndBillCode" class="shippingAction" method="queryShippingInfoByComCodeAndBillCode">
+		</action>
+		
+		<!-- 提供快递100的回调接口 -->
+		<action name="kuaidiCallback" class="shippingAction" method="kuaidiCallback">
+		</action>
+		
+		<!-- 提供商城获得快递信息 -->
+		<action name="queryShippingInfoKd" class="shippingAction" method="queryShippingInfoKd">
+		</action>
+		
+		<!-- 快递接口 -->
+		<action name="kuaidiAction" class="kuaidiAction" />
+	</package>
+</struts>
