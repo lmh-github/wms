@@ -1,2 +1,3 @@
 WMS
-WMS 仓储管理系统
+浠撳簱绠＄悊绯荤粺
+http://wms.gionee.com
