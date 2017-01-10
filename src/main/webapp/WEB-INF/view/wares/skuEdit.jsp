@@ -144,7 +144,7 @@
 			alert("请选择SKU！");
 			return;
 		}
-		
+
 		if (item.quantity.length > 0 && (!/^\d+$/.test(item.quantity) || +item.quantity == 0)) {
 			alert("数量必须为数字，且大于0！");
 			return;

@@ -418,7 +418,8 @@
     					on t0.cat_id = t5.id
 				   <where>
 				   		<if test="id != null">t1.id=#{id}</if>
-				   		<if test="waresId != null">and t1.wares_id=#{waresId}</if>
+					    <if test="waresId != null">and t1.wares_id=#{waresId}</if>
+					    <if test="materialCode != null">and t1.material_code=#{materialCode}</if>
 				   		<if test="skuCode != null">and t1.sku_code=#{skuCode}</if>
 				   		<if test="skuName != null">and t1.sku_name like '%${skuName}%'</if>
 				   		<if test="skuFullName != null">and t1.sku_name=#{skuFullName}</if>

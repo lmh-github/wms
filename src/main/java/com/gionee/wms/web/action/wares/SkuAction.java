@@ -56,7 +56,9 @@ public class SkuAction extends CrudActionSupport<Sku> {
 		criteria.put("catPath", StringUtils.defaultIfBlank(sku.getWares().getCategory().getCatPath(), null));
 		criteria.put("skuCode", StringUtils.defaultIfBlank(sku.getSkuCode(), null));
 		criteria.put("skuName", StringUtils.defaultIfBlank(sku.getSkuName(), null));
+		criteria.put("materialCode", StringUtils.defaultIfBlank(sku.getMaterialCode(), null));
 		criteria.put("waresId", sku.getWares().getId());
+
 		int totalRow = waresService.getSkuWithAttrListTotal(criteria);
 		page.setTotalRow(totalRow);
 		page.calculate();
