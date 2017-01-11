@@ -35,10 +35,6 @@
 				<label>SKU名称：</label>
 				<input type="text" name="skuName" value="${skuName}"/>
 			</li>
-			<li>
-				<label>ERP物料编号：</label>
-				<input type="text" name="materialCode" value="${materialCode}"/>
-			</li>
 		</ul>
 		<div class="subBar">
 			<ul>
