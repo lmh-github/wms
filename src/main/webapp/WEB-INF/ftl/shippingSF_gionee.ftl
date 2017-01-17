@@ -85,7 +85,7 @@ p {
       </div>
       <!-- 声明价值 -->
       <div class="e" style="top: 315px; left: 305px;">
-        <p><span style="font-size: 130%; letter-spacing: 5px;">${(order.invoiceAmount?if_exists)?string("#.##")}</span></p>
+        <p><span style="font-size: 130%; letter-spacing: 5px;">${(order.payableAmount?if_exists)?string("#.##")}</span></p>
       </div>
       <!-- 原寄地 -->
       <div class="e" style="top: 60px; left: 590px;">
@@ -135,7 +135,7 @@ p {
       <!-- 备注 -->
       <div class="e" style="top: 295px;left: 489px;">
       	<#if order.paymentType==2>
-        	<p>代收货款，金额：${(order.invoiceAmount?if_exists)?string("#.##")}</p>
+        	<p>代收货款，金额：${(order.payableAmount?if_exists)?string("#.##")}</p>
         </#if>
         <#if order.paymentType==1>
         	<p>转寄协议客户</p>
