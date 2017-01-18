@@ -7,11 +7,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="alipay-sdk-20140125" level="project" />
+    <orderEntry type="library" name="alipay-sdk-source-20140125" level="project" />
+    <orderEntry type="library" name="taobao-sdk-standard-20131125" level="project" />
+    <orderEntry type="library" name="taobao-sdk-standard-source-20131125" level="project" />
     <orderEntry type="library" name="Maven: org.apache.struts:struts2-core:2.3.14.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.struts.xwork:xwork-core:2.3.14.2" level="project" />
     <orderEntry type="library" name="Maven: asm:asm-commons:3.3" level="project" />
@@ -94,7 +97,7 @@
     <orderEntry type="library" name="Maven: com.oracle:ojdbc14:10.2.0.4.0" level="project" />
     <orderEntry type="library" name="Maven: jbarcode:jbarcode:0.2.8" level="project" />
     <orderEntry type="library" name="Maven: taobao:taobao-sdk:20130924" level="project" />
-    <orderEntry type="library" name="Maven: opensymphony:quartz-all:1.6.3" level="project" />
+    <orderEntry type="library" name="Maven: opensymphony:quartz-all:163" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:3.0.4.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.thoughtworks.xstream:xstream:1.4.5" level="project" />
     <orderEntry type="library" name="Maven: xmlpull:xmlpull:1.1.3.1" level="project" />
