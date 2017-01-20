@@ -206,8 +206,10 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
                 if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
                     result.setMessage("未发货的单才能进行配货");
                 } else {
-                    transfer.setStatus(WmsConstants.TransferStatus.DELIVERYING.getCode());
-                    transferService.updateTransfer(transfer);
+                    Transfer tr=new Transfer();
+                    tr.setTransferId(transfer.getTransferId());
+                    tr.setStatus(WmsConstants.TransferStatus.DELIVERYING.getCode());
+                    transferService.updateTransferSf(tr);
                     result.setOk(true);
                     result.setResult(transfer);
                 }

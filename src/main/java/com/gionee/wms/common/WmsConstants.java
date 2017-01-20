@@ -555,7 +555,7 @@ public class WmsConstants {
 		/**
 		 * 移动互联网
 		 */
-		YI_DONG_HU_LIAN_WANG("12", "移动互联网"),
+		// YI_DONG_HU_LIAN_WANG("12", "移动互联网"),
 		/**
 		 * 京东
 		 */
@@ -641,7 +641,7 @@ public class WmsConstants {
 		/**
 		 * 移动互联网
 		 */
-		YI_DONG_HU_LIAN_WANG("12", "移动互联网"),
+		//YI_DONG_HU_LIAN_WANG("12", "移动互联网"),
 		/**
 		 * 京东
 		 */
