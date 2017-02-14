@@ -158,6 +158,9 @@
 			<result name="input_goods_new">/WEB-INF/view/stock/transferGoodsNew.jsp</result>
 			<result name="print_transfer" type="freemarker">/WEB-INF/ftl/printTransfer.ftl</result>
 			<result name="trans_back_input">/WEB-INF/view/stock/transBack.jsp</result>
+			<result name="trans_import">/WEB-INF/view/stock/transferImport.jsp</result>
+			<result name="trans_goods_import">/WEB-INF/view/stock/transferGoodsImport.jsp</result>
+
 		</action>
 		
 		<!-- µ÷²¦(Ë³·á) -->

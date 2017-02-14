@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excelImport>
+	<repeatImport>
+		<![CDATA[
+			A2=WAREHOUSE_NAME,
+			B2=TRANSFERTO,
+			C2=CONSTACT,
+			D2=LOGISTIC_NAME,
+			E2=TRANSFER_SALE,
+			F2=TANSFER_SEND,
+			G2=TANSFER_INVOICE,
+			H2=ORDER_AMOUNT,
+			I2=TANS_TYPE,
+			J2=CONSIGNEE,
+			K2=PO,
+			L2=REMARK
+		]]>
+		<endCode>End</endCode>
+	</repeatImport>
+	
+</excelImport>

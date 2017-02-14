@@ -262,6 +262,14 @@ public class WmsConstants {
 	public static final String EXCEL_UPLOAD_ALLOWED_TYPES = "application/msexcel;application/vnd.ms-excel;application/kset;";// 上传EXCEL的大小限制2M
 	public static final String XML_UPLOAD_ALLOWED_TYPES = "text/xml";// 上传XML文件类型
 
+	public static final String TANSFER_IMP_DATA = "config/excel/tansfer_imp_data.xls";// 配送订单模版
+	public static final String TANSFER_IMP_DESC = "config/excel/tansfer_imp_desc.xml";// 配送订单模版文件描述
+	public static final String TANSFER_IMP_DEMO="config/excel/tansfer_imp_demo.xls"; //导出模版
+
+	public static final String TANSFER_GOODS_IMP_DATA = "config/excel/tansfer_goods_imp_data.xls";// 配送商品模版
+	public static final String TANSFER_GOODS_IMP_DESC = "config/excel/tansfer_goods_imp_desc.xml";// 配送商品模版文件描述
+	public static final String TANSFER_GOODS_IMP_DEMO="config/excel/tansfer_goods_imp_demo.xls"; //导出商品模版
+
 	public static final String SHOPPING_LIST_FTL_PATH = "/WEB-INF/ftl/shoppingList.ftl";// 购物清单模板所在类路径
 	public static final String SHIPPING_FTL_PATH = "/WEB-INF/ftl/shipping.ftl";// 运单模板所在类路径
 	public static final String SHIPPING_SF_TEMPLATE = "/WEB-INF/ftl/shippingSf.ftl";// 运单模板所在类路径

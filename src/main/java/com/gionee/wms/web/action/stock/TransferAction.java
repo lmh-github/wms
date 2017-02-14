@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.gionee.wms.common.excel.excelimport.bean.ExcelData;
+import com.gionee.wms.common.excel.excelimport.bean.ImportCellDesc;
+import com.gionee.wms.common.excel.excelimport.userinterface.ExcelImportUtil;
+import com.gionee.wms.entity.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -27,14 +30,6 @@ import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.CommonAjaxResult;
 import com.gionee.wms.dto.Page;
-import com.gionee.wms.entity.Indiv;
-import com.gionee.wms.entity.IndivScanItem;
-import com.gionee.wms.entity.Sku;
-import com.gionee.wms.entity.Stock;
-import com.gionee.wms.entity.Transfer;
-import com.gionee.wms.entity.TransferGoods;
-import com.gionee.wms.entity.TransferPartner;
-import com.gionee.wms.entity.Warehouse;
 import com.gionee.wms.service.ServiceException;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.StockService;
@@ -44,6 +39,7 @@ import com.gionee.wms.service.wares.WaresService;
 import com.gionee.wms.web.action.CrudActionSupport;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller("TransferAction")
 @Scope("prototype")
@@ -88,6 +84,13 @@ public class TransferAction extends CrudActionSupport<Transfer> {
 	private Date createTimeEnd;// 结束时间
 
 	private String exports;
+
+	private File upload;
+
+	private String uploadContentType;
+	private String uploadFileName;
+
+
 
 	/**
 	 * 查询调拨单列表
@@ -394,6 +397,251 @@ public class TransferAction extends CrudActionSupport<Transfer> {
 		ajaxObject(result);
 		return null;
 	}
+	/**
+	 * 进入导入订单excel页面
+	 */
+	public String transImport() throws Exception {
+		warehouseList = warehouseService.getValidWarehouses();
+		return "trans_import";
+	}
+	/**
+	 * 进入导入调拨excel页面
+	 */
+	public String transGoodsImport() throws Exception {
+		warehouseList = warehouseService.getValidWarehouses();
+		return "trans_goods_import";
+	}
+
+	public String imp() throws Exception {
+		String errorMsg = fileValidate(upload);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			logger.error(errorMsg);
+			ajaxError(errorMsg);
+			return null;
+		}
+		try {
+			List<Transfer> transferList = getTransferList(upload);
+		//	checkService.addPhysicalGoodsList(checkService.getCheck(id), physicalGoodsList);
+			for(Transfer trans:transferList){
+
+				trans.setHandledBy(ActionUtils.getLoginName());
+				transferService.addTransfer(trans);
+			}
+
+			ajaxSuccess("上传订单数据成功");
+		} catch (Exception e) {
+			logger.error("上传订单数据时出错", e);
+			ajaxError("上传订单数据时出错：" + e.getMessage());
+		}
+
+		return null;
+	}
+
+
+	public String impGoods() throws Exception {
+		String errorMsg = fileValidate(upload);
+		if (StringUtils.isNotBlank(errorMsg)) {
+			logger.error(errorMsg);
+			ajaxError(errorMsg);
+			return null;
+		}
+		try {
+			Transfer transfer =new Transfer();
+			transfer = transferService.getTransferById(transferId);
+			if(transfer==null){
+				throw new RuntimeException("到不到此订单号");
+			}
+			if(transfer.getStatus()!=1){
+				throw new RuntimeException(transfer.getTransferId()+":此单号SKU不能修改");
+			}
+
+			List<TransferGoods> physicalGoodsList = getTransferGoodsList(upload);
+			for(TransferGoods transferGoods:physicalGoodsList){
+
+				Stock stock=stockService.getStock(warehouseService.getWarehouse(transfer.getWarehouseId()).getWarehouseCode(),transferGoods.getSkuId());
+
+				if(stock==null){
+					ajaxError("请检查该商品库存信息:"+transferGoods.getSkuCode());
+				}else if(transfer.getTransType()==WmsConstants.TRANS_TYPE_NONDEFECTIVE){
+					ajaxError("可销售库存不足:"+transferGoods.getSkuCode());
+				}else if(transfer.getTransType() == WmsConstants.TRANS_TYPE_DEFECTIVE && transferGoods.getQuantity() > stock.getUnsalesQuantity()){
+					ajaxError("不可销售库存不足:"+transferGoods.getSkuCode());
+				}else {
+					//transferGoods.setQuantity(sku.get);
+					transferGoods.setTransferId(transfer.getTransferId()+"");
+					transferGoods.setMeasureUnit("台");
+					transferService.addTransferGoods(transfer, transferGoods);
+					ajaxSuccess("添加调拨商品成功");
+				}
+			}
+
+
+			//ajaxSuccess("上传订单数据成功");
+		} catch (Exception e) {
+			logger.error("上传订单数据时出错", e);
+			ajaxError("上传订单数据时出错：" + e.getMessage());
+		}
+
+		return null;
+	}
+
+	private List<Transfer> getTransferList(File upload) throws Exception {
+		List<Transfer> list=new ArrayList<Transfer>();
+		ExcelData uploadData = null;
+		uploadData = ExcelImportUtil.readExcel(WmsConstants.TANSFER_IMP_DESC, FileUtils.openInputStream(upload));
+
+		if (uploadData == null || CollectionUtils.isEmpty(uploadData.getRepeatData())) {
+			throw new RuntimeException("文件数据格式不正确");
+		}
+
+		List<Map<String, ImportCellDesc>> physicalExcelRows = uploadData.getRepeatData();
+		for (Map<String, ImportCellDesc> row : physicalExcelRows) {
+			Transfer transfer =new Transfer();
+			Map<String, Object> criteria = Maps.newHashMap();
+			try {
+
+				transferPartnerList = transferService.getTransferPartnerList(criteria);
+				warehouseList = warehouseService.getValidWarehouses();
+
+				transfer.setWarehouseName(row.get("WAREHOUSE_NAME").getFieldValue());
+				transfer.setTransferTo(row.get("TRANSFERTO").getFieldValue());
+				transfer.setContact(row.get("CONSTACT").getFieldValue());
+				transfer.setLogisticName(row.get("LOGISTIC_NAME").getFieldValue());
+				transfer.setOrderAmount(new BigDecimal(row.get("ORDER_AMOUNT").getFieldValue()));
+				transfer.setPo(row.get("PO").getFieldValue());
+				transfer.setTransType(row.get("TANS_TYPE").getFieldValue().toString().equals("良品调拨") ? 0 : 1);
+
+				transfer.setRemark(row.get("REMARK").getFieldValue());
+				//transfer.setTransferTo();
+				for(Warehouse warehouse:warehouseList){
+					if(row.get("WAREHOUSE_NAME").getFieldValue().equals(warehouse.getWarehouseName())){
+						transfer.setWarehouseId(warehouse.getId());
+					}
+				}
+
+				for(TransferPartner ts:transferPartnerList){
+					if(ts.getName().equals(row.get("TRANSFER_SALE").getFieldValue())){
+						transfer.setTransferSale(ts.getId());
+					}
+					if(ts.getName().equals(row.get("TANSFER_SEND").getFieldValue())){
+						transfer.setTransferSend(ts.getId());
+					}
+					if(ts.getName().equals(row.get("TANSFER_INVOICE").getFieldValue())){
+						transfer.setTransferInvoice(ts.getId());
+					}
+				}
+				//transfer.setTransferSale();
+
+			} catch (Exception e) {
+				throw new RuntimeException("请正确填写调拨单数据");
+			}
+			/*if (transferList.containsKey(physicalGoods.getSkuCode())) {
+				throw new RuntimeException("商品条目存在重复");
+			}*/
+			//transferService.addTransfer(transfer);
+			list.add(transfer);
+		}
+		return list;
+	}
+	private List<TransferGoods> getTransferGoodsList(File upload) throws Exception {
+		List<TransferGoods> list=new ArrayList<TransferGoods>();
+		ExcelData uploadData = null;
+		uploadData = ExcelImportUtil.readExcel(WmsConstants.TANSFER_GOODS_IMP_DESC, FileUtils.openInputStream(upload));
+
+		if (uploadData == null || CollectionUtils.isEmpty(uploadData.getRepeatData())) {
+			throw new RuntimeException("文件数据格式不正确");
+		}
+
+		List<Map<String, ImportCellDesc>> physicalExcelRows = uploadData.getRepeatData();
+		for (Map<String, ImportCellDesc> row : physicalExcelRows) {
+
+			TransferGoods goods=new TransferGoods();
+			Map<String, Object> criteria = Maps.newHashMap();
+			try {
+				///transferId
+				transferPartnerList = transferService.getTransferPartnerList(criteria);
+				warehouseList = warehouseService.getValidWarehouses();
+
+
+				String sku_code=row.get("SKU_CODE").getFieldValue();
+				String quantity=row.get("QUANTITY").getFieldValue();//数量
+				String number=row.get("NUMBER").getFieldValue();//单价
+				//System.out.println(StringToString(sku_code) + ":" + quantity + ":" + number);
+
+
+				if(row.get("SKU_CODE").getFieldValue()!=null){
+					Sku sku=waresService.getSkuByCode(StringToString(sku_code));
+					goods.setSkuId(sku.getId());
+					goods.setSkuCode(sku.getSkuCode());
+					goods.setSkuName(sku.getSkuName());
+					BigDecimal bigDecimal=new BigDecimal(number);
+					goods.setUnitPrice(bigDecimal);
+					goods.setQuantity(StringToInt(quantity));
+					goods.setMeasureUnit(sku.getWares().getMeasureUnit());
+
+					//goods.set
+
+				}else{
+					throw new RuntimeException("请填写正确的sku:"+row.get("SKU_CODE").getFieldValue());
+				}
+
+				//transfer.setTransferSale();
+
+			} catch (Exception e) {
+				throw new RuntimeException("请正确填写商品数据");
+			}
+				list.add(goods);
+			/*if (transferList.containsKey(physicalGoods.getSkuCode())) {
+				throw new RuntimeException("商品条目存在重复");
+			}*/
+			//transferService.addTransfer(transfer);
+			//list.add(sku);
+		}
+		return list;
+	}
+
+
+
+	public static Integer StringToInt(String number){
+		boolean flag=number.contains(".");
+		Integer a=0;
+		if(flag){
+			a=Integer.parseInt(number.substring(0, number.indexOf(".")));
+		}else{
+			a=Integer.parseInt(number);
+		}
+		return a;
+	}
+	public static String StringToString(String number){
+		boolean flag=number.contains(".");
+		String a="";
+		if(flag){
+			a=number.substring(0, number.indexOf("."));
+		}else{
+			a=number;
+		}
+		return a;
+	}
+
+
+
+	private String fileValidate(File upload) {
+		String errorMsg = "";
+		if (upload == null) {
+			errorMsg = "上传文件为空";
+		} else if (StringUtils.isBlank(uploadContentType)
+				|| !WmsConstants.EXCEL_UPLOAD_ALLOWED_TYPES.contains(uploadContentType)) {
+			errorMsg = "上传文件类型不是Excel";
+		} else if (upload.length() > WmsConstants.EXCEL_UPLOAD_MAXIMUM_SIZE) {
+			errorMsg = "上传文件不能大于2M";
+		}
+		logger.info("upload file name: " + uploadFileName);
+		logger.info("upload file type: " + uploadContentType);
+		logger.info("upload file size: " + upload.length());
+		return errorMsg;
+	}
+
+
 
 	/**
 	 * 确认退回
@@ -650,4 +898,35 @@ public class TransferAction extends CrudActionSupport<Transfer> {
 		this.createTimeEnd = createTimeEnd;
 	}
 
+	public File getUpload() {
+		return upload;
+	}
+
+	public void setUpload(File upload) {
+		this.upload = upload;
+	}
+	public String getUploadContentType() {
+		return uploadContentType;
+	}
+
+	public String getUploadFileName() {
+		return uploadFileName;
+	}
+
+	public void setUploadContentType(String uploadContentType) {
+		this.uploadContentType = uploadContentType;
+	}
+
+	public void setUploadFileName(String uploadFileName) {
+		this.uploadFileName = uploadFileName;
+	}
+
+	public void setWarehouseService(WarehouseService warehouseService) {
+		this.warehouseService = warehouseService;
+	}
+
+	public WarehouseService getWarehouseService() {
+
+		return warehouseService;
+	}
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excelImport>
+	<repeatImport>
+		<![CDATA[
+			A2=SKU_CODE,
+			B2=QUANTITY,
+			C2=NUMBER
+		]]>
+		<endCode>End</endCode>
+	</repeatImport>
+	
+</excelImport>

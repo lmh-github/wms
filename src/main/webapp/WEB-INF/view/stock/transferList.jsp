@@ -66,6 +66,17 @@
 			<li><a class="edit" href="${ctx}/stock/transfer!inputManual.action?transfer.transferId={sid_transfer}" target="dialog"  rel="dlg_transfer_manual" mask="true" width="800" height="600"><span>查看编辑调拨单</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/transfer!printTransfer.action?transferId={sid_transfer}" target="navTab"  targetType="navTab" warn="请选择调拨单"><span>打印调拨单</span></a></li>
+
+
+			<li>
+				<!--<input type="file" name="file">-->
+				<a class="add" href="${ctx}/stock/transfer!transImport.action" target="dialog" mask="true" width="800" height="600"><span>导入订单</span></a>
+			</li>
+			<li>
+				<!--<input type="file" name="file">-->
+				<a class="add" href="${ctx}/stock/transfer!transGoodsImport.action?transferId={sid_transfer}" target="dialog" mask="true" width="800" height="600" warn="请选择调拨单"><span>导入商品</span></a>
+			</li>
+
 		</ul>
 	</div>
 	<table class="list" width="100%" layoutH="140">
