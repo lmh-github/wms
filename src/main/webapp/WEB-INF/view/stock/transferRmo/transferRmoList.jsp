@@ -12,18 +12,33 @@
 <div class="pageHeader">
   <form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/transferRmo.action" method="post">
     <div class="searchBar">
-      <ul class="searchContent">
-        <li style="width: 430px;"><label>创建时间从：</label> <input type="text" name="createTimeBegin" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd HH:mm:ss"/>" /> 到： <input type="text" name="createTimeEnd" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd HH:mm:ss"/>" /></li>
-         <li style="width: 250px;"><label>订单号：</label> <input type="text" name="transferCode" value="${transferCode}" style="width: 140px" /></li>
-          <li style="width: 250px;"> <label>平台：</label>  <input type="text" name="backPlatform" value="${backPlatform}" style="width: 140px" /> </li>
-        <li style="width: 230px;"><label style="width: 70px;">退货状态：</label>
-          <s:select name="status" list="#{'1':'已创建', '0':'无效', '2':'已收货'}" listKey="key" listValue="value" value="status" headerKey="" headerValue="" theme="simple"></s:select>
-                <li style="width: 230px;"><label style="width: 70px;">品质：</label>
-          <s:select name="quality" list="#{'1':'良品', '0':'次品'}" listKey="key" listValue="value" value="quality" headerKey="" headerValue="" theme="simple"></s:select>
-
-      </ul>
-
-
+        <ul class="searchContent">
+            <li>
+                <label>创建开始时间：</label>
+                <input type="text" name="createTimeBegin" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>创建截止时间：</label>
+                <input type="text" name="createTimeEnd" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>订单号：</label>
+                <input type="text" name="transferCode" value="${transferCode}"/>
+            </li>
+            <li>
+                <label>平台：</label>
+                <input type="text" name="backPlatform" value="${backPlatform}"/>
+            </li>
+            <li>
+                <label>退货状态：</label>
+                <s:select name="status" list="#{'1':'已创建', '0':'无效', '2':'已收货'}" listKey="key" listValue="value"
+                          value="status" headerKey="" headerValue="" theme="simple"></s:select>
+            <li>
+                <label>品质：</label>
+                <s:select name="quality" list="#{'1':'良品', '0':'次品'}" listKey="key" listValue="value" value="quality"
+                          headerKey="" headerValue="" theme="simple"></s:select>
+            </li>
+        </ul>
 
       <div class="subBar">
         <ul>

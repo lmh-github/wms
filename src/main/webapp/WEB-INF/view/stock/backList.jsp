@@ -14,25 +14,25 @@
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/back.action" method="post">
 	<div class="searchBar">
 		<ul class="searchContent">
-			<li style="width:380px;">
-				<label>退货时间从：</label>
+			<li>
+				<label>退货开始时间：</label>
 				<input type="text" name="backTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${backTimeBegin}" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+                <label>退货截止时间：</label>
 				<input type="text" name="backTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${backTimeEnd}" pattern="yyyy-MM-dd"/>"/>
 			</li>
 			<li>
 				<label>退货状态：</label>
-				<s:select name="backStatus" cssStyle="width: 133px" list="@com.gionee.wms.common.WmsConstants$BackStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>  
+				<s:select name="backStatus" list="@com.gionee.wms.common.WmsConstants$BackStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>
 			</li>
 			<li>
 				<label>退货单号：</label>
 				<input type="text" name="backCode" value="${backCode}"/>
 			</li>
-		</ul>
-		<ul class="searchContent">
-			<li style="width:380px;">
+			<li>
 				<label>订单号：</label>
-				<input type="text" name="orderCode" value="${orderCode}" style="width: 190px"/>
+				<input type="text" name="orderCode" value="${orderCode}"/>
 			</li>
 			<li>
 				<label>运单号：</label>

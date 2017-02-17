@@ -14,10 +14,12 @@
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/deliveryBatch.action" method="post">
 	<div class="searchBar">
 		<ul class="searchContent">
-			<li style="width:380px;">
-				<label>制单时间从：</label>
+			<li>
+				<label>制单开始时间：</label>
 				<input type="text" name="preparedTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${preparedTimeBegin}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
+            </li>
+            <li>
+                <label>制单截止时间：</label>
 				<input type="text" name="preparedTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${preparedTimeEnd}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
 			<li>

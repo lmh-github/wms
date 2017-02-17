@@ -12,7 +12,7 @@
 <div class="pageHeader">
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/transferSf.action" method="post">
 	<div class="searchBar">
-		<ul class="searchContent" layoutH="990">
+		<ul class="searchContent">
 			<li>
 				<label>发货仓：</label>
 				<select class="required" name="transfer.warehouseId">
@@ -46,11 +46,13 @@
 					<option value="1" ${(1==transfer.orderPushStatus)?"selected='true'":""}>已推送</option>
 				</select>
 			</li>
-			<li style="width:380px;">
-				<label>创建时间从：</label>
+			<li>
+				<label>创建开始时间：</label>
 				<input type="text" name="createTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
-				<input type="text" name="createTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>创建截止时间：</label>
+                <input type="text" name="createTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
 		</ul>
 		<div class="subBar">
@@ -68,7 +70,7 @@
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/transferSf!inputManual.action?transfer.transferId={sid_transfer}" target="dialog"  rel="dlg_transfer_manual" mask="true" width="800" height="600"><span>查看编辑调拨单</span></a></li>
 			<li class="line">line</li>
-			<li><a class="add" href="javascript:;" onclick="addPoOrder();"><span>下达顺风入库</span></a></li>
+			<li><a class="add" href="javascript:;" onclick="addSfOrder();"><span>下达顺丰入库</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/transferSf.action?exports=1" target="dwzExport" targettype="navTab"><span>导出调拨单excel</span></a></li>
 		</ul>
@@ -139,18 +141,18 @@
 
 	</div>
 	<script type="text/javascript">
-          // 下达京东入库单
-          function addPoOrder() {
+          // 手工入库顺丰
+          function addSfOrder() {
               var tb = $("#tb${rand}"), selTr = tb.find(">tbody>tr.selected");
               if (selTr.length == 0) {
                   return alertMsg.error("请选择单据！");
               }
-              alertMsg.confirm("确定将所选择的调货单下发到顺风入库吗？", {
+              alertMsg.confirm("确定将所选择的调货单下发到顺丰入库吗？", {
                   okCall: function() {
                       // ajaxTodo(url, $this.attr("callback"));
                       $.ajax({
                           type: 'POST',
-                          url: "${ctx}/stock/transferSf!addPoOrder.action?transferId=" + $.trim(selTr.find("td:first").text()),
+                          url: "${ctx}/stock/transferSf!addSfOrder.action?transferId=" + $.trim(selTr.find("td:first").text()),
                           dataType: "json",
                           cache: false,
                           success: navTabAjaxDone,

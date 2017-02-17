@@ -1,20 +1,24 @@
 package com.gionee.wms.web.action.stock;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.OneBarcodeUtil;
+import com.gionee.wms.common.WmsConstants;
+import com.gionee.wms.common.WmsConstants.IndivWaresStatus;
+import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
+import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
+import com.gionee.wms.dto.CommonAjaxResult;
+import com.gionee.wms.dto.Page;
+import com.gionee.wms.entity.*;
+import com.gionee.wms.service.ServiceException;
+import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.QimenBusinessService;
+import com.gionee.wms.service.stock.StockService;
+import com.gionee.wms.service.stock.TransferService;
+import com.gionee.wms.service.wares.IndivService;
+import com.gionee.wms.service.wares.WaresService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
+import com.gionee.wms.web.action.CrudActionSupport;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -24,31 +28,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.gionee.wms.common.ActionUtils;
-import com.gionee.wms.common.OneBarcodeUtil;
-import com.gionee.wms.common.WmsConstants;
-import com.gionee.wms.common.WmsConstants.IndivWaresStatus;
-import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
-import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
-import com.gionee.wms.dto.CommonAjaxResult;
-import com.gionee.wms.dto.Page;
-import com.gionee.wms.entity.Indiv;
-import com.gionee.wms.entity.IndivScanItem;
-import com.gionee.wms.entity.Sku;
-import com.gionee.wms.entity.Stock;
-import com.gionee.wms.entity.Transfer;
-import com.gionee.wms.entity.TransferGoods;
-import com.gionee.wms.entity.TransferPartner;
-import com.gionee.wms.entity.Warehouse;
-import com.gionee.wms.service.ServiceException;
-import com.gionee.wms.service.basis.WarehouseService;
-import com.gionee.wms.service.stock.StockService;
-import com.gionee.wms.service.stock.TransferService;
-import com.gionee.wms.service.wares.IndivService;
-import com.gionee.wms.service.wares.WaresService;
-import com.gionee.wms.web.action.CrudActionSupport;
-import com.google.common.collect.Maps;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+/**
+ * 顺丰分仓调货
+ */
 @Controller("TransferSfAction")
 @Scope("prototype")
 public class TransferSfAction extends CrudActionSupport<Transfer> {
@@ -81,6 +71,25 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
     private Boolean editGoods;
     private String exports;
     private String skuCode;
+    private List<Warehouse> warehouseList;// 仓库列表
+    private Page page = new Page();
+    private TransferGoods goods;
+    private Long id;
+    private List<TransferGoods> goodsList;
+    private Long goodsId;
+    private String barCodeImgPath;
+    private Long warehouseId;
+    private String indivCode;
+    private Integer waresStatus;// 商品良次品状态
+    private String[] indivCodes;
+    private String[] skuCodes;
+    private Integer[] waresStatuss;
+    private Integer[] indivEnableds;
+    private List<TransferPartner> transferPartnerList;// 调拨合作伙伴列表
+    private Date createTimeBegin;// 开始时间
+    private Date createTimeEnd;// 结束时间
+    private Date shippingTimeBegin;// 开始时间
+    private Date shippingTimeEnd;// 结束时间
 
     public String getExports() {
         return exports;
@@ -114,27 +123,6 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
         this.skuCode = skuCode;
     }
 
-    private List<Warehouse> warehouseList;// 仓库列表
-    private Page page = new Page();
-
-    private TransferGoods goods;
-    private Long id;
-    private List<TransferGoods> goodsList;
-    private Long goodsId;
-    private String barCodeImgPath;
-    private Long warehouseId;
-    private String indivCode;
-    private Integer waresStatus;// 商品良次品状态
-    private String[] indivCodes;
-    private String[] skuCodes;
-    private Integer[] waresStatuss;
-    private Integer[] indivEnableds;
-    private List<TransferPartner> transferPartnerList;// 调拨合作伙伴列表
-    private Date createTimeBegin;// 开始时间
-    private Date createTimeEnd;// 结束时间
-    private Date shippingTimeBegin;// 开始时间
-    private Date shippingTimeEnd;// 结束时间
-
     /**
      * 查询调拨单列表
      */
@@ -153,7 +141,6 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
             criteria.put("orderPushStatus", transfer.getOrderPushStatus());
             criteria.put("logisticNo", StringUtils.trimToNull(transfer.getLogisticNo()));
         }
-        criteria.put("transferTo", "8610752");
         criteria.put("createTimeBegin", createTimeBegin);
         criteria.put("createTimeEnd", createTimeEnd);
         criteria.put("shippingTimeBegin", shippingTimeBegin);
@@ -193,9 +180,9 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
     }
 
     /**
-     * 创建京东入库单
+     * 手工下达入库操作
      */
-    public void addPoOrder() {
+    public void addSfOrder() {
         if (transferId == null) {
             ajaxError("没有要操作的调货单！");
         }
@@ -204,8 +191,8 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
             ajaxSuccess("找不到此调货单");
             return;
         }
-        ServiceCtrlMessage msg = qimenBusinessService.entryOrderCreate(transfer);
 
+        ServiceCtrlMessage msg = transferService.purchaseOrder(transfer);
         if (msg.isResult()) {
             ajaxSuccess(msg.getMessage());
         } else {
@@ -233,7 +220,6 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
 
     /**
      * 编辑调拨清单
-     *
      * @return
      * @throws Exception
      */
@@ -360,8 +346,7 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
         // 根据调拨批次号生成条码信息
         String barCodePath = ActionUtils.getProjectPath() + WmsConstants.BAR_CODE_TRANSER_PATH;
         String fileName = OneBarcodeUtil.generateBar(String.valueOf(transferId), barCodePath);
-        if (fileName != null)
-            barCodeImgPath = WmsConstants.BAR_CODE_TRANSER_PATH + fileName;
+        if (fileName != null) barCodeImgPath = WmsConstants.BAR_CODE_TRANSER_PATH + fileName;
         return "print_transfer";
     }
 
@@ -377,7 +362,6 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
      * 扫描商品个体
      */
     public String scanIndiv() throws Exception {
-        // Map<String, Object> params = Maps.newHashMap();
         CommonAjaxResult result = new CommonAjaxResult();
         IndivScanItem indivScan = new IndivScanItem();
         try {
@@ -783,12 +767,12 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
         this.shippingTimeEnd = shippingTimeEnd;
     }
 
-    public void setQimenBusinessService(QimenBusinessService qimenBusinessService) {
-        this.qimenBusinessService = qimenBusinessService;
-    }
-
     public QimenBusinessService getQimenBusinessService() {
 
         return qimenBusinessService;
+    }
+
+    public void setQimenBusinessService(QimenBusinessService qimenBusinessService) {
+        this.qimenBusinessService = qimenBusinessService;
     }
 }

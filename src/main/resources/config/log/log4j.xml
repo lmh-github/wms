@@ -2,114 +2,120 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 
-	<!-- 以下是appender的定义  -->
-	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern"	value="%n%d %-5p %c{2} - %m%n" />
-		</layout>
-	</appender>
+    <!-- 以下是appender的定义  -->
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%n%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
 
-	<appender name="PROJECT" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<param name="threshold" value="info" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern"	value="%n%d %-5p %c{2} - %m%n" />
-		</layout>
-	</appender>
+    <appender name="PROJECT" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <param name="threshold" value="info"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%n%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
 
-	<appender name="PROJECT-DEBUG" class="org.apache.log4j.FileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-debug.log" />
-		<param name="append" value="false" />
-		<param name="encoding" value="UTF-8" />
-		<param name="threshold" value="debug" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern"
-				value="%n%d %-5p %c{2} - [%X{loginUser}@%X{remoteAddr} - %X{method} %X{requestURIWithQueryString}] %nUserAgent: %X{userAgent}%nReferrer: %X{referrer}%n%m%n" />
-		</layout>
-		<filter class="org.apache.log4j.varia.LevelRangeFilter">
-			<param name="LevelMin" value="DEBUG"/>
-			<param name="LevelMax" value="DEBUG"/>
-		</filter>
-	</appender>
+    <appender name="PROJECT-DEBUG" class="org.apache.log4j.FileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-debug.log"/>
+        <param name="append" value="false"/>
+        <param name="encoding" value="UTF-8"/>
+        <param name="threshold" value="debug"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%n%d %-5p %c{2} - [%X{loginUser}@%X{remoteAddr} - %X{method} %X{requestURIWithQueryString}] %nUserAgent: %X{userAgent}%nReferrer: %X{referrer}%n%m%n"/>
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="DEBUG"/>
+            <param name="LevelMax" value="DEBUG"/>
+        </filter>
+    </appender>
 
-	<appender name="MYBATIS" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-mybatis.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p %c{2} - %m%n" />
-		</layout>
-	</appender>
+    <appender name="MYBATIS" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-mybatis.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
 
-	<!-- 记录数据里异常的脏数据 -->
-	<appender name="dbDataExceptionAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-db-data-exception.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p %c{2} - %m%n" />
-		</layout>
-	</appender>
-	<appender name="APACHE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-apache.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern"
-				value="%d [%X{requestURIWithQueryString}] %-5p %c{2} - %m%n" />
-		</layout>
-	</appender>
-	<appender name="KUAIDI" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-kuaidi.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%m%n" />
-		</layout>
-	</appender>
-	<appender name="FILTER" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="file" value="${wms.loggingRoot}/wms-filter.log" />
-		<param name="append" value="true" />
-		<param name="encoding" value="UTF-8" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%m%n" />
-		</layout>
-	</appender>
-	<!--  以下是logger的定义  -->
+    <!-- 记录数据里异常的脏数据 -->
+    <appender name="dbDataExceptionAppender" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-db-data-exception.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+    <appender name="APACHE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-apache.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%d [%X{requestURIWithQueryString}] %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
+    <appender name="KUAIDI" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-kuaidi.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n"/>
+        </layout>
+    </appender>
+    <appender name="FILTER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${wms.loggingRoot}/wms-filter.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n"/>
+        </layout>
+    </appender>
+    <!--  以下是logger的定义  -->
 
-	<logger name="com.mybatis" additivity="false">
-		<level value="info" />
-		<appender-ref ref="MYBATIS" />
-	</logger>
-	<logger name="java.sql" additivity="true">
-		<level value="debug" />
-		<appender-ref ref="MYBATIS" />
-	</logger>
-	
-	<logger name="dbDataException" additivity="false">
-		<level value="info" />
-		<appender-ref ref="dbDataExceptionAppender" />
-	</logger>
-	<logger name="org.apache" additivity="false">
-		<level value="info" />
-		<appender-ref ref="APACHE" />
-	</logger>
-	<logger name="kuaidiLog" additivity="false">
-		<level value="info" />
-		<appender-ref ref="KUAIDI" />
-	</logger>
-	<logger name="filterLog" additivity="false">
-		<level value="info" />
-		<appender-ref ref="FILTER" />
-	</logger>
-	<!-- Root logger的定义-->
-	<root>
-		<level value="INFO" />
-		<appender-ref ref="PROJECT" />
-		<!--appender-ref ref="PROJECT-DEBUG" /--> 
-		<appender-ref ref="STDOUT"/>
-	</root>
+    <logger name="com.mybatis" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="MYBATIS"/>
+    </logger>
+    <logger name="java.sql" additivity="true">
+        <level value="debug"/>
+        <appender-ref ref="MYBATIS"/>
+    </logger>
+
+    <logger name="com.dxhy.openApi.service" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="dbDataException" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="dbDataExceptionAppender"/>
+    </logger>
+    <logger name="org.apache" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="APACHE"/>
+    </logger>
+    <logger name="kuaidiLog" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="KUAIDI"/>
+    </logger>
+    <logger name="filterLog" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="FILTER"/>
+    </logger>
+    <!-- Root logger的定义-->
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="PROJECT"/>
+        <appender-ref ref="APACHE"/>
+        <!--appender-ref ref="PROJECT-DEBUG" /-->
+        <appender-ref ref="STDOUT"/>
+    </root>
 </log4j:configuration>

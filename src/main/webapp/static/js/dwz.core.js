@@ -231,8 +231,24 @@ var DWZ = {
 				var iH = iRefH - iLayoutH > 50 ? iRefH - iLayoutH : 50;
 				
 				if ($this.isTag("table")) {
-					$this.removeAttr("layoutH").wrap('<div layoutH="'+iLayoutH+'" style="overflow:auto;height:'+iH+'px"></div>');
-				} else {
+					//$this.removeAttr("layoutH").wrap('<div layoutH="'+iLayoutH+'" style="overflow:auto;height:'+iH+'px"></div>');
+                    $this.removeAttr("layoutH").wrap('<div layoutH="'+iLayoutH+'" style="overflow:auto;" data-gridwap="true"></div>');
+                    var sH = 0;
+                    $this.parent().siblings().each(function() {
+                        sH += $(this).outerHeight();
+                    });
+                    var $page = $this.closest(".page.unitBox");
+                    var pageHeaderH = $page.find(".pageHeader").outerHeight();
+                    $this.parent().height($page.outerHeight()- pageHeaderH - sH);
+				} else if($this.data("gridwap")) {
+                    var sH = 0;
+                    $this.siblings().each(function() {
+                        sH += $(this).outerHeight();
+                    });
+                    var $page = $this.closest(".page.unitBox");
+                    var pageHeaderH = $page.find(".pageHeader").outerHeight();
+                    $this.height($page.outerHeight() - pageHeaderH - sH);
+                } else {
 					$this.height(iH).css("overflow","auto");
 				}
 			});

@@ -12,24 +12,44 @@
 <div class="pageHeader">
   <form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/orderBack.action" method="post">
     <div class="searchBar">
-      <ul class="searchContent">
-        <li style="width: 430px;"><label>发起时间从：</label> <input type="text" name="createTimeBegin" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd HH:mm:ss"/>" /> 到： <input type="text" name="createTimeEnd" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd HH:mm:ss"/>" /></li>
-        <li style="width: 230px;"><label style="width: 70px;">退货状态：</label> <s:select name="backStatus" cssStyle="width: 133px" list="@com.gionee.wms.common.WmsConstants$BackStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey="" /></li>
-        <li style="width: 250px;"><label style="width: 60px;">手机号：</label> <input type="text" name="mobile" value="<s:property value="mobile" />" /></li>
-      </ul>
-      <ul class="searchContent">
-        <li style="width: 250px;"><label>订单号：</label> <input type="text" name="orderCode" value="${orderCode}" style="width: 140px" /></li>
-        <li style="width:230px;"><label style="width: 60px;">运单号：</label> <input type="text" name="shippingNo" value="${shippingNo}" style="width:140px;" /></li>
-        <li style="width:240px;"><label style="width: 60px;">收货人：</label> <input type="text" name="consignee" value="<s:property value="consignee" />" /></li>
-        <li style="width: 160px;">
-          <label>退换货类型：</label>
-          <s:select name="backType" list="#{'back':'退货', 'exchange':'换货', 'rejected':'拒签'}" listKey="key" listValue="value" value="backType" headerKey="" headerValue="" theme="simple"></s:select>
-        </li>
-        <li style="width: 200px;">
-          <label>是否标记：</label>
-          <s:select name="mark" list="#{'1':'是', '0':'否'}" listKey="key" listValue="value" value="mark" headerKey="" headerValue="" theme="simple"></s:select>
-        </li>
-      </ul>
+        <ul class="searchContent">
+            <li>
+                <label>发起开始时间：</label>
+                <input type="text" name="createTimeBegin" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>发起结束时间：</label>
+                <input type="text" name="createTimeEnd" class="date" size="19" dateFmt="yyyy-MM-dd HH:mm:ss" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>退货状态：</label>
+                <s:select name="backStatus" list="@com.gionee.wms.common.WmsConstants$BackStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>
+            </li>
+            <li>
+                <label>手机号：</label>
+                <input type="text" name="mobile" value="<s:property value="mobile" />"/>
+            </li>
+            <li>
+                <label>订单号：</label>
+                <input type="text" name="orderCode" value="${orderCode}"/>
+            </li>
+            <li>
+                <label>运单号：</label>
+                <input type="text" name="shippingNo" value="${shippingNo}"/>
+            </li>
+            <li>
+                <label>收货人：</label>
+                <input type="text" name="consignee" value="<s:property value="consignee" />"/>
+            </li>
+            <li>
+                <label>退换货类型：</label>
+                <s:select name="backType" list="#{'back':'退货', 'exchange':'换货', 'rejected':'拒签'}" listKey="key" listValue="value" value="backType" headerKey="" headerValue="" theme="simple"></s:select>
+            </li>
+            <li>
+                <label>是否标记：</label>
+                <s:select name="mark" list="#{'1':'是', '0':'否'}" listKey="key" listValue="value" value="mark" headerKey="" headerValue="" theme="simple"></s:select>
+            </li>
+        </ul>
       <div class="subBar">
         <ul>
           <li><div class="buttonActive"><div class="buttonContent"><button type="submit" id="search${rand }">检索</button></div></div></li>

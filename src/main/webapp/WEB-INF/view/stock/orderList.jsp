@@ -14,25 +14,31 @@
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/salesOrder.action" method="post">
 	<input type="hidden" name="stockCheckId" value="${stockCheckId }" />
 	<div class="searchBar">
-		<ul class="searchContent" style="height: 80px;">
-			<li style="width:380px;">
-				<label>订单时间从：</label>
+		<ul class="searchContent">
+			<li>
+				<label>订单开始时间：</label>
 				<input type="text" name="orderTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${orderTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
-				<input type="text" name="orderTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${orderTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
-			<li style="width:380px;">
-				<label>支付时间从：</label>
+            <li>
+                <label>订单截止时间：</label>
+                <input type="text" name="orderTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${orderTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+			<li>
+				<label>支付开始时间：</label>
 				<input type="text" name="paymentTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${paymentTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
-				<input type="text" name="paymentTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${paymentTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
-			<li style="width:380px;">
-				<label>发货时间从：</label>
+            <li>
+                <label>支付截止时间：</label>
+                <input type="text" name="paymentTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${paymentTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+			<li>
+				<label>发货开始时间：</label>
 				<input type="text" name="shippingTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${shippingTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
-				<input type="text" name="shippingTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${shippingTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
+            <li>
+                <label>发货截止时间：</label>
+                <input type="text" name="shippingTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${shippingTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
 			<li>
 				<label>订单状态：</label>
 				<s:select name="orderStatus" list="@com.gionee.wms.common.WmsConstants$OrderStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>  
@@ -76,24 +82,24 @@
 				<input type="text" name="consignee" value="${consignee}"/>
 			</li>
 			<li>
-				<label>手机号</label>
+				<label>手机号：</label>
 				<input type="text" name="mobile" value="${mobile}" />
 			</li>
 			<li>
-				<label>物流单号</label>
+				<label>物流单号：</label>
 				<input type="text" name="shippingNo" value="${shippingNo}" />
 			</li>
-			<li style="width: 350px;">
-				<label style="width:100px">SKU编码：</label>
-				<select name="condition">
+			<li>
+				<label>SKU编码：</label>
+				<select name="condition" style="width: 40px;">
 					<option value="1" ${(1==condition)?"selected='true'":""}>含</option>
 					<option value="2" ${(2==condition)?"selected='true'":""}>等于</option>
 					<option value="3" ${(3==condition)?"selected='true'":""}>不含</option>
 				</select>
-				<input name="skuCode" type="text" value="${skuCode}"/>
+				<input name="skuCode" type="text" value="${skuCode}" style="width: 117px;"/>
 			</li>
 			<li>
-				<label>是否已经推送到顺丰</label>
+				<label>是否推送：</label>
 				<select name="orderPushStatus">
                   <option value="" ${orderPushStatus == null ? "selected" : "" }>请选择</option>
                   <option value="1" <s:property value="orderPushStatus == 1 ? 'selected' : ''"/>>是</option>

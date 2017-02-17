@@ -4,265 +4,49 @@
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
        xsi:schemaLocation="http://cxf.apache.org/jaxws
-	                       http://cxf.apache.org/schemas/jaxws.xsd
-	                       http://cxf.apache.org/transports/http/configuration 
-	                       http://cxf.apache.org/schemas/configuration/http-conf.xsd 
-	                       http://www.springframework.org/schema/beans 
-	                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+                           http://cxf.apache.org/schemas/jaxws.xsd
+                           http://cxf.apache.org/transports/http/configuration 
+                           http://cxf.apache.org/schemas/configuration/http-conf.xsd 
+                           http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-lazy-init="true">
 
     <description>service setting</description>
 
-    <bean id="orderPushSFJob" class="com.gionee.wms.job.OrderPushSFJob"/>
-    <bean id="orderPushSFTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail">
-            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-                <property name="targetObject" ref="orderPushSFJob"/>
-                <property name="targetMethod" value="execute"/>
-            </bean>
-        </property>
-        <property name="cronExpression" value="0 0/30 * * * ?"/>
-        <!-- 每30分钟执行一次 -->
-    </bean>
 
-    <!-- 轮询执行订单通知(已发货或已退货) -->
-    <!--  <bean id="orderNotifyJob" class="com.gionee.wms.job.OrderNotifyJob" lazy-init="false">
-          &lt;!&ndash; 每次执行间隔时间(秒)&ndash;&gt;
-          <property name="period" value="${wms.biz.orderNotifyJob.period}"/>
-          &lt;!&ndash; 首次执行延期10秒 &ndash;&gt;
-          <property name="initialDelay" value="10"/>
-      </bean>-->
-
-    <!-- 定时检查对快递100进行订阅 -->
-
-    <!-- <bean id="kuaidiCronJob" class="com.gionee.wms.job.KuaidiSubscribeJob" lazy-init="false">
-            &lt;!&ndash; 调度间隔为5分钟 &ndash;&gt;
-            &lt;!&ndash;<property name="cronExpression" value="30 1/5 * * * *"/>&ndash;&gt;
-        </bean>-->
-    <!-- 定时把销售发货的商品个体推送到SAP -->
-    <!--    <bean id="indivPushJob" class="com.gionee.wms.job.IndivPushJob" lazy-init="false">
-            &lt;!&ndash; 调度间隔为5分钟 &ndash;&gt;
-            <property name="cronExpression" value="0 0/5 * * * *"/>
-        </bean>-->
-
-    <!-- 定时把销售订单由未筛单转换为已筛单 -->
-    <!-- 调度间隔为5分钟 -->
-    <!-- <bean id="kuaidiFilterJob" class="com.gionee.wms.job.KuaidiFilterJob" lazy-init="false">
-        <property name="cronExpression" value="0/10 * * * * *"/>
-    </bean> -->
-
-    <!-- 同步淘宝订单任务 -->
-    <!-- <bean id="syncTaobaoOrderTask" class="com.gionee.wms.job.SyncTaobaoOrderTask">
-    </bean> -->
-
-    <!-- 调度同步淘宝订单任务 -->
-    <!-- <bean id="syncTaobaoOrderJob"
-        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="syncTaobaoOrderTask" />
-        <property name="targetMethod" value="execute" />
-    </bean> -->
-
-    <!-- 同步淘宝订单任务调度触发器 -->
-    <!-- <bean id="syncTaobaoOrderTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="syncTaobaoOrderJob" />
-        调度间隔为每天凌晨3:00执行一次
-        <property name="cronExpression" value="0 0 3 * * ?"/>
-    </bean> -->
-
-    <!-- 同步库存任务 -->
-    <bean id="syncStockTask" class="com.gionee.wms.job.SyncStockTask">
-    </bean>
-
-    <!-- 调度同步库存任务 -->
-    <bean id="syncStockJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="syncStockTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 同步库存任务调度触发器 -->
-    <bean id="syncStockTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="syncStockJob"/>
-        <!-- 调度间隔为每天凌晨3:00执行一次 -->
-        <property name="cronExpression" value="0 0 0/1 * * ?"/>
-    </bean>
-
-    <!-- 同步唯品会订单任务 -->
-    <bean id="syncVipOrderTask" class="com.gionee.wms.job.SyncVipOrderTask">
-    </bean>
-
-    <!-- 调度同步唯品会订单任务 -->
-    <bean id="syncVipOrderJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="syncVipOrderTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 同步唯品会订单任务调度触发器 -->
-    <bean id="syncVipOrderTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="syncVipOrderJob"/>
-        <!-- 调度间隔为每30分钟执行一次 -->
-        <property name="cronExpression" value="0 0/30 * * * ?"/>
-    </bean>
-
-    <!-- 重置拣货批次号后缀任务 -->
-    <bean id="resetJHBatchCodeTask" class="com.gionee.wms.job.ResetJHBatchCodeTask">
-    </bean>
-    <!-- 调度重置拣货批次号后缀任务 -->
-    <bean id="resetJHBatchCodeJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="resetJHBatchCodeTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 重置拣货批次号后缀任务调度触发器 -->
-    <bean id="resetJHBatchCodeTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="resetJHBatchCodeJob"/>
-        <!-- 调度间隔为每天凌晨00:05执行一次 -->
-        <property name="cronExpression" value="0 5 0 * * ?"/>
-    </bean>
-
-    <!-- 增量库存任务 -->
-    <bean id="stockDeltaTask" class="com.gionee.wms.job.StockDeltaTask">
-    </bean>
-
-    <!-- 调度增量库存任务 -->
-    <bean id="stockDeltaJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="stockDeltaTask"/>
-        <property name="targetMethod" value="execute"/>
-        <property name="concurrent" value="false"/>
-    </bean>
-
-    <!-- 同步库存任务调度触发器 -->
-    <bean id="stockDeltaTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="stockDeltaJob"/>
-        <!-- 调度间隔为每10秒钟一次 -->
-        <property name="cronExpression" value="0/10 * * * * ?"/>
-    </bean>
-
-    <!-- 销售统计任务 -->
-    <bean id="orderStatTask" class="com.gionee.wms.job.OrderStatTask">
-    </bean>
-
-    <!-- 调度销售统计任务 -->
-    <bean id="orderStatJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="orderStatTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 销售统计任务调度触发器 -->
-    <bean id="orderStatTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="orderStatJob"/>
-        <!-- 调度间隔为每天凌晨2:00执行一次 -->
-        <property name="cronExpression" value="0 1 2 * * ?"/>
-    </bean>
-
-    <!-- 每日库存信息任务 -->
-    <bean id="DailyStockTask" class="com.gionee.wms.job.DailyStockTask">
-    </bean>
-
-    <!-- 调度每日库存信息任务 -->
-    <bean id="DailyStockJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="DailyStockTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 每日库存信息任务调度触发器 -->
-    <bean id="DailyStockTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="DailyStockJob"/>
-        <!-- 调度间隔为每天凌晨2:30执行一次 -->
-        <property name="cronExpression" value="0 30 2 * * ?"/>
-    </bean>
-
-    <!-- 同步商品信息任务 -->
-    <bean id="syncSfSkuMapTask" class="com.gionee.wms.job.SyncSfSkuMapTask">
-    </bean>
-
-    <!-- 调度同步商品信息任务 -->
-    <bean id="syncSfSkuMapJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="syncSfSkuMapTask"/>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-
-    <!-- 同步商品信息任务调度触发器 -->
-    <bean id="syncSfSkuMapTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="syncSfSkuMapJob"/>
-        <!-- 调度间隔30分钟调用一次 -->
-        <property name="cronExpression" value="0/30 * * * * ?"/>
-    </bean>
-
-    <!-- 调拨到顺丰仓任务 -->
-    <bean id="TransferJobTask" class="com.gionee.wms.job.TransferJobTask"></bean>
-    <bean id="transferSfJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="TransferJobTask"></property>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-    <bean id="transferSfTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="transferSfJob"/>
-        <!-- 调度间隔为每天凌晨2点调用一次 -->
-        <!--<property name="cronExpression" value="0 2 0 * * ?"/>-->
-        <!-- 调度间隔为每50分钟执行一次 -->
-        <property name="cronExpression" value="0 0/50 * * * ?"/>
-    </bean>
-
-    <!-- 查询调拨到顺丰仓入库状态 -->
-    <bean id="TransferStatusTask" class="com.gionee.wms.job.TransferStatusTask"></bean>
-    <bean id="transferSfStatusJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="TransferStatusTask"></property>
-        <property name="targetMethod" value="execute"/>
-    </bean>
-    <bean id="transferSfStatusTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="transferSfStatusJob"/>
-        <!-- 调度间隔为每天凌晨2点调用一次 -->
-        <!--<property name="cronExpression" value="0 2 0 * * ?"/>-->
-        <!-- 调度间隔为每20分钟执行一次 -->
-        <property name="cronExpression" value="0 0/20 * * * ?"/>
-    </bean>
-
-    <!-- 调度 -->
-    <bean id="quartz"
-          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="triggers">
-            <list>
-                <!-- <ref bean="syncTaobaoOrderTrigger" /> -->
-                <!--    <ref bean="stockDeltaTrigger"/>
-                    <ref bean="syncStockTrigger"/>
-                    <ref bean="syncVipOrderTrigger"/>
-                    <ref bean="resetJHBatchCodeTrigger"/>
-                    <ref bean="orderStatTrigger"/>
-                    <ref bean="DailyStockTrigger"/>
-                    <ref bean="syncSfSkuMapTrigger"/>
-                    <ref bean="transferSfTrigger"/>
-                    <ref bean="transferSfStatusTrigger"/>
-                    <ref bean="orderPushSFTrigger"/>-->
-
-
-
-
-            </list>
+    <!-- 邮件发送 -->
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${mail.host}"/><!-- 发送邮件的SMTP服务器 -->
+        <property name="username" value="${mail.username}"/><!-- 发件人的用户名 -->
+        <property name="password" value="${mail.pwd}"/><!-- 发件人的密码 -->
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.timeout">25000</prop>
+            </props>
         </property>
     </bean>
+
 
     <!-- 线程池配置,溢出策略:CallerRunsPolicy(等待执行)-->
     <bean id="taskExecutor"
           class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="10"/>
-        <property name="maxPoolSize" value="20"/>
+        <property name="corePoolSize" value="20"/>
+        <property name="maxPoolSize" value="30"/>
         <property name="queueCapacity" value="1000"/>
         <property name="keepAliveSeconds" value="200"/>
         <property name="rejectedExecutionHandler">
-            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"></bean>
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
         </property>
     </bean>
 
     <!-- ==============WebService======================= -->
     <!-- jax-ws endpoint定义  -->
     <jaxws:endpoint address="/purchaseService"><!-- wsdlLocation="/WEB-INF/wms.wsdl"-->
-        <jaxws:implementor ref="purchaseSoapService"/>
+        <jaxws:implementor>
+            <!-- WebService的实现Bean定义 -->
+            <ref bean="purchaseSoapService"/>
+        </jaxws:implementor>
         <jaxws:inInterceptors>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
             <bean class="com.gionee.wms.web.ws.interceptor.IpAddressInterceptor"/>
@@ -306,6 +90,22 @@
         <jaxws:outInterceptors>
             <bean class="com.gionee.wms.web.ws.interceptor.WriteHeaderInterceptor">
                 <property name="namespaceURI" value="http://service.warehouse.integration.sf.com/"/>
+                <property name="qualifiedName" value="AuthInfo"/>
+                <property name="userNameTag" value="LoginId"/>
+                <property name="passwordTag" value="Password"/>
+                <property name="userName" value="${wms.sf.ws.username}"/>
+                <property name="password" value="${wms.sf.ws.password}"/>
+            </bean>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+
+    <!-- soap sf osip client -->
+    <jaxws:client id="sfexpressService" serviceClass="com.sf.integration.expressservice.service.IExpressService"
+                  address="${wms.sf.oisp.url}">
+        <jaxws:outInterceptors>
+            <bean class="com.gionee.wms.web.ws.interceptor.WriteHeaderInterceptor">
+                <property name="namespaceURI" value="http://service.expressservice.integration.sf.com/"/>
                 <property name="qualifiedName" value="AuthInfo"/>
                 <property name="userNameTag" value="LoginId"/>
                 <property name="passwordTag" value="Password"/>

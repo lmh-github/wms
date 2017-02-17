@@ -18,10 +18,12 @@
 	<input id="sf_shipping_id" type="hidden" name="shippingId" value="${shippingId}" />
 	<div class="searchBar">
 		<ul class="searchContent" style="height: 50%;">
-			<li style="width:380px;">
-				<label>下单时间从：</label>
+			<li>
+				<label>下单开始时间：</label>
 				<input type="text" name="orderTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${orderTimeBegin }" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+				<label>下单截止时间：</label>
 				<input type="text" name="orderTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${orderTimeEnd }" pattern="yyyy-MM-dd"/>"/>
 			</li>
 			<li>
@@ -36,10 +38,12 @@
               <label>运单号：</label>
               <input type="text" name="shippingNo" value="${shippingNo}"/>            
             </li>
-			<li style="width:380px;">
-				<label>推送时间：</label>
+			<li>
+				<label>推送开始时间：</label>
 				<input type="text" name="orderPushTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd HH:mm:00" value="<fmt:formatDate value="${orderPushTimeBegin }" pattern="yyyy-MM-dd HH:mm"/>"/>
-				到：
+            </li>
+            <li>
+                <label>推送截止时间：</label>
 				<input type="text" name="orderPushTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd HH:mm:00" value="<fmt:formatDate value="${orderPushTimeEnd }" pattern="yyyy-MM-dd HH:mm"/>"/>
 			</li>
             <li>

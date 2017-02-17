@@ -16,14 +16,34 @@
   <form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/morder.action" method="post">
     <div class="searchBar">
       <ul class="searchContent">
-        <li style="width: 330px;"><label>创建日期从：</label> <input type="text" name="createTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd"/>" /> 到： <input type="text" name="createTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd"/>" /></li>
-        <li style="width: 330px;"><label>状态：</label> <s:select name="order.status" list="#{'1':'已处理', '0':'未处理'}" listKey="key" listValue="value" value="order.status" headerKey="" headerValue="" theme="simple"></s:select></li>
-        <li style="width: 330px;"><label>建单类型：</label> <s:select name="order.billType" list="#{'赠品漏发':'赠品漏发', '三包期限内质量问题补发':'三包期限内质量问题补发', '系统BUG':'系统BUG'}" listKey="key" listValue="value" value="order.billType" headerKey="" headerValue="" theme="simple"></s:select></li>
-      </ul>
-      <ul class="searchContent">
-        <li style="width: 330px;"><label>订单号：</label> <input type="text" name="order.orderCode" value="${order.orderCode}" style="width: 190px" /></li>
-        <li style="width: 330px;"><label>电话：</label> <input type="text" name="mobile" value="${mobile}" /></li>
-        <li style="width: 330px;"><label>是否重开发票：</label> <s:select name="order.invoice" list="#{'1':'是', '0':'否'}" listKey="key" listValue="value" value="order.invoice" headerKey="" headerValue="" theme="simple"></s:select></li>
+        <li>
+            <label>创建开始时间：</label>
+            <input type="text" name="createTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeBegin}" pattern="yyyy-MM-dd"/>" />
+        </li>
+        <li>
+            <label>创建截止时间：</label>
+            <input type="text" name="createTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${createTimeEnd}" pattern="yyyy-MM-dd"/>" />
+        </li>
+        <li>
+            <label>状态：</label>
+            <s:select name="order.status" list="#{'1':'已处理', '0':'未处理'}" listKey="key" listValue="value" value="order.status" headerKey="" headerValue="" theme="simple"></s:select>
+        </li>
+        <li>
+            <label>建单类型：</label>
+            <s:select name="order.billType" list="#{'赠品漏发':'赠品漏发', '三包期限内质量问题补发':'三包期限内质量问题补发', '系统BUG':'系统BUG'}" listKey="key" listValue="value" value="order.billType" headerKey="" headerValue="" theme="simple"></s:select>
+        </li>
+        <li>
+            <label>订单号：</label>
+            <input type="text" name="order.orderCode" value="${order.orderCode}" />
+        </li>
+        <li>
+            <label>电话：</label>
+            <input type="text" name="mobile" value="${mobile}" />
+        </li>
+        <li>
+            <label>是否重开发票：</label>
+            <s:select name="order.invoice" list="#{'1':'是', '0':'否'}" listKey="key" listValue="value" value="order.invoice" headerKey="" headerValue="" theme="simple"></s:select>
+        </li>
       </ul>
       <div class="subBar">
         <ul>

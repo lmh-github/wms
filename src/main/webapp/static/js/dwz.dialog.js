@@ -132,8 +132,21 @@
 			if (op.mask) {
 				$(dialog).css("zIndex", 1000);
 				$("a.minimize",dialog).hide();
-				$(dialog).data("mask", true);
-				$("#dialogBackground").show();
+                $(dialog).data("mask", true);
+                var masklayer = $(dialog).data("masklayer");
+                if (masklayer == null) {
+                    masklayer = $("<div class='dialogBackground'></div>").appendTo("body").show();
+                    $(dialog).data("masklayer", masklayer);
+                }
+
+                var layerZindex = window["layerZindex"];
+                if (layerZindex == null) {
+                    window["layerZindex"] = 700;
+                } else {
+                    layerZindex = window["layerZindex"] = window["layerZindex"] + 1;
+                }
+                masklayer.css("z-index", layerZindex);
+				//$("#dialogBackground").show();
 			}else {
 				//add a task to task bar
 				if(op.minable) $.taskBar.addDialog(dlgid,title);
@@ -290,7 +303,8 @@
 			$(dialog).hide();
 			$("div.shadow").hide();
 			if($(dialog).data("mask")){
-				$("#dialogBackground").hide();
+                $(dialog).data("masklayer").hide();
+				//$("#dialogBackground").hide();
 			} else{
 				if ($(dialog).data("id")) $.taskBar.closeDialog($(dialog).data("id"));
 			}

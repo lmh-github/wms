@@ -113,7 +113,7 @@
 				</td>
 				<td>
 					<a title="设置安全库存" target="dialog" mask="true" width="500" height="600" href="${ctx}/stock/stock!inputLimit.action?id=${id }">设置安全库存</a>
-                    <s:if test="warehouse.warehouseName == '顺丰仓' ">&nbsp;|&nbsp;<a href="${ctx}/stock/stock!queryRealTimeInvBalance.action?skuCode=${sku.skuCode}" target="dialog" rel="dlg_RealTimeInventoryBalance" mask="true" width="600" height="500" warn="查看实时库存">查看实时库存</a></s:if>
+                    <s:if test="warehouse.warehouseName != '东莞电商仓' ">&nbsp;|&nbsp;<a href="${ctx}/stock/stock!queryRealTimeInvBalance.action?skuCode=${sku.skuCode}&warehouse=${warehouse.warehouseCode}" target="dialog" rel="dlg_RealTimeInventoryBalance" mask="true" width="600" height="500" warn="查看实时库存">查看实时库存</a></s:if>
 				</td>
 			</tr>
 			</s:iterator>

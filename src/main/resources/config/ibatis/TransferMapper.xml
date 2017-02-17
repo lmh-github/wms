@@ -42,30 +42,32 @@
 	   		<if test="shippingTimeEnd != null">and t1.shipping_time<![CDATA[<=]]>#{shippingTimeEnd}</if>
 	   </where>
 	</sql>
+
+    <sql id="sf_warehouse_query">SELECT WMS_WAREHOUSE.ID FROM WMS_WAREHOUSE WHERE WMS_WAREHOUSE.ID != '1643'</sql>
 	<!-- 查询调拨列表总数(顺丰) -->
 	<select id="getTransferSfList" parameterType="map" resultType="Transfer">
       SELECT * FROM (
-	   SELECT 
-		T1.ID as transferId,
-		T3.WAREHOUSE_NAME as transferTo,
-		T1.STATUS as status,
-		T1.CREATE_TIME as createTime,
-		T1.HANDLED_BY as handledBy,
-		T1.CONSIGNEE as consignee,
-		T1.CONTACT as contact,
-		T1.ORDER_AMOUNT as orderAmount,
-		T1.TRANS_TYPE as transType,
-		T1.REMARK as remark,
-		T1.ORDER_PUSH_STATUS as orderPushStatus,
-		T1.ORDER_CONFIRM_STATUS as orderConfirmStatus,
-		T2.INDIV_CODE as logisticName,
-		T2.WAREHOUSE_NAME as warehouseName,
-		T2.SKU_CODE as tSale,
-		T2.SKU_NAME as tSend,
-        1 as QUANTITY
-		FROM WMS_TRANSFER T1
-		LEFT JOIN WMS_INDIV T2 ON T1.ID = T2.PREPARE_ID
-		LEFT JOIN WMS_WAREHOUSE T3 ON T1.TRANSFER_TO = T3.ID
+        SELECT
+        T1.ID                   AS transferId,
+        T3.WAREHOUSE_NAME       AS transferTo,
+        T1.STATUS               AS status,
+        T1.CREATE_TIME          AS createTime,
+        T1.HANDLED_BY           AS handledBy,
+        T1.CONSIGNEE            AS consignee,
+        T1.CONTACT              AS contact,
+        T1.ORDER_AMOUNT         AS orderAmount,
+        T1.TRANS_TYPE           AS transType,
+        T1.REMARK               AS remark,
+        T1.ORDER_PUSH_STATUS    AS orderPushStatus,
+        T1.ORDER_CONFIRM_STATUS AS orderConfirmStatus,
+        T2.INDIV_CODE           AS logisticName,
+        T2.WAREHOUSE_NAME       AS warehouseName,
+        T2.SKU_CODE             AS tSale,
+        T2.SKU_NAME             AS tSend,
+        1                       AS QUANTITY
+        FROM WMS_TRANSFER T1
+        LEFT JOIN WMS_INDIV T2 ON T1.ID = T2.PREPARE_ID
+        LEFT JOIN WMS_WAREHOUSE T3 ON T1.TRANSFER_TO = T3.ID
 		<where>
 			<if test="transferId != null">t1.id=#{transferId}</if>
 			<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
@@ -77,31 +79,32 @@
             <if test="createTimeEnd != null">and t1.create_time <![CDATA[<=]]> #{createTimeEnd,jdbcType=DATE}</if>
 	   		<if test="shippingTimeBegin != null">and t1.shipping_time<![CDATA[>=]]>#{shippingTimeBegin,jdbcType=DATE}</if>
 	   		<if test="shippingTimeEnd != null">and t1.shipping_time<![CDATA[<=]]>#{shippingTimeEnd,jdbcType=DATE}</if>
+            AND T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
 		</where>
       UNION ALL
-      SELECT
-      	T1.ID AS transferId,
-      	T3.WAREHOUSE_NAME AS transferTo,
-      	T1.STATUS AS status,
-      	T1.CREATE_TIME AS createTime,
-      	T1.HANDLED_BY AS handledBy,
-      	T1.CONSIGNEE AS consignee,
-      	T1.CONTACT AS contact,
-      	T1.ORDER_AMOUNT AS orderAmount,
-      	T1.TRANS_TYPE AS transType,
-      	T1.REMARK AS remark,
-      	T1.ORDER_PUSH_STATUS AS orderPushStatus,
-      	T1.ORDER_CONFIRM_STATUS AS orderConfirmStatus,
-      	'' AS logisticName,
-      	T4.WAREHOUSE_NAME AS warehouseName,
-      	T2.SKU_CODE AS tSale,
-      	T2.SKU_NAME AS tSend,
-      	T2.QUANTITY
-      FROM
-      	WMS_TRANSFER T1
-      LEFT JOIN WMS_TRANSFER_GOODS T2 ON T1."ID" = T2.TRANSFER_ID
-      LEFT JOIN WMS_WAREHOUSE T3 ON T1.TRANSFER_TO = T3. ID
-      LEFT JOIN WMS_WAREHOUSE T4 ON T1.WAREHOUSE_ID = T4.ID
+        SELECT
+        T1.ID                   AS transferId,
+        T3.WAREHOUSE_NAME       AS transferTo,
+        T1.STATUS               AS status,
+        T1.CREATE_TIME          AS createTime,
+        T1.HANDLED_BY           AS handledBy,
+        T1.CONSIGNEE            AS consignee,
+        T1.CONTACT              AS contact,
+        T1.ORDER_AMOUNT         AS orderAmount,
+        T1.TRANS_TYPE           AS transType,
+        T1.REMARK               AS remark,
+        T1.ORDER_PUSH_STATUS    AS orderPushStatus,
+        T1.ORDER_CONFIRM_STATUS AS orderConfirmStatus,
+        ''                      AS logisticName,
+        T4.WAREHOUSE_NAME       AS warehouseName,
+        T2.SKU_CODE             AS tSale,
+        T2.SKU_NAME             AS tSend,
+        T2.QUANTITY
+        FROM
+        WMS_TRANSFER T1
+        LEFT JOIN WMS_TRANSFER_GOODS T2 ON T1."ID" = T2.TRANSFER_ID
+        LEFT JOIN WMS_WAREHOUSE T3 ON T1.TRANSFER_TO = T3.ID
+        LEFT JOIN WMS_WAREHOUSE T4 ON T1.WAREHOUSE_ID = T4.ID
       <where>
         T2.SKU_CODE LIKE '2%'
       	<if test="transferId != null">and t1.id=#{transferId}</if>
@@ -114,38 +117,38 @@
         <if test="createTimeEnd != null">and t1.create_time <![CDATA[<=]]> #{createTimeEnd,jdbcType=DATE}</if>
       	<if test="shippingTimeBegin != null">and t1.shipping_time<![CDATA[>=]]>#{shippingTimeBegin,jdbcType=DATE}</if>
       	<if test="shippingTimeEnd != null">and t1.shipping_time<![CDATA[<=]]>#{shippingTimeEnd,jdbcType=DATE}</if>
+        AND T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
       </where>
 	 ) TV ORDER BY TV.createTime desc 
 	</select>
 	
 	<!-- 获取调拨列表(顺丰) -->
 	<select id="getTransferListSf" parameterType="map" resultType="Transfer">
-		SELECT *
-		FROM(
-		SELECT A.*, rownum r
-		FROM(
-		select t1.id as transferId,
-		t1.warehouse_id as warehouseId,
-		t3.warehouse_name as transferTo,
-		t1.remark
-		as remark,
-		t1.status as status,
-		t1.create_time as createTime,
-		t1.logistic_no as logisticNo,
-		t1.handled_by as handledBy,
-		t1.consignee as consignee,
-		t1.contact as contact,
-		t1.transfer_sale as transferSale,
-		t1.transfer_send as transferSend,
-		t1.transfer_invoice as transferInvoice,
-		t1.order_amount as orderAmount,
-		t1.order_push_status as orderPushStatus,
-		t1.order_confirm_status as orderConfirmStatus,
-		t2.warehouse_name as warehouseName
-		from
-		wms_transfer t1
-		left join wms_warehouse t2 on t1.warehouse_id=t2.id
-		left join wms_warehouse t3 on t1.transfer_to=t3.id
+      SELECT * FROM (
+        SELECT A.*, rownum r
+        FROM (
+           SELECT
+           t1.id                   AS transferId,
+           t1.warehouse_id         AS warehouseId,
+           t3.warehouse_name       AS transferTo,
+           t1.remark               AS remark,
+           t1.status               AS status,
+           t1.create_time          AS createTime,
+           t1.logistic_no          AS logisticNo,
+           t1.handled_by           AS handledBy,
+           t1.consignee            AS consignee,
+           t1.contact              AS contact,
+           t1.transfer_sale        AS transferSale,
+           t1.transfer_send        AS transferSend,
+           t1.transfer_invoice     AS transferInvoice,
+           t1.order_amount         AS orderAmount,
+           t1.order_push_status    AS orderPushStatus,
+           t1.order_confirm_status AS orderConfirmStatus,
+           t2.warehouse_name       AS warehouseName
+         FROM
+           wms_transfer t1
+           LEFT JOIN wms_warehouse t2 ON t1.warehouse_id = t2.id
+           LEFT JOIN wms_warehouse t3 ON t1.transfer_to = t3.id
 		<where>
 			<if test="transferId != null">t1.id=#{transferId}</if>
 			<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
@@ -157,77 +160,80 @@
             <if test="createTimeEnd != null">and t1.create_time &lt;= #{createTimeEnd,jdbcType=DATE}</if>
             <if test="shippingTimeBegin != null">and t1.shipping_time &gt;= #{shippingTimeBegin,jdbcType=DATE}</if>
             <if test="shippingTimeEnd != null">and t1.shipping_time &lt;= #{shippingTimeEnd,jdbcType=DATE}</if>
+            AND T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
 		</where>
-		order by t1.create_time desc
+        ORDER BY t1.create_time DESC
 		) A
-	<![CDATA[
-			  WHERE rownum<=#{page.endRow} 
-			)
-	    WHERE r >= #{page.startRow}
-	]]>
+      <![CDATA[
+          WHERE rownum<=#{page.endRow}
+		  )
+      WHERE r >= #{page.startRow}
+      ]]>
 	</select>
 	
 	<!-- 查询调拨总数(顺丰) -->
-	<select id="getTransferListTotalSf" parameterType="map"
-		resultType="int">
-		select count(1) as total from wms_transfer t1
-		<where>
-			<if test="transferId != null">t1.id=#{transferId}</if>
-			<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
-			<if test="transferTo != null">and t1.transfer_to=#{transferTo}</if>
-			<if test="status != null">and t1.status=#{status}</if>
-			<if test="orderPushStatus != null and orderPushStatus != ''">and t1.order_push_status=#{orderPushStatus}</if>
+    <select id="getTransferListTotalSf" parameterType="map" resultType="int">
+        select count(1) as total from wms_transfer t1
+        <where>
+            <if test="transferId != null">t1.id=#{transferId}</if>
+            <if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
+            <if test="transferTo != null">and t1.transfer_to=#{transferTo}</if>
+            <if test="status != null">and t1.status=#{status}</if>
+            <if test="orderPushStatus != null and orderPushStatus != ''">and t1.order_push_status=#{orderPushStatus}</if>
             <if test="logisticNo != null">and t1.LOGISTIC_NO = #{logisticNo}</if>
             <if test="createTimeBegin != null">and t1.create_time &gt;= #{createTimeBegin,jdbcType=DATE}</if>
             <if test="createTimeEnd != null">and t1.create_time &lt;= #{createTimeEnd,jdbcType=DATE}</if>
             <if test="shippingTimeBegin != null">and t1.shipping_time &gt;= #{shippingTimeBegin,jdbcType=DATE}</if>
             <if test="shippingTimeEnd != null">and t1.shipping_time &lt;= #{shippingTimeEnd,jdbcType=DATE}</if>
-		</where>
-	</select>
+            AND T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
+        </where>
+    </select>
 	
 	
 	<!-- 获取调拨列表 -->
 	<select id="getTransferList" parameterType="map" resultType="Transfer">
-		SELECT *
-		FROM(
-		SELECT A.*, rownum r
-		FROM(
-		select t1.id as transferId,
-		t1.warehouse_id as warehouseId,
-		t1.transfer_to as transferTo,
-		t1.remark
-		as remark,
-		t1.status as status,
-		t1.create_time as createTime,
-		t1.logistic_no as logisticNo,
-		t1.handled_by as handledBy,
-		t1.consignee as consignee,
-		t1.contact as contact,
-		t1.transfer_sale as transferSale,
-		t1.transfer_send as transferSend,
-		t1.transfer_invoice as transferInvoice,
-		t1.order_amount as orderAmount,
-		t2.warehouse_name as warehouseName
-		from
-		wms_transfer t1
-		left join wms_warehouse t2 on t1.warehouse_id=t2.id
-		<where>
-			<if test="transferId != null">t1.id=#{transferId}</if>
-			<if test="transferTo != null">and t1.transfer_to like '%${transferTo}%'</if>
-			<if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
-			<if test="status != null">and t1.status=#{status}</if>
-			<if test="logisticNo != null">and t1.logistic_no=#{logisticNo}</if>
-			<if test="createTimeBegin != null">and t1.create_time &gt;= #{createTimeBegin}</if>
-			<if test="createTimeEnd != null">and t1.create_time &lt;= #{createTimeEnd}</if>
-			and t1.ORDER_PUSH_STATUS is null
-		</where>
-		order by t1.create_time desc
-		) A
-	<![CDATA[
-			  WHERE rownum<=#{page.endRow} 
-			)
-	    WHERE r >= #{page.startRow}
-	]]>
+        SELECT *
+        FROM (
+            SELECT
+                A.*,
+                rownum r
+            FROM (
+                SELECT
+                    t1.id               AS transferId,
+                    t1.warehouse_id     AS warehouseId,
+                    t1.transfer_to      AS transferTo,
+                    t1.remark           AS remark,
+                    t1.status           AS status,
+                    t1.create_time      AS createTime,
+                    t1.logistic_no      AS logisticNo,
+                    t1.handled_by       AS handledBy,
+                    t1.consignee        AS consignee,
+                    t1.contact          AS contact,
+                    t1.transfer_sale    AS transferSale,
+                    t1.transfer_send    AS transferSend,
+                    t1.transfer_invoice AS transferInvoice,
+                    t1.order_amount     AS orderAmount,
+                    t2.warehouse_name   AS warehouseName
+                FROM
+                wms_transfer t1
+                LEFT JOIN wms_warehouse t2 ON t1.warehouse_id = t2.id
+                <where>
+                    <if test="transferId != null">t1.id=#{transferId}</if>
+                    <if test="transferTo != null">and t1.transfer_to like '%${transferTo}%'</if>
+                    <if test="warehouseId != null">and t1.warehouse_id=#{warehouseId}</if>
+                    <if test="status != null">and t1.status=#{status}</if>
+                    <if test="logisticNo != null">and t1.logistic_no=#{logisticNo}</if>
+                    <if test="createTimeBegin != null">and t1.create_time &gt;= #{createTimeBegin}</if>
+                    <if test="createTimeEnd != null">and t1.create_time &lt;= #{createTimeEnd}</if>
+                    and t1.ORDER_PUSH_STATUS is null
+                </where>
+		        order by t1.create_time desc
+		    ) A
+        <![CDATA[
+            WHERE rownum<=#{page.endRow}
+        )
+        WHERE r >= #{page.startRow}
+        ]]>
 	</select>
 
 	<!-- 查询调拨总数 -->
@@ -301,39 +307,38 @@
     </select>
 
 	<!-- 根据调拨批次id获取调拨信息 -->
-	<select id="getTransferById" parameterType="long" resultType="Transfer">
-		select t1.id as transferId,
-		t1.warehouse_id as warehouseId,
-		t1.transfer_to as transferTo,
-		t1.remark as remark,
-		t1.status as status,
-		t1.create_time as createTime,
-		t1.logistic_no as logisticNo,
-		t1.handled_by as handledBy,
-		t1.consignee as consignee,
-		t1.contact as contact,
-		t1.po as po,
-		t1.logistic_name as logisticName,
-		t1.transfer_sale as transferSale,
-		t1.transfer_send as transferSend,
-		t1.transfer_invoice as transferInvoice,
-		t1.order_amount as orderAmount,
-		t1.trans_type as transType,
-		t2.warehouse_name as warehouseName,
-    	t3a.name as tSale,
-    	t3b.name as tSend,
-    	t3c.name as tInvoice
-		from wms_transfer t1
-		left join
-		wms_warehouse t2 on t1.warehouse_id=t2.id
-		left join
-    	wms_transfer_partner t3a on t1.transfer_sale=t3a.id
-    	left join
-    	wms_transfer_partner t3b on t1.transfer_send=t3b.id
-    	left join
-    	wms_transfer_partner t3c on t1.transfer_invoice=t3c.id
-		where t1.id=#{transferId}
-	</select>
+    <select id="getTransferById" parameterType="long" resultType="Transfer">
+      SELECT
+        t1.id                   AS transferId,
+        t1.warehouse_id         AS warehouseId,
+        t1.transfer_to          AS transferTo,
+        t1.remark               AS remark,
+        t1.status               AS status,
+        t1.create_time          AS createTime,
+        t1.logistic_no          AS logisticNo,
+        t1.handled_by           AS handledBy,
+        t1.consignee            AS consignee,
+        t1.contact              AS contact,
+        t1.po                   AS po,
+        t1.logistic_name        AS logisticName,
+        t1.transfer_sale        AS transferSale,
+        t1.transfer_send        AS transferSend,
+        t1.transfer_invoice     AS transferInvoice,
+        t1.order_amount         AS orderAmount,
+        t1.trans_type           AS transType,
+        t2.warehouse_name       AS warehouseName,
+        t3a.name                AS tSale,
+        t3b.name                AS tSend,
+        t3c.name                AS tInvoice,
+        t1.order_confirm_status AS orderConfirmStatus,
+        t1.order_push_status    AS orderPushStatus
+      FROM wms_transfer t1
+        LEFT JOIN wms_warehouse t2 ON t1.warehouse_id = t2.id
+        LEFT JOIN wms_transfer_partner t3a ON t1.transfer_sale = t3a.id
+        LEFT JOIN wms_transfer_partner t3b ON t1.transfer_send = t3b.id
+        LEFT JOIN wms_transfer_partner t3c ON t1.transfer_invoice = t3c.id
+      WHERE t1.id = #{transferId}
+    </select>
 	
 	<!-- 根据调拨批次id获取调拨信息(顺丰) -->
 	<select id="getTransferSfById" parameterType="long" resultType="Transfer">
@@ -363,46 +368,51 @@
 	</select>
 
 	<select id="getTransfered" resultType="Transfer">
-		select t1.id as transferId,
-		t1.warehouse_id as warehouseId,
-		t1.remark
-		as remark,
-		t1.status as status,
-		t1.create_time as createTime,
-		t1.order_push_status as orderPushStatus,
-		t1.logistic_no as logisticNo,
-		t1.handled_by as handledBy,
-		t1.consignee as consignee,
-		t1.contact as contact,
-		t1.transfer_sale as transferSale,
-		t1.transfer_send as transferSend,
-		t1.transfer_invoice as transferInvoice,
-		t1.order_amount as orderAmount
-		from
-		wms_transfer t1
-	where t1.status=2 and t1.transfer_to='8610752' and t1.order_push_status = 0
+        SELECT
+          t1.id                AS transferId,
+          t1.warehouse_id      AS warehouseId,
+          t1.remark            AS remark,
+          t1.status            AS status,
+          t1.create_time       AS createTime,
+          t1.order_push_status AS orderPushStatus,
+          t1.logistic_no       AS logisticNo,
+          t1.handled_by        AS handledBy,
+          t1.consignee         AS consignee,
+          t1.contact           AS contact,
+          t1.transfer_sale     AS transferSale,
+          t1.transfer_send     AS transferSend,
+          t1.transfer_invoice  AS transferInvoice,
+          t1.order_amount      AS orderAmount,
+          t1.TRANSFER_TO       AS transferTo
+        FROM
+          wms_transfer t1
+        WHERE t1.status = 2 AND t1.order_push_status = 0 AND
+              T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
 	</select>
 	
 	<select id="getTransferPush" resultType="Transfer">
-		select t1.id as transferId,
-		t1.warehouse_id as warehouseId,
-		t1.remark
-		as remark,
-		t1.status as status,
-		t1.create_time as createTime,
-		t1.order_push_status as orderPushStatus,
-		t1.order_confirm_status as orderConfirmStatus,
-		t1.logistic_no as logisticNo,
-		t1.handled_by as handledBy,
-		t1.consignee as consignee,
-		t1.contact as contact,
-		t1.transfer_sale as transferSale,
-		t1.transfer_send as transferSend,
-		t1.transfer_invoice as transferInvoice,
-		t1.order_amount as orderAmount
-		from
-		wms_transfer t1
-	where t1.status=2 and t1.transfer_to='8610752' and t1.order_push_status = 1 and t1.order_confirm_status = 0
+        SELECT
+          t1.id                   AS transferId,
+          t1.warehouse_id         AS warehouseId,
+          t1.remark               AS remark,
+          t1.status               AS status,
+          t1.create_time          AS createTime,
+          t1.order_push_status    AS orderPushStatus,
+          t1.order_confirm_status AS orderConfirmStatus,
+          t1.logistic_no          AS logisticNo,
+          t1.handled_by           AS handledBy,
+          t1.consignee            AS consignee,
+          t1.contact              AS contact,
+          t1.transfer_sale        AS transferSale,
+          t1.transfer_send        AS transferSend,
+          t1.transfer_invoice     AS transferInvoice,
+          t1.order_amount         AS orderAmount,
+          t1.TRANSFER_TO          AS transferTo
+        FROM
+          wms_transfer t1
+        WHERE t1.status = 2 AND t1.order_confirm_status = 0 AND
+              t1.order_push_status = 1 AND
+              T1.TRANSFER_TO IN (<include refid="sf_warehouse_query"/>)
 	</select>
 	
 	<select id="getImeiSf" resultType="Transfer">
@@ -551,20 +561,21 @@
 	</select>
 	
 	<!-- 根据调拨批次id获取调拨商品 -->
-	<select id="getTransferGoodsById" parameterType="long"
-		resultType="TransferGoods">
-		select t.id as id,
-		t.transfer_id as transferId,
-		t.sku_id as skuId,
-		t.sku_code as skuCode,
-		t.sku_name as skuName,
-		t.quantity as quantity,
-		t.measure_unit as measureUnit,
-		t.indiv_enabled as indivEnabled,
-		t.unit_price as unitPrice,
-		t.qty as qty
-		from WMS_TRANSFER_GOODS t
-		where t.transfer_id=#{transferId}
+    <select id="getTransferGoodsById" parameterType="long" resultType="TransferGoods">
+        SELECT
+          t.id            AS id,
+          t.transfer_id   AS transferId,
+          t.sku_id        AS skuId,
+          t.sku_code      AS skuCode,
+          t.sku_name      AS skuName,
+          t.quantity      AS quantity,
+          t.measure_unit  AS measureUnit,
+          t.indiv_enabled AS indivEnabled,
+          t.unit_price    AS unitPrice,
+          t.qty           AS qty,
+          t.PREPARED_NUM  AS preparedNum
+        FROM WMS_TRANSFER_GOODS t
+        WHERE t.transfer_id = #{transferId}
 	</select>
 	
 	<!-- 删除指定调拨商品 -->

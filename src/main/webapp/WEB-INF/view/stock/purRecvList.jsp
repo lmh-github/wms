@@ -25,10 +25,12 @@
 				<label>采购编号：</label>
 				<input type="text" name="purchaseCode" value="${purchaseCode}"/>
 			</li>
-			<li style="width:380px;">
-				<label>制单时间从：</label>
+			<li>
+				<label>制单开始时间：</label>
 				<input type="text" name="preparedTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${preparedTimeBegin }" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+                <label>制单截止时间：</label>
 				<input type="text" name="preparedTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${preparedTimeEnd }" pattern="yyyy-MM-dd"/>"/>
 			</li>
 			<li>
@@ -49,6 +51,7 @@
 				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">检索</button></div></div></li>
 			</ul>
 		</div>
+    </div>
 	</form>
 </div>
 <div class="pageContent">

@@ -17,16 +17,16 @@
 	<div class="searchBar">
 		<ul class="searchContent">
 			<li>
-				<label style="width:100px">系统SKU编码：</label>
-				<input type="text" name="skuMap.skuCode" bringBackName="sku.skuCode"  value="${skuMap.skuCode }" lookupGroup="sku" style="float:left"/>
+				<label>系统SKU编码：</label>
+				<input type="text" name="skuMap.skuCode" bringBackName="sku.skuCode"  value="${skuMap.skuCode }" lookupGroup="sku" style="float:left;width:140px;"/>
 				<a class="btnLook" href="${ctx}/wares/sku!lookup.action" lookupGroup="sku" width="1200">查找SKU</a>
 			</li>
 			<li>
-				<label style="width:100px">第三方SKU编码：</label>
+				<label>第三方SKU编码：</label>
 				<input type="text" name="skuMap.outerSkuCode" value="${skuMap.outerSkuCode}"/>
 			</li>
 			<li>
-				<label style="width:100px">第三方公司编码：</label>
+				<label>第三方公司编码：</label>
 				<!--  
 				<input type="text" name="skuMap.outerCode" value="${skuMap.outerCode}"/>(唯品会:vip)
 				-->

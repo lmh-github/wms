@@ -1,17 +1,16 @@
 package com.gionee.wms.common;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.gionee.wms.dto.ShiroUser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.struts2.ServletActionContext;
 
-import com.gionee.wms.dto.ShiroUser;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.xml.ws.Service;
+import java.io.File;
+import java.io.IOException;
 
 public class ActionUtils {
 	// -- Content Type 定义 --//
@@ -32,7 +31,7 @@ public class ActionUtils {
 
 	/**
 	 * 判断是否为json格式请求
-	 * 
+	 *
 	 * @return
 	 */
 	public static boolean isJsonRequest() {
@@ -54,104 +53,128 @@ public class ActionUtils {
 		return ServletActionContext.getServletContext().getRealPath("/");
 	}
 
-	/**
-	 * 取类绝对路径
-	 */
-	public static String getClassPath() {
-		String classPath = ActionUtils.class.getClassLoader().getResource("").getPath();
-		// 对 Windows下的物理路径做特殊处理
-		if ("\\".equals(File.separator)) {
-			classPath = classPath.substring(1);// .replaceAll("/", "\\\\");
-		}
-		return classPath;
-	}
+    /**
+     * 取类绝对路径
+     */
+    public static String getClassPath() {
+        String classPath = ActionUtils.class.getClassLoader().getResource("").getPath();
+        // 对 Windows下的物理路径做特殊处理
+        if ("\\".equals(File.separator)) {
+            classPath = classPath.substring(1);// .replaceAll("/", "\\\\");
+        }
+        return classPath;
+    }
 
-	public static ShiroUser getCurrentUser() {
-		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-		return user;
-	}
+    /**
+     * 登录用户
+     * @return
+     */
+    public static ShiroUser getCurrentUser() {
+        try {
+            if (SecurityUtils.getSubject() != null) {
+                ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+                return user;
+            }
+        } catch (Exception e) {
+            // ignore
+        }
 
-	public static String getLoginName() {
-		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
-		if(user == null){
-			return null;
-		}
-		return user.getLoginName();
-	}
+        return null;
+    }
 
-	public static void logout() {
-		SecurityUtils.getSubject().logout();
-	}
+    /**
+     * 获取当前登录用户
+     * @return
+     */
+    public static String getLoginName() {
+        ShiroUser user = getCurrentUser();
+        if (user == null) {
+            return null;
+        }
+        return user.getLoginName();
+    }
 
-	/**
-	 * 输出json类型到客户端
-	 */
-	public static void outputJson(final String content) {
-		output(JSON_TYPE, WmsConstants.DEFAULT_ENCODING, content);
-	}
+    /**
+     * 获取当前登录的用户名，没有则返回系统用户System
+     * @return
+     */
+    public static String getLoginNameAndDefault(){
+        return StringUtils.defaultString(getLoginName(), "System");
+    }
 
-	/**
-	 * 输出text类型到客户端
-	 */
-	public static void outputText(final String content) {
-		output(TEXT_TYPE, WmsConstants.DEFAULT_ENCODING, content);
-	}
+    public static void logout() {
+        SecurityUtils.getSubject().logout();
+    }
 
-	private static void output(final String contentType, final String encoding, final String content) {
-		HttpServletResponse response = ServletActionContext.getResponse();
-		response.setContentType(contentType + ";charset=" + encoding);
-		try {
-			response.getWriter().write(content);
-			response.getWriter().flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+    /**
+     * 输出json类型到客户端
+     */
+    public static void outputJson(final String content) {
+        output(JSON_TYPE, WmsConstants.DEFAULT_ENCODING, content);
+    }
 
-	/**
-	 * 获取请求上下文中的真实IP地址
-	 */
-	public static String getRemoteAddr(HttpServletRequest request) {
-		if (request == null) {
-			request = ServletActionContext.getRequest();
-		}
+    /**
+     * 输出text类型到客户端
+     */
+    public static void outputText(final String content) {
+        output(TEXT_TYPE, WmsConstants.DEFAULT_ENCODING, content);
+    }
 
-		String ip = request.getHeader("X-Real-IP");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			return ip;
-		}
+    private static void output(final String contentType, final String encoding, final String content) {
+        HttpServletResponse response = ServletActionContext.getResponse();
+        response.setContentType(contentType + ";charset=" + encoding);
+        try {
+            response.getWriter().write(content);
+            response.getWriter().flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
-		ip = request.getHeader("X-Forwarded-For");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			// 多次反向代理后会有多个IP值，第一个为真实IP
-			int index = ip.indexOf(',');
-			if (index > -1) {
-				return ip.substring(0, index);
-			} else {
-				return ip;
-			}
-		}
+    /**
+     * 获取请求上下文中的真实IP地址
+     */
+    public static String getRemoteAddr(HttpServletRequest request) {
+        if (request == null) {
+            request = ServletActionContext.getRequest();
+        }
 
-		ip = request.getHeader("Proxy-Client-IP");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			return ip;
-		}
+        String ip = request.getHeader("X-Real-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
 
-		ip = request.getHeader("WL-Proxy-Client-IP");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			return ip;
-		}
+        ip = request.getHeader("X-Forwarded-For");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            // 多次反向代理后会有多个IP值，第一个为真实IP
+            int index = ip.indexOf(',');
+            if (index > -1) {
+                return ip.substring(0, index);
+            } else {
+                return ip;
+            }
+        }
 
-		ip = request.getHeader("HTTP_CLIENT_IP");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			return ip;
-		}
+        ip = request.getHeader("Proxy-Client-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
 
-		ip = request.getHeader("X-Cluster-Client-IP");
-		if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
-			return ip;
-		}
-		return request.getRemoteAddr();
-	}
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("HTTP_CLIENT_IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("X-Cluster-Client-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+        return request.getRemoteAddr();
+    }
 
 }

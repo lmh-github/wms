@@ -13,11 +13,13 @@
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/salesOrder!orderStatusStat.action?queryFrom=button" method="post">
 	<input type="hidden" name="stockCheckId" value="${stockCheckId }" />
 	<div class="searchBar">
-		<ul class="searchContent" style="height: 80px;">
-			<li style="width:380px;">
-				<label>订单时间从：</label>
+		<ul class="searchContent">
+			<li>
+				<label>订单开始时间：</label>
 				<input type="text" name="orderTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${orderTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
+            </li>
+            <li>
+                <label>订单截止时间：</label>
 				<input type="text" name="orderTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${orderTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
 			<li>
@@ -29,11 +31,10 @@
 					<s:select id="orderSource" name="orderSource" list="@com.gionee.wms.common.WmsConstants$OrderSourceIuni@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>
 				</s:elseif>
 			<li>
-				<label style="width:100px">含商品：</label>
+				<label>含商品：</label>
 				<input type="text" id="skuCode" name="skuCode" value="${skuCode }"/>
 			</li>
-			</li>
-			<!-- 
+			<!--
 			<li>
 				<label style="width:100px">含商品名称：</label>
 				<input type="text" id="skuName" name="skuName" bringBackName="sku.skuName"  value="${skuName }" lookupGroup="sku" style="float:left"/>

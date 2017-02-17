@@ -12,55 +12,71 @@ package com.gionee.wms.vo;
  * @author PengBin 00001550<br>
  * @date 2014年8月27日 下午2:51:23
  */
-public class ServiceCtrlMessage {
+public class ServiceCtrlMessage<T> {
 
-	/** 操作结果,true|false 即成功|失败 */
-	private boolean result;
-	/** 说明，备注 */
-	private String message;
+    /** 操作结果,true|false 即成功|失败 */
+    private boolean result;
+    /** 说明，备注 */
+    private String message;
 
-	public ServiceCtrlMessage() {
-		super();
-	}
+    private T data;
 
-	public ServiceCtrlMessage(boolean result, String message) {
-		super();
-		this.result = result;
-		this.message = message;
-	}
+    public ServiceCtrlMessage() {
+        super();
+    }
 
-	/**
-	 * @return the result
-	 */
-	public boolean isResult() {
-		return result;
-	}
+    public ServiceCtrlMessage(boolean result, String message) {
+        super();
+        this.result = result;
+        this.message = message;
+    }
 
-	/**
-	 * @param result the result
-	 */
-	public void setResult(boolean result) {
-		this.result = result;
-	}
+    public ServiceCtrlMessage(boolean result, String message, T data) {
+        this.result = result;
+        this.message = message;
+        this.data = data;
+    }
 
-	/**
-	 * @return the message
-	 */
-	public String getMessage() {
-		return message;
-	}
+    /**
+     * @return the result
+     */
+    public boolean isResult() {
+        return result;
+    }
 
-	/**
-	 * @param message the message
-	 */
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    /**
+     * @param result the result
+     */
+    public void setResult(boolean result) {
+        this.result = result;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public String toString() {
-		return "ServiceCtrlMessage [result=" + result + ", message=" + message + "]";
-	}
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "ServiceCtrlMessage [result=" + result + ", message=" + message + "]";
+    }
 
 }

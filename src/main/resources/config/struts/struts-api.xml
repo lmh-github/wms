@@ -77,5 +77,14 @@
 		
 		<!-- 快递接口 -->
 		<action name="kuaidiAction" class="kuaidiAction" />
+
+        <!-- 开电子发票 -->
+		<action name="makeEInvoice" class="EInvoiceApiAction" method="makeEInvoice"></action>
+        <!-- 查询电子发票 -->
+		<action name="queryEInvoice" class="EInvoiceApiAction" method="queryEInvoice"></action>
+        <!-- 冲红发票 -->
+        <action name="chEInvoice" class="EInvoiceApiAction" method="chEInvoice"></action>
+        <!-- 微信二维码 -->
+        <action name="ewmGenerate" class="EInvoiceApiAction" method="ewmGenerate"></action>
 	</package>
 </struts>

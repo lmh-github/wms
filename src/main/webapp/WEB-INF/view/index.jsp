@@ -16,16 +16,12 @@
 <meta HTTP-EQUIV="expires" CONTENT="0">
 <title>电商仓管系统</title>
 
-<link href="${ctx}/static/themes/default/style.css" rel="stylesheet" type="text/css" media="screen"/>
-<link href="${ctx}/static/themes/css/core.css" rel="stylesheet" type="text/css" media="screen"/>
+<link href="${ctx}/static/themes/default/style.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
+<link href="${ctx}/static/themes/css/core.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
 <link href="${ctx}/static/themes/css/print.css" rel="stylesheet" type="text/css" media="print"/>
 <link href="${ctx}/static/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" media="screen"/>
 <!--[if IE]>
 <link href="themes/css/ieHack.css" rel="stylesheet" type="text/css" media="screen"/>
-<![endif]-->
-
-<!--[if lte IE 9]>
-<script src="js/speedup.js" type="text/javascript"></script>
 <![endif]-->
 
 <script src="${ctx}/static/js/jquery-1.8.3.min.js" type="text/javascript"></script>
@@ -35,7 +31,7 @@
 <script src="${ctx}/static/ckeditor-4.1.2/ckeditor.js" type="text/javascript"></script>
 <script src="${ctx}/static/uploadify/scripts/jquery.uploadify.js" type="text/javascript"></script>
 
-<script src="${ctx}/static/js/dwz.core.js" type="text/javascript"></script>
+<script src="${ctx}/static/js/dwz.core.js?_=01" type="text/javascript"></script>
 <script src="${ctx}/static/js/dwz.util.date.js" type="text/javascript"></script>
 <script src="${ctx}/static/js/dwz.validate.method.js" type="text/javascript"></script>
 <script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
@@ -87,7 +83,7 @@ $(function(){
 		debug:false,	// 调试模式 【true|false】
 		callback:function(){
 			initEnv();
-			$("#themeList").theme({themeBase:"themes"}); // themeBase 相对于index页面的主题base路径
+			//$("#themeList").theme({themeBase:"themes"}); // themeBase 相对于index页面的主题base路径
 		}
 	});
 	initAudio();
@@ -134,6 +130,20 @@ function soundError() {
 		// do nothing
 	}
 }
+
+window['downLoadEvent'] = function(e) {
+    var content = e.contentWindow.document.body.innerHTML;
+    $(e).remove();
+    if (/HTTP Status 404/g.test(content)) {
+        return alertMsg.error("您要下载的文件找不到了！");
+    }
+    if (/HTTP Status 500/g.test(content)) {
+        return alertMsg.error("服务器下载出现异常！");
+    }
+    if ($.trim(content).length > 0) {
+        return alertMsg.error($.trim(content));
+    }
+}
 </script>
 </head>
 
@@ -146,7 +156,7 @@ function soundError() {
 					<li><a href="${ctx}/account/login!index.action" target="_blank">平台首页</a></li>
 					<li><a href="${ctx}/account/login!logout.action">退出</a></li>
 				</ul>
-				<ul class="themeList" id="themeList">
+				<ul class="themeList" id="themeList" style="display: none;">
 					<li theme="default"><div class="selected">蓝色</div></li>
 					<li theme="green"><div>绿色</div></li>
 					<!--<li theme="red"><div>红色</div></li>-->
@@ -157,7 +167,7 @@ function soundError() {
 			</div>
 
 			<!-- navMenu -->
-			
+
 		</div>
 
 		<div id="leftside">
@@ -171,19 +181,19 @@ function soundError() {
 
 				<div class="accordion" fillSpace="sidebar">
 					<div class="accordionContent">
-						<ul class="tree treeFolder"><!-- 
+						<ul class="tree treeFolder"><!--
 							<li><a href="tabsPage.html" target="navTab">主框架面板</a>
 								<ul>
 									<li><a href="main.html" target="navTab" rel="main">我的主页</a></li>
 								</ul>
 							</li> -->
 							${menuHtml}
-							
+
 <%
-	/* 
+	/*
 	root 是菜单树，但是根据显示的实际情况，只输出两级，所以配置菜单的时候需要注意。
 	生成的菜单 参照以上 菜单的html结构
-	
+
 Menu root = (Menu) request.getAttribute("menu");
 List<Menu> menuGroups = root.getChildMenus();
 for (Menu menu : menuGroups) {
@@ -195,13 +205,13 @@ for (Menu menu : menuGroups) {
 		String actionName = org.apache.commons.lang3.StringUtils.substringBefore(actionFullName,".action");
 		if(actionName!=null){
 			if(actionName.indexOf("!")>-1){
-				actionName = actionName.substring(actionName.indexOf("!")+1);	
+				actionName = actionName.substring(actionName.indexOf("!")+1);
 			}
 			actionName ="tab_"+actionName;
 		}else{
 			actionName="";
 		}
-		
+
 		out.println("<li>");
 		out.println("<a href=\"" + request.getContextPath()+ childMenu.getUrl()+ "\" target=\"navTab\" rel=\""+actionName+"\">" + childMenu.getName()+ "</a>");
 		out.println("</li>");
@@ -232,19 +242,19 @@ for (Menu menu : menuGroups) {
 				</ul>
 				<div class="navTab-panel tabsPageContent layoutBox">
 					<div class="page unitBox">
-						<div class="accountInfo">
+						<div class="accountInfo" style="width: 100%;height: 100%;">
 							<p><span>欢迎登录系统！</span></p>
 						</div>
 						<div class="pageFormContent" layoutH="80" style="margin-right:230px">
-							
-							
+
+
 						</div>
-						
-						<div style="width:230px;position: absolute;top:60px;right:0" layoutH="80">
+
+						<div style="width:230px;position: absolute;top:60px;right:0;display: none;" >
 							<iframe width="100%" height="430" class="share_self"  frameborder="0" scrolling="no" src=""></iframe>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
 		</div>
@@ -253,7 +263,7 @@ for (Menu menu : menuGroups) {
 
 </body>
 <div id="audioArea" style="display: none;"></div>
-<object id="mscomm1" classid="clsid:648A5600-2C6E-101B-82B6-000000000014" codebase="${ctx}/static/weight/mscomm32.cab#version=1,0,0,1" >
+<object id="mscomm1" classid="clsid:648A5600-2C6E-101B-82B6-000000000014" codebase="${ctx}/static/weight/mscomm32.cab#version=1,0,0,1" style="height: 0;width: 0; position: absolute;left: -999px;top: -999px;" >
   <param name="CommPort" value="3">
   <param name="InBufferSize" value="1024">
   <param name="InputLen" value="1">
@@ -269,11 +279,11 @@ for (Menu menu : menuGroups) {
   <param name="EOFEnable" value="0">
   <param name="InputMode" value="0">
 </object>
-</html>
 
-<SCRIPT   LANGUAGE="javascript"   FOR="mscomm1"   EVENT="OnComm"> 
+<SCRIPT   LANGUAGE="javascript"   FOR="mscomm1"   EVENT="OnComm">
    <!--
    // MSComm1控件每遇到 OnComm 事件就调用 MSComm1_OnComm()函数
            msComm_OnComm();
-    //--> 
+    //-->
 </SCRIPT>
+</html>

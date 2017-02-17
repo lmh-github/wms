@@ -44,10 +44,12 @@
 				<label>SKU名称：</label>
 				<input type="text" name="skuName" value="${skuName}"/>
 			</li>
-			<li style="width:380px;">
-				<label>入库时间从：</label>
+			<li>
+				<label>入库开始时间：</label>
 				<input type="text" name="stockInTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${stockInTimeBegin }" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+                <label>入库截止时间：</label>
 				<input type="text" name="stockInTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${stockInTimeEnd }" pattern="yyyy-MM-dd"/>"/>
 			</li>
 		</ul>

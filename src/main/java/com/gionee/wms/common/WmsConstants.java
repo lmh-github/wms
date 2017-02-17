@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * WMS常量
- * 
+ *
  * @author kevin
  */
 public class WmsConstants {
@@ -587,7 +587,17 @@ public class WmsConstants {
 		/**
 		 * 中国移动
 		 */
-		CHINA_MOBILE("18", "中国移动");
+		CHINA_MOBILE("18", "中国移动"),
+
+		LTHC("19", "联通华盛"),
+        /**
+         * 山东三际
+         */
+        SDSJ("20", "山东三际"),
+        /**
+         * 杭州玩风
+         */
+		HZWF("21", "杭州玩风");
 
 		private final String code;
 		private final String name;
@@ -673,7 +683,17 @@ public class WmsConstants {
 		/**
 		 * 中国移动
 		 */
-		CHINA_MOBILE("18", "中国移动");
+		CHINA_MOBILE("18", "中国移动"),
+
+		LTHC("19", "联通华盛"),
+        /**
+         * 山东三际
+         */
+        SDSJ("20", "山东三际"),
+        /**
+         * 杭州玩风
+         */
+        HZWF("21", "杭州玩风");
 
 		private final String code;
 		private final String name;
@@ -1342,7 +1362,7 @@ public class WmsConstants {
 
 	/**
 	 * 订单推送状态代码枚举
-	 * 
+	 *
 	 * @author PengBin 00001550<br>
 	 * @date 2014年8月19日 下午5:10:30
 	 */
@@ -1369,7 +1389,7 @@ public class WmsConstants {
 
 	/**
 	 * 配送方式枚举
-	 * 
+	 *
 	 * @author PengBin 00001550<br>
 	 * @date 2014年8月19日 下午5:43:37
 	 */
@@ -1405,7 +1425,7 @@ public class WmsConstants {
 
 	/**
 	 * 库存状态枚举
-	 * 
+	 *
 	 * @author PengBin 00001550<br>
 	 * @date 2014年8月25日 下午6:46:51
 	 */
@@ -1447,7 +1467,7 @@ public class WmsConstants {
 
 	/**
 	 * 仓库编码枚举
-	 * 
+	 *
 	 * @author PengBin 00001550<br>
 	 * @date 2014年8月28日 下午3:24:02
 	 */
@@ -1510,4 +1530,35 @@ public class WmsConstants {
 	public static final String ORDER_AUTO_PUSH_SF = "ORDER_AUTO_PUSH_SF";
 	/** 推送前是否库存校验 */
 	public static final String ORDER_PUSH_CHECK_STOCK = "ORDER_PUSH_CHECK_STOCK";
+
+    /**
+     * 开票状态
+     */
+    public enum EInvoiceStatus{
+		/** 等待打印 */
+		WAIT_MAKE("等待开票"),
+		/** 等待下载 */
+		WAIT_DOWNLOAD("等待出票"),
+		/** 开票成功 */
+		SUCCESS("已开票"),
+		/** 开票失败 */
+		FAILURE("开票失败"),
+		/** 月底最后一天延后标记 */
+		KP_DELAYED("延期开票"),
+		/** 延期冲红 */
+		CH_DELAYED("延期冲红"),
+		/** 订单取消 */
+        ORDER_CANCEL("订单取消"),
+		/** 发票冲红 */
+		RED("已冲红");
+
+        EInvoiceStatus(String text){
+            this.text = text;
+        }
+
+		private String text;
+		public String getText(){
+			return this.text;
+		}
+	}
 }

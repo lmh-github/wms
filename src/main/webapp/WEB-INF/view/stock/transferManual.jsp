@@ -23,7 +23,7 @@
 			</dl>
 			<dl>
 				<dt>收货地址：</dt>
-				<dd><input name="transfer.transferTo" class="required" type="text" maxlength="40" size="40" value="${transfer.transferTo }" ${editEnabled?"":"readonly='readonly'"} /></dd>
+				<dd><input name="transfer.transferTo" class="required" type="text" maxlength="40" value="${transfer.transferTo }" ${editEnabled?"":"readonly='readonly'"} /></dd>
 			</dl>
 			<dl>
 				<dt>收货人：</dt>

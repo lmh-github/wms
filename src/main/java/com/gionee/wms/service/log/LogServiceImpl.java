@@ -36,7 +36,7 @@ public class LogServiceImpl implements LogService {
 	*  @return 返回受影响的行数
 	*  @author ZuoChangjun
  	*/
-	public int insertLog(Log log)throws Exception{
+	public int insertLog(Log log){
     		return logDao.insertLog(log);
 	}
 	

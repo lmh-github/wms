@@ -218,5 +218,9 @@
           <result name="confirmBack">/WEB-INF/view/stock/orderBackConfirm.jsp</result>
           <result name="view">/WEB-INF/view/stock/orderBackView.jsp</result>
         </action>
+		
+		<action name="invoiceInfo" class="InvoiceInfoAction">
+			<result name="success">/WEB-INF/view/stock/invoiceInfoList.jsp</result>
+		</action>
 	</package>
 </struts>

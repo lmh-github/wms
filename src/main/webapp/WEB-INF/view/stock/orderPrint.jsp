@@ -8,7 +8,6 @@
 <OBJECT id=m_ObjSoapKp classid="clsid:31EE4CA3-5469-4151-AF4B-01ED9ABD1E35" width=0 height=0 align="center" hspace=0 vspace=0 CODEBASE="SoapKpClient.cab#Version=1,0,0,0"> </OBJECT>
 <script language="javascript" src="${ctx}/static/print/LodopFuncs.js"></script>
 <script language="javascript" src="${ctx}/static/print/sfimage.js"></script>
-<style type="text/css">#orderPrint-ul li{width: 250px;}</style>
 <form id="pagerForm" method="post" action="#rel#">
 	<input type="hidden" name="page.currentPage" value="1" />
 	<input type="hidden" name="page.pageSize" value="${page.pageSize}" />
@@ -21,16 +20,20 @@
 	<input id="shipping_code" type="hidden" name="shippingCode" value="${shippingCode}" />
 	<div class="searchBar">
 		<ul class="searchContent" style="height: 50%;" id="orderPrint-ul">
-			<li style="width:380px;">
-				<label>下单时间从：</label>
+			<li>
+				<label>下单开始时间：</label>
 				<input type="text" name="orderTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${orderTimeBegin }" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+                <label>下单截止时间：</label>
 				<input type="text" name="orderTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${orderTimeEnd }" pattern="yyyy-MM-dd"/>"/>
 			</li>
-			<li style="width:380px;">
-				<label>支付时间从：</label>
+			<li>
+				<label>支付开始时间：</label>
 				<input type="text" name="paymentTimeBegin" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${paymentTimeBegin }" pattern="yyyy-MM-dd"/>"/>
-				到：
+            </li>
+            <li>
+                <label>支付截止时间：</label>
 				<input type="text" name="paymentTimeEnd" class="date" size="10" dateFmt="yyyy-MM-dd" maxDate="{%y}-%M-%d" value="<fmt:formatDate value="${paymentTimeEnd }" pattern="yyyy-MM-dd"/>"/>
 			</li>
 			<li>
@@ -49,7 +52,7 @@
 				<label>拣货编号：</label>
 				<input type="text" name="batchCode" value="${batchCode}"/>
 			</li>
-			<li style="width: 180px;">
+			<li>
 				<label>订单状态：</label>
 				<s:select name="orderStatus" list="@com.gionee.wms.common.WmsConstants$OrderStatus@values()" listKey="code" listValue="name" headerValue="请选择" headerKey="999"/>
 			</li>
@@ -61,7 +64,7 @@
 					<s:select name="orderSource" list="@com.gionee.wms.common.WmsConstants$OrderSourceIuni@values()" listKey="code" listValue="name" headerValue="请选择" headerKey=""/>
 				</s:elseif>
 			</li>
-			<li style="width: 210px;">
+			<li>
 				<label>是否含发票：</label>
 				<select name="invoiceEnabled">
 					<option value="">请选择</option>
@@ -69,17 +72,17 @@
 					<option value="0" ${(0==invoiceEnabled)?"selected='true'":""}>不含发票</option>
 				</select>
 			</li>
-			<li style="width: 300px">
+			<li>
 				<label>SKU编码：</label>
-				<select name="condition">
+				<select name="condition" style="width: 40px;">
 					<option value="1" ${(1==condition)?"selected='true'":""}>含</option>
 					<option value="2" ${(2==condition)?"selected='true'":""}>等于</option>
 					<option value="3" ${(3==condition)?"selected='true'":""}>不含</option>
 				</select>
-				<input name="skuCode" type="text" value="${skuCode}"/>
+				<input name="skuCode" type="text" value="${skuCode}" style="width: 117px;"/>
 			</li>
           <li>
-            <label>是否已经推送到顺丰</label>
+            <label>是否推送：</label>
             <select name="orderPushStatus">
                       <option value="" ${orderPushStatus == null ? "selected" : "" }>请选择</option>
                       <option value="1" <s:property value="orderPushStatus == 1 ? 'selected' : ''"/>>是</option>
@@ -107,7 +110,7 @@
 	<div class="panelBar">
 		<ul class="toolBar">
 			<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@FILTERED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@PRINTED.code">
-				<li><a class="icon" onclick="allPrint()" title="确定要同时打印吗？"><span>同时打印快递面单、购物清单、拣货单、发票</span></a></li>
+				<li><a class="icon" onclick="allPrint()" title="确定要同时打印吗？"><span>同时打印快递面单、购物清单、拣货单</span></a></li>
 				<li class="line">line</li>
 			</s:if>
 			<li><a class="icon" onclick="batchPrint('shipping')"><span>只打印快递面单</span></a></li>
@@ -305,7 +308,7 @@ function allPrint(){
 				//打运单
 				doPrint(idstr, 'shipping');
 				//打发票
-				doPrint(idstr, 'invoice');
+				//doPrint(idstr, 'invoice');
 			}
 			//打拣货单
 			doPrint(idstr, 'picking');

@@ -1,15 +1,5 @@
 package com.gionee.wms.web.action.stock;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.gionee.wms.common.ActionUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
-
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.dto.CommonAjaxResult;
 import com.gionee.wms.entity.Indiv;
@@ -22,6 +12,14 @@ import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.service.wares.IndivService;
 import com.gionee.wms.web.action.CrudActionSupport;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller("TransPrepareAction")
 @Scope("prototype")
@@ -75,8 +73,7 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
         int prepareRst = 0;
         // 获取配货订单仓库信息
         Transfer transfer = transferService.getTransferById(transferId);
-        if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer
-                .getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
+        if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
             // 不为未发货或者配货中
             result.setOk(false);
             result.setMessage("调拨单状态异常，请检查");
@@ -87,11 +84,8 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
             // sku编码
             if (null != goodsList) {
                 for (TransferGoods goods : goodsList) {
-                    if (indivCode.equals(goods.getSkuCode())
-                            && WmsConstants.ENABLED_FALSE == goods
-                            .getIndivEnabled()) {
-                        Integer preparedNum = null == goods.getPreparedNum() ? 1
-                                : goods.getPreparedNum() + 1;
+                    if (indivCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_FALSE == goods.getIndivEnabled()) {
+                        Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
                         if (preparedNum > goods.getQuantity()) {
                             prepareRst = 1; // 已超出
                             break;
@@ -120,15 +114,13 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
         } else {
             // 个体编码
             Indiv indiv = indivService.getIndivByCode(indivCode);
-            Warehouse warehouse = warehouseService.getWarehouse(transfer
-                    .getWarehouseId());
+            Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
 
             result.setOk(true);
             if (null == indiv) {
                 result.setOk(false);
                 result.setMessage("未找到商品个体");
-            } else if (WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode() != indiv
-                    .getStockStatus()) {
+            } else if (WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode() != indiv.getStockStatus()) {
                 result.setOk(false);
                 result.setMessage("商品不在库中");
             } else if (!(warehouse.getId().equals(indiv.getWarehouseId()))) {
@@ -153,12 +145,8 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
                 String skuCode = indiv.getSkuCode();
                 if (null != goodsList) {
                     for (TransferGoods goods : goodsList) {
-                        if (skuCode.equals(goods.getSkuCode())
-                                && WmsConstants.ENABLED_TRUE == goods
-                                .getIndivEnabled()) {
-                            Integer preparedNum = null == goods
-                                    .getPreparedNum() ? 1 : goods
-                                    .getPreparedNum() + 1;
+                        if (skuCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_TRUE == goods.getIndivEnabled()) {
+                            Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
                             if (preparedNum > goods.getQuantity()) {
                                 prepareRst = 1; // 超出
                                 break;
@@ -206,7 +194,7 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
                 if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
                     result.setMessage("未发货的单才能进行配货");
                 } else {
-                    Transfer tr=new Transfer();
+                    Transfer tr = new Transfer();
                     tr.setTransferId(transfer.getTransferId());
                     tr.setStatus(WmsConstants.TransferStatus.DELIVERYING.getCode());
                     transferService.updateTransferSf(tr);
@@ -227,7 +215,6 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
 
     /**
      * 确认调拨
-     *
      * @return
      * @throws Exception
      */

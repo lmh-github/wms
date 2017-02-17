@@ -236,12 +236,12 @@ a:hover {text-decoration:underline;}
 .panelBar { display:block; overflow:hidden; height:25px; border-style:solid; border-width:1px 0; background-repeat:repeat-x; }
 
 .panelBar ul { padding:1px;}
-.panelBar li { float:left; display:block; overflow:hidden; height:23px; padding:0 0 0 5px;}
-.panelBar li.hover { background-position:0 -100px;}
-.panelBar li.hover a { background-position:100% -150px;}
+.panelBar li { float:left; display:block; overflow:hidden; height:23px; }
+.panelBar li.hover { }
+.panelBar li.hover a {background: #b8d0d6;border-radius: 4px; }
 
-.panelBar .toolBar li, .panelBar .toolBar li.hover { padding:0 0 0 5px; background-position:0 -100px;}
-.panelBar .toolBar a, .panelBar .toolBar li.hover a { float:left; display:block; overflow:hidden; padding:0 5px 0 0; text-decoration:none; background-position:100% -150px;}
+.panelBar .toolBar li, .panelBar .toolBar li.hover {  }
+.panelBar .toolBar a, .panelBar .toolBar li.hover a { float:left; display:block; overflow:hidden;  text-decoration:none;padding: 0 4px; }
 .panelBar .toolBar span, .panelBar .toolBar li.hover span { float:left; display:block; overflow:hidden; height:23px; padding:0 0 0 20px; line-height:23px; cursor:pointer;}
 
 .panelBar .toolBar a.add span { background-position:0 -696px;}
@@ -256,8 +256,8 @@ a:hover {text-decoration:underline;}
 .panelBar .pages select { float:left; margin:0 3px; font-size:12px;}
 
 .pagination { float:right; padding-left:7px; background-position:0 -199px;}
-.pagination li, .pagination li.hover { padding:0 0 0 5px; background-position:0 -100px;}
-.pagination a, .pagination li.hover a, .pagination li span { float:left; display:block; padding:0 5px 0 0; text-decoration:none; line-height:23px; background-position:100% -150px;}
+.pagination li, .pagination li.hover { }
+.pagination a, .pagination li.hover a, .pagination li span { float:left; display:block; padding:0 5px 0 5px; text-decoration:none; line-height:23px; background-position:100% -150px;}
 .pagination li.selected a{color:red; font-weight:bold;}
 .pagination span, .pagination li.hover span { float:left; display:block; height:23px; line-height:23px; cursor:pointer;}
 
@@ -313,7 +313,14 @@ a:hover {text-decoration:underline;}
 
 /* CSS Table */
 table.list {border-collapse:collapse; border:solid 1px #ededed;}
-table.list thead tr {background:url("../default/images/grid/tableth.png") repeat-x scroll 0 0 #F0EFF0;}
+table.list thead tr {/*background:url("../default/images/grid/tableth.png") repeat-x scroll 0 0 #F0EFF0;*/
+    background-color:#f0f0f0;
+    background:#f0f0f0;
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#f8f8f8), to(#eaeaea));
+    background:-moz-linear-gradient(100% 100% 90deg, #eaeaea, #f8f8f8);
+    background:-ms-linear-gradient(top, #f8f8f8 0%,#eaeaea 100%);
+    background:linear-gradient(top, #f8f8f8 0%,#eaeaea 100%);
+}
 table.list th {padding:1px 2px; line-height:21px; border-right: solid 1px #D0D0D0; border-bottom:solid 1px #D0D0D0; font-weight:bolder; }
 table.list td {padding:1px 2px; line-height:21px; border-right:solid 1px #ededed;}
 table.list th.asc, .grid .gridHeader th.asc{background-position: 100% 0; background:url(../default/images/order_up.gif) no-repeat right; cursor:pointer;}
@@ -371,14 +378,15 @@ table.nowrap tbody tr {border-bottom:solid 1px #ededed;}
 textarea.focus, textarea.required, textarea.error, textarea.readonly, textarea.disabled { padding:2px; margin:0; height:16px; font-size:12px; border-style:solid; border-width:1px;}
 input.required, textarea.required { background-position:100% 0;}
 input.gray, textarea.gray{color:gray;}
-select{height: 21px;border-color:#a2bac0;vertical-align: middle;}
+select{height: 21px;border:1px solid #a2bac0;vertical-align: middle;width: 152px;}
+
 
 .inputButton { float:left; display:block; overflow:hidden; text-indent:-1000px; width:16px; height:21px;}
 .inputButton:hover { background-position:0 -50px;}
 .inputDateButton { float:left; display:block; overflow:hidden; text-indent:-1000px; width:16px; height:21px; background-position:0 -100px;}
 .inputDateButton:hover { background-position:0 -150px;}
 
-span.error { display:block; overflow:hidden; width:165px; height:21px; padding:0 3px; line-height:21px; background:#F00; color:#FFF; position:absolute; top:5px; left:318px;}
+span.error { overflow:hidden; height:21px; padding:0 3px; line-height:21px; background:#F00; color:#FFF; position:absolute; top:5px;margin-left: 3px;}
 label.alt {display:block; overflow:hidden; position:absolute;line-height:20px;color: #999;}
 
 /* Button */
@@ -449,12 +457,14 @@ body { overflow:hidden;}
 #navMenu li.selected span { padding:0 8px; background-position:0 -100px;}
 
 /* Pages default */
-.page { display:block; overflow:hidden;float:left; width:100%;}
+.page { display:block; overflow:hidden;float:left; width:100%;height: 100%;}
 .pageHeader { display:block; overflow:auto; margin-bottom:1px; padding:5px; border-style:solid; border-width:0 0 1px 0; position:relative;}
 .searchBar {}
-.searchBar ul.searchContent { display:block; overflow:hidden; height:25px;}
-.searchBar ul.searchContent li { float:left; display:block; overflow:hidden; width:300px; height:21px; padding:2px 0;}
-.searchBar label { float:left; width:80px; padding:0 5px; line-height:23px;}
+.searchBar ul.searchContent { display:block; overflow:hidden; /*height:25px;*/}
+.searchBar ul.searchContent li { float:left; display:inline-block; overflow:hidden; width:270px; height:21px; padding:2px 0;}
+.searchBar label { float:left; width:85px; padding:0 5px; line-height:23px;}
+.searchBar li input[type='text']{width:160px;}
+.searchBar li select{width:166px;}
 .searchBar .searchContent td{padding-right:20px; white-space:nowrap; height:25px}
 .searchBar .subBar { height:25px;}
 .searchBar .subBar ul { float:right;}
@@ -472,7 +482,7 @@ body { overflow:hidden;}
 .pageFormContent p.nowrap { height:auto; width: 100%}
 .pageFormContent .radioGroup { float:left; display:block; overflow:hidden;}
 .pageFormContent label { float:left; width:120px; padding:0 5px; line-height:21px;}
-.pageFormContent label.radioButton { float:left; width:auto; padding:0 10px 0 0; line-height:21px;}
+.pageFormContent label.radioButton { float:left; width:auto; padding:0 10px 0 0; line-height:21px;width: 160px;}
 .pageFormContent .textInput { float:left;}
 .pageFormContent select { float:left;}
 .pageFormContent .inputInfo { padding:0 5px; line-height:21px;}
@@ -480,7 +490,7 @@ body { overflow:hidden;}
 .pageFormContent span.info{color:#7F7F7F;display:block;line-height:21px;float:left;}
 
 .pageFormContent dl { float:left; display:block; width:380px; height:21px; margin:0; padding:5px 0; position:relative;}
-.pageFormContent dt { float:left; width:120px; padding:0 5px; line-height:21px;}
+.pageFormContent dt { float:left; width:70px; padding:0 5px; line-height:21px;}
 .pageFormContent dd {display:block;line-height:21px;width:220px;float:left;}
 .pageFormContent dl.nowrap, .nowrap dl{width:100%; height:auto; clear: both;}
 .pageFormContent dl.nowrap dd, .nowrap dd {width: 560px;}

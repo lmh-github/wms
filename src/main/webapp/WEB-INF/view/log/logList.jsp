@@ -19,20 +19,20 @@
 <div class="pageHeader">
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/log/log.action" method="post">
 	<div class="searchBar">
-		<ul class="searchContent" style="height: 50px;">
+		<ul class="searchContent">
 			<li>
-				<label style="width:100px">开始时间：</label>
+				<label>开始时间：</label>
 				<input type="text" name="startDate" value="${startDate}" class="date textInput"/>
 				<!-- <a class="inputDateButton" href="javascript:;">选择</a> -->
 			</li>
 			<li>
-				<label style="width:100px">结束时间：</label>
+				<label>结束时间：</label>
 				<input type="text" name="endDate" value="${endDate}" class="date textInput"/>
 				<!-- <a class="inputDateButton" href="javascript:;">选择</a> -->
 			</li>
 
 			<li>
-				<label style="width:100px">日志类型：</label>
+				<label>日志类型：</label>
 				<!--  
 				<input type="text" name="log.type" value="${log.type }"/>
 				-->
@@ -43,15 +43,15 @@
 				</select>
 			</li>
 			<li>
-				<label style="width:100px">操作名：</label>
+				<label>操作名：</label>
 				<input type="text" name="log.opName" value="${log.opName}"/>
 			</li>
 			<li>
-				<label style="width:100px">操作内容：</label>
+				<label>操作内容：</label>
 				<input type="text" name="log.content" value="${log.content}"/>
 			</li>
 			<li>
-				<label style="width:100px">操作用户：</label>
+				<label>操作用户：</label>
 		
 				<input type="text" name="log.opUserName" value="${log.opUserName}"/>
 			</li>

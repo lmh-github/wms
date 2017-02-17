@@ -13,7 +13,7 @@
 <div class="pageHeader">
 	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/stockChange.action" method="post">
 	<div class="searchBar">
-		<ul class="searchContent" style="height: 50px;">
+		<ul class="searchContent">
 			<li>
 				<label>仓库：</label>
 				<select class="required" name="warehouseId">
@@ -31,10 +31,12 @@
 				<label>SKU名称：</label>
 				<input type="text" name="skuName" value="${skuName}"/>
 			</li>
-			<li style="width:380px;">
-				<label>变动时间从：</label>
+			<li>
+				<label>变动开始时间：</label>
 				<input type="text" name="createTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-				到：
+            </li>
+            <li>
+                <label>变动截止时间：</label>
 				<input type="text" name="createTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
 			</li>
 			<li>

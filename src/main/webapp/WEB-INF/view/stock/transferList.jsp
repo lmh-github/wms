@@ -42,11 +42,13 @@
 				<label>物流单号：</label>
 				<input type="text" name="transfer.logisticNo" value="${transfer.logisticNo}"/>
 			</li>
-            <li style="width:380px;">
-              <label>变动时间从：</label>
+            <li>
+              <label>变动开始时间：</label>
               <input type="text" name="createTimeBegin" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeBegin }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
-                                              到：
-              <input type="text" name="createTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
+            </li>
+            <li>
+                <label>变动截止时间：</label>
+                <input type="text" name="createTimeEnd" class="date" size="15" dateFmt="yyyy-MM-dd HH:mm:ss" value="<fmt:formatDate value="${createTimeEnd }" pattern="yyyy-MM-dd HH:mm:ss"/>"/>
             </li>
 		</ul>
 		<div class="subBar">

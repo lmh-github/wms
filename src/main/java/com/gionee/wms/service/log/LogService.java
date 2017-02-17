@@ -22,7 +22,7 @@ public interface LogService{
 	*  @return 返回受影响的行数
 	*  @author ZuoChangjun
  	*/
-	public int insertLog(Log log)throws Exception;
+	int insertLog(Log log);
 	
    /**
 	*  删除Log

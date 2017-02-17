@@ -391,7 +391,7 @@ public class StockAction extends CrudActionSupport<Stock> {
 
 			WmsRealTimeInventoryBalanceQueryRequest request = new WmsRealTimeInventoryBalanceQueryRequest();
 			request.setCompany(WmsConstants.SF_COMPANY); // 货主
-			request.setWarehouse(WmsConstants.SF_WAREHOUSE); // 仓库
+			request.setWarehouse(ServletActionContext.getRequest().getParameter("warehouse")); // 仓库
 			request.setInventory_sts(InventoryStatusEnum.ZHENGPIN.getCode());
 			request.setItemList(Lists.newArrayList(skuMap.getOuterSkuCode()));
 			WmsRealTimeInventoryBalanceQueryResponse response = sfWebService.outsideToLscmService(WmsRealTimeInventoryBalanceQueryRequest.class, WmsRealTimeInventoryBalanceQueryResponse.class, request);
