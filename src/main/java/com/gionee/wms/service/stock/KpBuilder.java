@@ -60,7 +60,6 @@ public class KpBuilder implements EInvoiceBuildService {
             xmxxMapList.add(xmxxMap);
         }
 
-        //modelMap.put("FPQQLSH", FPQQLSH_FORMAT.format(new Date())); // 发票请求唯一流水号
         modelMap.put("FPQQLSH", invoiceInfoService.createKpLsh(order.getOrderCode())); // 发票请求唯一流水号
         modelMap.put("DSPTBM", EInvoiceConfig.E_DSPTBM); // 平台编码
         modelMap.put("NSRSBH", EInvoiceConfig.E_NSRSBH); // 开票方识别号
@@ -86,6 +85,7 @@ public class KpBuilder implements EInvoiceBuildService {
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.setScale(2, ROUND_DOWN).toString()); // 合计税额
         modelMap.put("DDH", order.getOrderCode()); // 订单号
+        modelMap.put("BZ", "订单号：" + order.getOrderCode());
 
         return modelMap;
     }

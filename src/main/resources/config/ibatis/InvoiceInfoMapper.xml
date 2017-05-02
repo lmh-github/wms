@@ -135,7 +135,7 @@
             <if test="fpDm != null">AND FP_DM = #{fpDm}</if>
             <if test="fpHm != null">AND FP_HM = #{fpHm}</if>
             <if test="returnCode != null">AND RETURN_CODE = #{returnCode}</if>
-            <if test="status != null">AND STATUS = #{orderCode}</if>
+            <if test="status != null">AND STATUS = #{status}</if>
             <if test="invoiceType != null">AND INVOICE_TYPE = #{invoiceType}</if>
             <if test="opDateBegin != null">AND OP_DATE &gt;= #{opDateBegin}</if>
             <if test="opDateEnd != null">AND OP_DATE &lt;= #{opDateEnd}</if>
@@ -182,6 +182,48 @@
         WHERE INVOICE_TYPE = 'E'
         <if test="orderCode != null"> AND ORDER_CODE = #{orderCode}</if>
         <if test="mobile != null"> AND MOBILE = #{mobile}</if>
+    </select>
+
+    <resultMap id="exprotQuery" type="map">
+        <result column="ORDER_CODE" property="ORDER_CODE" javaType="string"/>
+        <result column="FP_DM" property="FP_DM" javaType="string"/>
+        <result column="FP_HM" property="FP_HM" javaType="string"/>
+        <result column="ORDER_SOURCE" property="ORDER_SOURCE" javaType="string"/>
+        <result column="KPRQ" property="KPRQ" javaType="string"/>
+        <result column="STATUS" property="STATUS" javaType="string"/>
+        <result column="KPLSH" property="KPLSH" javaType="string"/>
+        <result column="CHLSH" property="CHLSH" javaType="string"/>
+        <result column="INVOICE_TYPE" property="INVOICE_TYPE" javaType="string"/>
+    </resultMap>
+
+    <select id="exprotQuery" parameterType="map" resultMap="exprotQuery">
+        SELECT
+            i.ORDER_CODE,
+            i.FP_DM,
+            i.FP_HM,
+            o.ORDER_SOURCE,
+            TO_CHAR(i.KPRQ, 'yyyy-mm-dd hh24:mi:ss') KPRQ,
+            i.STATUS,
+            i.KPLSH,
+            i.CHLSH,
+            i.INVOICE_TYPE
+        FROM
+          WMS_INVOICE I
+        LEFT JOIN WMS_SALES_ORDER O ON i.ORDER_CODE = o.ORDER_CODE
+        <where>
+            <if test="orderCode != null">AND i.ORDER_CODE = #{orderCode}</if>
+            <if test="fpDm != null">AND i.FP_DM = #{fpDm}</if>
+            <if test="fpHm != null">AND i.FP_HM = #{fpHm}</if>
+            <if test="returnCode != null">AND i.RETURN_CODE = #{returnCode}</if>
+            <if test="status != null">AND i.STATUS = #{status}</if>
+            <if test="invoiceType != null">AND i.INVOICE_TYPE = #{invoiceType}</if>
+            <if test="opDateBegin != null">AND i.OP_DATE &gt;= #{opDateBegin}</if>
+            <if test="opDateEnd != null">AND i.OP_DATE &lt;= #{opDateEnd}</if>
+            <if test="mobile != null">AND i.MOBILE = #{mobile}</if>
+            <if test="kpLsh != null">AND i.KPLSH = #{kpLsh}</if>
+            <if test="chLsh != null">AND i.CHLSH = #{chLsh}</if>
+            AND ROWNUM &lt;= 4000
+        </where>
     </select>
 
     <select id="queryOrderCodesByStatus" parameterType="list" resultType="string">

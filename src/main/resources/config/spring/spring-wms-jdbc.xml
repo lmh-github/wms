@@ -24,6 +24,10 @@
 	
 	<!-- hibernate validator -->
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <bean id="idGenerator" class="com.gionee.wms.service.common.DatabaseIDGenerator">
+        <property name="idBlockSize" value="1" />
+    </bean>
 	
 	<!-- 定义环境变量配置 -->
 	<bean id="placeholderConfigurer" class="com.gionee.wms.common.SpringPropertyConfigurer">

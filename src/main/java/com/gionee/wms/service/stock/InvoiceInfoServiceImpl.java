@@ -2,13 +2,16 @@ package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.ActionUtils;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
+import com.gionee.wms.common.WmsConstants.OrderSourceGionee;
 import com.gionee.wms.common.excel.excelimport.util.StringUtil;
 import com.gionee.wms.dao.InvoiceInfoDao;
 import com.gionee.wms.dto.Page;
 import com.gionee.wms.dto.PageResult;
 import com.gionee.wms.entity.InvoiceInfo;
 import com.gionee.wms.entity.SalesOrder;
+import com.gionee.wms.service.common.IDGenerator;
 import com.gionee.wms.vo.ServiceCtrlMessage;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +26,7 @@ import java.util.Map;
 import static com.gionee.wms.common.WmsConstants.EInvoiceStatus.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.leftPad;
 
 /**
  * Created by Pengbin on 2017/3/13.
@@ -31,12 +35,14 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 public class InvoiceInfoServiceImpl implements InvoiceInfoService {
 
     /** 发票请求唯一流水号生成器，共20位 */
-    SimpleDateFormat FPQQLSH_FORMAT = new SimpleDateFormat("'G'yyyyMMddHHmmssSSSSS");
+    SimpleDateFormat fpqqlshPrefixFormat = new SimpleDateFormat("'G'yyyyMMddHHmmss");
 
     @Autowired
     private InvoiceInfoDao invoiceInfoDao;
     @Autowired
     private EInvoiceService eInvoiceService;
+    @Autowired
+    private IDGenerator idGenerator;
 
     /** {@inheritDoc} */
     @Override
@@ -141,13 +147,15 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
         if (invoiceInfo.getKpLsh() != null) {
             return invoiceInfo.getKpLsh();
         }
-        String kpLsh = FPQQLSH_FORMAT.format(new Date());
+        String kpLshPrefix = fpqqlshPrefixFormat.format(new Date());
+        String kplshSuffix = leftPad(idGenerator.getId("KP-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date())) + "", 5, "0");
+        String kplsh = kpLshPrefix + kplshSuffix;
         InvoiceInfo toUpInvoice = new InvoiceInfo();
         toUpInvoice.setId(invoiceInfo.getId());
-        toUpInvoice.setKpLsh(FPQQLSH_FORMAT.format(new Date()));
+        toUpInvoice.setKpLsh(kplsh);
         invoiceInfoDao.updateExcludeNull(toUpInvoice);
 
-        return kpLsh;
+        return kplsh;
     }
 
     /** {@inheritDoc} */
@@ -157,10 +165,12 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
         if (invoiceInfo.getChLsh() != null) {
             return invoiceInfo.getChLsh();
         }
-        String chLsh = FPQQLSH_FORMAT.format(new Date());
+        String chLshPrefix = fpqqlshPrefixFormat.format(new Date());
+        String chLshSuffix = leftPad(idGenerator.getId("CH-" + new SimpleDateFormat("yyyy-mm-dd").format(new Date())) + "", 5, "0");
+        String chLsh = chLshPrefix + chLshSuffix;
         InvoiceInfo toUpInvoice = new InvoiceInfo();
         toUpInvoice.setId(invoiceInfo.getId());
-        toUpInvoice.setChLsh(FPQQLSH_FORMAT.format(new Date()));
+        toUpInvoice.setChLsh(chLsh);
         invoiceInfoDao.updateExcludeNull(toUpInvoice);
 
         return chLsh;
@@ -195,6 +205,28 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
     @Override
     public List<String> queryForJob(List<?> orderStatus, List<?> invoiceStatus) {
         return invoiceInfoDao.queryForJob(orderStatus, invoiceStatus);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<Map<String, String>> exprotQuery(Map<String, Object> paramMap) {
+        Map<Object, String> orderSourceMap = Maps.newHashMap();
+        for (OrderSourceGionee o : OrderSourceGionee.values()) {
+            orderSourceMap.put(o.getCode(), o.getName());
+        }
+
+        Map<Object, String> invoiceStatusMap = Maps.newHashMap();
+        for (EInvoiceStatus o : EInvoiceStatus.values()) {
+            invoiceStatusMap.put(o.toString(), o.getText());
+        }
+
+        List<Map<String, String>> mapList = invoiceInfoDao.exprotQuery(paramMap);
+        for (Map<String, String> o : mapList) {
+            o.put("ORDER_SOURCE", orderSourceMap.get(o.get("ORDER_SOURCE")));
+            o.put("STATUS", invoiceStatusMap.get(o.get("STATUS")));
+        }
+
+        return mapList;
     }
 
 }

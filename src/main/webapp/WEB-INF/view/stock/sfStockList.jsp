@@ -12,13 +12,24 @@
     <div class="pageFormContent" layoutH="50">
       <s:if test="#inv_response == null">无商品库存信息</s:if>
       <s:else>
-        <dl>
-          <%-- <dt>库存数量：<dd><s:property value="#inv_response"/> </dd></dt> --%>
-          <dt>总库存数量：<dd><s:property value="#inv_response.total_stock == null ? '0' : #inv_response.total_stock"/> </dd></dt>
-          <dt>在库库存数量：<dd><s:property value="#inv_response.on_hand_stock == null ? '0' : #inv_response.on_hand_stock"/> </dd></dt>
-          <dt>可用库存数量：<dd><s:property value="#inv_response.available_stock == null ? '0' : #inv_response.available_stock"/> </dd></dt>
-          <dt>在途库存数量：<dd><s:property value="#inv_response.in_transit_stock == null ? '0' : #inv_response.in_transit_stock"/> </dd></dt>
-        </dl>      
+          <table>
+              <tr>
+                  <td height="25">总库存数量：</td>
+                  <td><s:property value="#inv_response.total_stock == null ? '0' : #inv_response.total_stock"/></td>
+              </tr>
+              <tr>
+                  <td height="25">在库库存数量：</td>
+                  <td><s:property value="#inv_response.on_hand_stock == null ? '0' : #inv_response.on_hand_stock"/></td>
+              </tr>
+              <tr>
+                  <td height="25">可用库存数量：</td>
+                  <td><s:property value="#inv_response.available_stock == null ? '0' : #inv_response.available_stock"/></td>
+              </tr>
+              <tr>
+                  <td height="25">在途库存数量：</td>
+                  <td><s:property value="#inv_response.in_transit_stock == null ? '0' : #inv_response.in_transit_stock"/></td>
+              </tr>
+          </table>
       </s:else>
     </div>
   </div>

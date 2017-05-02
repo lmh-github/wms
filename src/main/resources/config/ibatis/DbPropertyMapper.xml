@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gionee.wms.dao.DbPropertyDao">
+
+    <sql id="columns">
+        KEY_, VALUE_, REV_
+    </sql>
+
+    <resultMap type="com.gionee.wms.entity.DbProperty" id="result">
+        <id property="key" column="KEY_"/>
+        <result property="value" column="VALUE_"/>
+        <result property="revision" column="REV_"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.DbProperty">
+        insert into GC_PROPERTY_ (<include refid="columns"/>) values (
+        #{key,jdbcType=VARCHAR},
+        #{value,jdbcType=VARCHAR},
+        #{nextRevision,jdbcType=NUMERIC}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.gionee.wms.entity.DbProperty">
+        update GC_PROPERTY_
+        <set>
+            <if test="value != null">
+                VALUE_ = #{value,jdbcType=VARCHAR},
+            </if>
+            REV_ = #{nextRevision}
+        </set>
+        where KEY_ = #{key} and REV_ = #{revision}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        delete GC_PROPERTY_ where KEY_ = #{key}
+    </delete>
+
+    <select id="getByKey" parameterType="string" resultMap="result">
+        select <include refid="columns"/> from GC_PROPERTY_
+        where KEY_ = #{_parameter}
+    </select>
+
+</mapper>

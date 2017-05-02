@@ -100,4 +100,11 @@ public interface InvoiceInfoService {
      */
     List<String> queryForJob(List<?> orderStatus, List<?> invoiceStatus);
 
+    /**
+     * 导出查询
+     * @param paramMap
+     * @return
+     */
+    List<Map<String, String>> exprotQuery(Map<String, Object> paramMap);
+
 }

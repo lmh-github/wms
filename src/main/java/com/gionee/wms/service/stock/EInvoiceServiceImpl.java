@@ -12,6 +12,7 @@ import com.gionee.wms.entity.SalesOrderGoods;
 import com.gionee.wms.service.common.MailService;
 import com.gionee.wms.service.log.LogService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
 import net.sf.json.xml.XMLSerializer;
@@ -210,7 +211,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         if (invoiceInfo1 == null) {
             return new ServiceCtrlMessage(false, "未找到相应的发票信息！");
         }
-        if (EInvoiceStatus.RED.toString().equals(invoiceInfo1.getStatus())) {
+        if (RED.toString().equals(invoiceInfo1.getStatus())) {
             return new ServiceCtrlMessage(false, "发票已经冲红！");
         }
         if (!asList(SUCCESS.toString(), WAIT_DOWNLOAD.toString()).contains(invoiceInfo1.getStatus())) {
@@ -230,21 +231,23 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         }
 
         List<SalesOrderGoods> salesOrderGoodses = salesOrderDao.queryGoodsListByOrderId(salesOrder.getId());
-        InvoiceInfo invoiceInfo = new InvoiceInfo();
-        invoiceInfo.setOrderCode(orderCode);
         try {
             KpInterface responseKpInterface = action(createRequestInterface(chService, salesOrder, salesOrderGoodses));
             ReturnStateInfo returnStateInfo = responseKpInterface.getReturnStateInfo();
             if (SUCCESS_CODE.equals(returnStateInfo.getReturnCode())) {
                 KpContentResp contentResp = XmlHelper1.toBean(responseKpInterface.getData().getContent(), KpContentResp.class);
 
+                InvoiceInfo invoiceInfo = invoiceInfoSerivce.get(orderCode);
                 invoiceInfo.setReturnCode(returnStateInfo.getReturnCode());
-                invoiceInfo.setStatus(EInvoiceStatus.RED.toString());
+                invoiceInfo.setStatus(RED.toString());
+                invoiceInfo.setPdfUrl(null);
+                invoiceInfo.setEwmUrl(null);
+                invoiceInfo.setPreviewImgUrl(null);
                 invoiceInfo.setOpDate(new Date());
                 invoiceInfo.setOpUser(getLoginNameAndDefault());
                 invoiceInfo.setJsonData(new XMLSerializer().read(responseKpInterface.getData().getContent()).toString());
 
-                invoiceInfoSerivce.saveOrUpdate(invoiceInfo, true);
+                invoiceInfoSerivce.saveOrUpdate(invoiceInfo, false);
                 return new ServiceCtrlMessage<>(true, null, contentResp);
             }
 
@@ -359,6 +362,12 @@ public class EInvoiceServiceImpl implements EInvoiceService {
     public ServiceCtrlMessage downloadInvoicePdfAnd2Img(String orderCode) {
         try {
             InvoiceInfo invoiceInfo = invoiceInfoSerivce.get(orderCode);
+            if (Lists.newArrayList(FAILURE.toString(), RED.toString(), ORDER_CANCEL.toString()).contains(invoiceInfo.getStatus())) {
+                return new ServiceCtrlMessage(false, "此状态发票不能再进行取票操作！");
+            }
+            if (isBlank(invoiceInfo.getPdfUrl())) {
+                return new ServiceCtrlMessage(false, "发票文件未生成，无法取票！");
+            }
             if ((new Date().getTime() - invoiceInfo.getOpDate().getTime()) > 1000 * 60 * 10) { // 发票生成十分钟内，等待签章生成后再下载
                 downFileAnd2Img(orderCode, invoiceInfo.getPdfUrl());
                 return new ServiceCtrlMessage(true, "操作成功！");

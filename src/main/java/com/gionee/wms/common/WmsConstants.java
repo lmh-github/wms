@@ -23,7 +23,7 @@ public class WmsConstants {
 	public static final String VIP_IUNI_HOUSE_CODE = System.getProperty("wms.vip.iuni.warehouse.code", "01");// IUNI
 																												// VIP仓库编码
 	public static final String TAOBAO_FX_GIONEE_HOUSE_CODE = System.getProperty("wms.taobao.fx.gionee.warehouse.code", "01");// 金立淘宝分销仓库编码
-	public static final String SHUNFENG_CUSTID = System.getProperty("wms.shunfeng.custid", "7699476943"); // 顺丰快递客户号
+	public static final String SHUNFENG_CUSTID = System.getProperty("wms.shunfeng.custid", "7693255199"); // 顺丰快递客户号
 	public static final String SHUNFENG_CHECKWORK = System.getProperty("wms.shunfeng.checkwork", "_DQcPl7DO8[}p2wH"); // 顺丰校验码
 	// =========顺丰对接属性 begin========
 	// 校验字段

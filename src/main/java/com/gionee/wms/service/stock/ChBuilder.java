@@ -90,7 +90,7 @@ public class ChBuilder implements EInvoiceBuildService {
         modelMap.put("KPHJJE", hjxmje.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 价税合计金额
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 合计税额
-        modelMap.put("BZ", ""); // 备注
+        modelMap.put("BZ", "订单号：" + order.getOrderCode()); // 备注
         modelMap.put("DDH", order.getOrderCode()); // 订单号
 
         return modelMap;

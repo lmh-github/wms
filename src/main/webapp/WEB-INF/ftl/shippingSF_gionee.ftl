@@ -96,13 +96,13 @@ p {
         <p></p>
       </div>
 
-      <!-- 代收货款 淘宝来源 0000000001 官网 7699476943 -->      
+      <!-- 代收货款 淘宝来源 0000000001 官网 7693255199 -->      
       <div class="e" style="letter-spacing: 8px;top: 164px;left: 496px;">
         <#if order.orderSource=='2' && order.paymentType==2>
         <p style="margin-left: 24px;letter-spacing: 5px;">0000000001</p>
         </#if>
         <#if order.orderSource=='1' && order.paymentType==2>
-        <p style="margin-left: 24px;letter-spacing: 5px;">7699476943</p>
+        <p style="margin-left: 24px;letter-spacing: 5px;">7693255199</p>
         </#if>
         <#if order.paymentType==2><b style="font-size: 20px;font-family: Vernada, Tahoma, Helvetica, sans-serif;position: absolute;left: -72px;top: 7px;">√</b></#if>
         <!--金额-->
@@ -115,7 +115,7 @@ p {
       </div>
       
       <div class="e" style="letter-spacing: 11px;top: 405px;left: 474px;">
-	  	<p>7699476943</p>
+	  	<p>7693255199</p>
 	  </div>
 
       <!-- 收件人签收提示 -->
