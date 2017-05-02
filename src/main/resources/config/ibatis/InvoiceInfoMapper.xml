@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.InvoiceInfoDao">
+
+    <sql id="columns">
+        ID,
+        ORDER_CODE,
+        FP_DM,
+        FP_HM,
+        KPRQ,
+        RETURN_CODE,
+        OP_DATE,
+        OP_USER,
+        STATUS,
+        JSON_DATA,
+        INVOICE_TYPE,
+        MOBILE,
+        EMAIL,
+        PREVIEW_IMG_URL,
+        PDF_URL,
+        EWM_URL,
+        KPLSH,
+        CHLSH
+    </sql>
+
+    <insert id="insert" parameterType="InvoiceInfo">
+        <selectKey keyProperty="id" resultType="string" order="BEFORE">
+            SELECT WMS_INVOICE_SEQ.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_INVOICE(<include refid="columns"/>) VALUES
+        (
+            #{id, jdbcType=VARCHAR},
+            #{orderCode, jdbcType=VARCHAR},
+            #{fpDm, jdbcType=VARCHAR},
+            #{fpHm, jdbcType=VARCHAR},
+            #{kprq, jdbcType=TIME},
+            #{returnCode, jdbcType=VARCHAR},
+            #{opDate, jdbcType=TIME},
+            #{opUser, jdbcType=VARCHAR},
+            #{status, jdbcType=VARCHAR},
+            #{jsonData, jdbcType=VARCHAR},
+            #{invoiceType, jdbcType=VARCHAR},
+            #{mobile, jdbcType=VARCHAR},
+            #{email, jdbcType=VARCHAR},
+            #{previewImgUrl, jdbcType=VARCHAR},
+            #{pdfUrl, jdbcType=VARCHAR},
+            #{ewmUrl, jdbcType=VARCHAR},
+            #{kpLsh, jdbcType=VARCHAR},
+            #{chLsh, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update" parameterType="InvoiceInfo">
+        UPDATE WMS_INVOICE SET
+               FP_DM = #{fpDm, jdbcType=VARCHAR},
+               FP_HM = #{fpHm, jdbcType=VARCHAR},
+               KPRQ = #{kprq, jdbcType=TIME},
+               RETURN_CODE = #{returnCode, jdbcType=VARCHAR},
+               OP_DATE = #{opDate, jdbcType=TIME},
+               OP_USER = #{opUser, jdbcType=VARCHAR},
+               STATUS = #{status, jdbcType=VARCHAR},
+               JSON_DATA = #{jsonData, jdbcType=VARCHAR},
+               INVOICE_TYPE = #{invoiceType, jdbcType=VARCHAR},
+               MOBILE = #{mobile, jdbcType=VARCHAR},
+               EMAIL = #{email, jdbcType=VARCHAR},
+               PREVIEW_IMG_URL = #{previewImgUrl, jdbcType=VARCHAR},
+               PDF_URL = #{pdfUrl, jdbcType=VARCHAR},
+               EWM_URL = #{ewmUrl, jdbcType=VARCHAR}
+        WHERE
+        <if test="id != null">
+            ID = #{id}
+        </if>
+        <if test="id == null and orderCode != null">
+            ORDER_CODE = #{orderCode}
+        </if>
+    </update>
+    
+    <update id="updateExcludeNull" parameterType="InvoiceInfo">
+        UPDATE WMS_INVOICE
+          <set>
+              <if test="fpDm != null">FP_DM = #{fpDm, jdbcType=VARCHAR},</if>
+              <if test="fpHm != null">FP_HM = #{fpHm, jdbcType=VARCHAR},</if>
+              <if test="kprq != null">KPRQ = #{kprq, jdbcType=TIME},</if>
+              <if test="returnCode != null">RETURN_CODE = #{returnCode, jdbcType=VARCHAR},</if>
+              <if test="opDate != null">OP_DATE = #{opDate, jdbcType=TIME},</if>
+              <if test="opUser != null">OP_USER = #{opUser, jdbcType=VARCHAR},</if>
+              <if test="status != null">STATUS = #{status, jdbcType=VARCHAR},</if>
+              <if test="jsonData != null">JSON_DATA = #{jsonData, jdbcType=VARCHAR},</if>
+              <if test="invoiceType != null">INVOICE_TYPE = #{invoiceType, jdbcType=VARCHAR},</if>
+              <if test="mobile != null">MOBILE = #{mobile, jdbcType=VARCHAR},</if>
+              <if test="email != null">EMAIL = #{email, jdbcType=VARCHAR},</if>
+              <if test="previewImgUrl != null">PREVIEW_IMG_URL = #{previewImgUrl, jdbcType=VARCHAR},</if>
+              <if test="pdfUrl != null">PDF_URL = #{pdfUrl, jdbcType=VARCHAR},</if>
+              <if test="ewmUrl != null">EWM_URL = #{ewmUrl, jdbcType=VARCHAR},</if>
+              <if test="kpLsh != null">KPLSH = #{kpLsh, jdbcType=VARCHAR},</if>
+              <if test="chLsh != null">CHLSH = #{chLsh, jdbcType=VARCHAR}</if>
+          </set>
+        WHERE
+        <if test="id != null">
+            ID = #{id}
+        </if>
+        <if test="id == null and orderCode != null">
+            ORDER_CODE = #{orderCode}
+        </if>
+    </update>
+
+    <select id="exist" parameterType="string" resultType="boolean">
+        SELECT COUNT(1) FROM WMS_INVOICE WHERE ORDER_CODE = #{param}
+    </select>
+
+    <resultMap id="result" type="com.gionee.wms.entity.InvoiceInfo">
+        <id column="ID" property="id"/>
+        <result column="ORDER_CODE" property="orderCode"/>
+        <result column="FP_DM" property="fpDm"/>
+        <result column="FP_HM" property="fpHm"/>
+        <result column="KPRQ" property="kprq"/>
+        <result column="RETURN_CODE" property="returnCode"/>
+        <result column="OP_DATE" property="opDate"/>
+        <result column="OP_USER" property="opUser"/>
+        <result column="STATUS" property="status"/>
+        <result column="JSON_DATA" property="jsonData"/>
+        <result column="INVOICE_TYPE" property="invoiceType"/>
+        <result column="MOBILE" property="mobile"/>
+        <result column="EMAIL" property="email"/>
+        <result column="PREVIEW_IMG_URL" property="previewImgUrl"/>
+        <result column="PDF_URL" property="pdfUrl"/>
+        <result column="EWM_URL" property="ewmUrl"/>
+        <result column="KPLSH" property="kpLsh"/>
+        <result column="CHLSH" property="chLsh"/>
+    </resultMap>
+
+    <sql id="query-where">
+        <where>
+            <if test="orderCode != null">AND ORDER_CODE = #{orderCode}</if>
+            <if test="fpDm != null">AND FP_DM = #{fpDm}</if>
+            <if test="fpHm != null">AND FP_HM = #{fpHm}</if>
+            <if test="returnCode != null">AND RETURN_CODE = #{returnCode}</if>
+            <if test="status != null">AND STATUS = #{orderCode}</if>
+            <if test="invoiceType != null">AND INVOICE_TYPE = #{invoiceType}</if>
+            <if test="opDateBegin != null">AND OP_DATE &gt;= #{opDateBegin}</if>
+            <if test="opDateEnd != null">AND OP_DATE &lt;= #{opDateEnd}</if>
+            <if test="mobile != null">AND MOBILE = #{mobile}</if>
+            <if test="kpLsh != null">AND KPLSH = #{kpLsh}</if>
+            <if test="chLsh != null">AND CHLSH = #{chLsh}</if>
+        </where>
+    </sql>
+
+    <select id="query" parameterType="map" resultMap="result">
+        SELECT * FROM (
+            SELECT
+                A.*,
+                ROWNUM r
+            FROM (
+                SELECT *
+                FROM WMS_INVOICE
+                <include refid="query-where"/>
+                ORDER BY OP_DATE DESC) A
+            WHERE ROWNUM &lt;= #{page.endRow})
+        WHERE r &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1)
+        FROM WMS_INVOICE
+        <include refid="query-where"/>
+    </select>
+
+    <resultMap id="extQueryResult" type="map">
+        <result column="ORDER_CODE" property="orderCode"/>
+        <result column="PREVIEW_IMG_URL" property="preview_img_url"/>
+        <result column="PDF_URL" property="pdf_url"/>
+        <result column="EWM_URL" property="ewm_url"/>
+    </resultMap>
+    
+    <select id="extQuery" parameterType="map" resultMap="extQueryResult">
+        SELECT
+          ORDER_CODE,
+          PREVIEW_IMG_URL,
+          PDF_URL,
+          EWM_URL
+        FROM WMS_INVOICE
+        WHERE INVOICE_TYPE = 'E'
+        <if test="orderCode != null"> AND ORDER_CODE = #{orderCode}</if>
+        <if test="mobile != null"> AND MOBILE = #{mobile}</if>
+    </select>
+
+    <select id="queryOrderCodesByStatus" parameterType="list" resultType="string">
+        SELECT ORDER_CODE
+        FROM WMS_INVOICE
+        WHERE STATUS IN <foreach item="status" index="index" collection="list" open="(" separator="," close=")">#{status}</foreach>
+    </select>
+
+    <select id="get" parameterType="string" resultMap="result">
+        SELECT * FROM WMS_INVOICE
+        WHERE ID = #{param} OR ORDER_CODE = #{param}
+    </select>
+
+    <select id="queryForJob" resultType="string">
+        SELECT I.ORDER_CODE
+        FROM WMS_INVOICE I INNER JOIN WMS_SALES_ORDER S ON i.ORDER_CODE = S.ORDER_CODE
+        WHERE S.ORDER_STATUS IN <foreach collection="orderStatus" open="(" close=")" separator="," item="item">#{item}</foreach> AND
+              i.STATUS IN <foreach collection="invoiceStatus" open="(" close=")" separator="," item="item">#{item}</foreach>
+    </select>
+
+</mapper>

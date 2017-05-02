@@ -1,0 +1,18 @@
+{
+    "globalInfo": {
+        "appId": "${appId?if_exists}",
+        "version": "1.0",
+        "userName": "${userName?if_exists}",
+        "passWord": "${passWord?if_exists}",
+        "taxpayerId": "${taxpayerId?if_exists}",
+        "enterpriseCode": "${enterpriseCode?if_exists}",
+        "dataExchangeId": "${dataExchangeId?if_exists}"
+    },
+    "data": {
+        "dataDescription": {
+            "zipCode": "${zipCode?if_exists}",
+            "encryptCode": "${encryptCode?if_exists}"
+        },
+        "content": "${content?if_exists}"
+    }
+}

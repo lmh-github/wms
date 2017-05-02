@@ -1,0 +1,139 @@
+#======log4j settings==========#
+wms.loggingRoot=B://log
+
+
+#=========UUC setting=========#
+#wms.uuc.url=http://passport.cm.com
+wms.uuc.url=http://passport.cm.com
+#beta
+wms.uuc.app.id=9F8ED8DE05FD4B22AC6DE76C6FBB1149
+wms.uuc.app.key=EFC5C68D81804EA1907766A20B694E43
+
+#======OC setting=======#
+wms.ecs.sync.stock.api=http://idc.shop.gionee.com/api/notify_stock.php
+wms.ecs.update.order.api=http://idc.shop.gionee.com/api/notify_order_shipping.php
+
+
+#=========SAP Settings===========#
+#SAP WebService
+wms.sap.ws.url=http://www.datatransetl.com:82/IDCSvc.asmx
+wms.sap.ws.username=PutSalesDeliveryUser
+wms.sap.ws.password=666666
+#the code of supplier for SAP
+wms.sap.supplier.code=001
+#the account of WMS WebService for SAP
+wms.ws.sap.username=pushPurchaseOrder
+wms.ws.sap.password=888888
+######WMS WebService settings######
+
+
+#=========WMS business constant setting==========#
+#set the code of warehouse for ecshop
+wms.ecshop.warehouse.code=002
+
+#choose whether to open the schedule job(true:1 false:0)
+wms.biz.assistant.flag=1
+
+#the unit of time is second
+wms.biz.orderNotifyJob.period=600
+
+#======kuaidi100 Setting==========# 
+wms.biz.kuaidi100.url=http://api.kuaidi100.com/api
+wms.biz.kuaidi100.html.url=http://www.kuaidi100.com/applyurl
+wms.biz.kuaidi100.callback=http://kuaidi100.gionee.com/api/kuaidiCallback.action
+wms.biz.kuaidi100.push=http://www.kuaidi100.com/poll
+wms.biz.kuaidi100.subkey=rHkjkDop4245
+
+#======taobao Setting==========#
+wms.taobao.flag=0
+wms.taobao.notify.url=http://stream.api.taobao.com/stream
+wms.taobao.top.url=http://gw.api.taobao.com/router/rest
+wms.taobao.appkey=21642154
+wms.taobao.secret=65dd78fa5f53758ccb50ad98457bbf3b
+wms.taobao.sessionkey=6100d178488f3c3be70e3e8c813605dde2de82437e511e2720912157
+#wms.top.send.url=http://121.196.132.61:30001/orderSyncServer/order/toSend
+wms.top.send.url=http://120.26.193.232:30001/orderSyncServer/order/toSend
+
+#======lodop Setting==========#
+wms.lodop.url.pre=http://wms.gionee.com
+
+#=========WMS business constant setting ==========#
+#set the code of warehouse for order source
+wms.official.gionee.warehouse.code=01
+wms.tmall.gionee.warehouse.code=01
+wms.taobao.fx.gionee.warehouse.code=01
+wms.vip.gionee.warehouse.code=01
+wms.official.iuni.warehouse.code=01
+wms.tmall.iuni.warehouse.code=01
+wms.vip.iuni.warehouse.code=01
+
+
+#======vip Setting==========#
+wms.vip.scm.flag=1
+wms.vip.scm.sid=22
+wms.vip.scm.source=5af78fad46985f6a8f1e454f586e10dc
+wms.vip.scm.url=http://visopen.vipshop.com/api/scm
+wms.vip.scm.order.list=/pop/order_list.php
+wms.vip.scm.order.list.api.name=pop/order_list
+wms.vip.scm.order.goods.list=/pop/get_pop_order_goods_list.php
+wms.vip.scm.order.goods.list.api.name=pop/get_pop_order_goods_list
+wms.vip.scm.order.export=/pop/export.php
+wms.vip.scm.order.export.api.name=pop/export
+wms.vip.scm.ship=/pop/ship.php
+wms.vip.scm.ship.api.name=pop/ship
+
+#======invoice Setting==========#
+wms.invoice.ws.url=http://127.0.0.1/wsdl/
+wms.invoice.type=2
+wms.invoice.seller.no=110101000000000
+wms.invoice.seller.password=111111
+wms.invoice.seller.address=\u6DF1\u5733\u5E02\u798F\u7530\u533A\u6DF1\u5357\u5927\u90537028\u53F7\u65F6\u4EE3\u79D1\u6280\u5927\u53A621\u697C 4007796666
+wms.invoice.seller.account=\u4E0A\u6D77\u6D66\u4E1C\u53D1\u5C55\u94F6\u884C\u6DF1\u5733\u5206\u884C79010154740016888
+wms.invoice.rate=17
+wms.invoice.maker=\u51AF\u76FC\u76FC
+
+#=========SAP Settings===========#
+#SAP WebService
+wms.sap.ws.url=http://192.168.119.27:8080/dc/services/saleInvoice?wsdl
+wms.sap.ws.username=DIANSHANGINVOICE
+wms.sap.ws.password=888888
+
+#choose whether to open the order overflow(true:1 false:0)
+wms.biz.order.over.flag=0
+
+#open or close indiv push job 1:open 0:close
+wms.sap.indivpush.flag=0
+
+#1:gionee, 2:iuni
+wms.company=1
+
+#SF WebServer
+#wms.sf.ws.url=http://bsp.sf-express.com/bsp-wms/ws/OutsideToLscmServiceImpl?wsdl
+wms.sf.ws.url=http://bsp-oisp.sf-express.com/bsp-wms/ws/OutsideToLscmServiceImpl?wsdl
+wms.sf.oisp.url=http://bsp-oisp.sf-express.com/bsp-oisp/ws/expressService?wsdl
+wms.sf.ws.username=
+wms.sf.ws.password=
+wms.sf.ws.checkword=kR9EUTgDoOjADkCB52diNMFsjhHMWVn6
+wms.sf.ws.company=440301103675620
+#wms.sf.ws.company=GNEE
+wms.sf.ws.warehouse=755DCA
+#wms.sf.ws.warehouse=755DCD
+wms.sf.ws.monthly_account=7550101503
+wms.sf.ws.vendor=GNEE
+
+#mail info
+mail.from=fapiao@gionee.com
+mail.host=smtp.gionee.com
+mail.username=fapiao@gionee.com
+mail.pwd=GIOnee!#2016
+
+#einvoice info
+einvoice.e.appid=168XVB14
+einvoice.e.username=18239169
+einvoice.e.tax_payer_id=91440300741233215A
+einvoice.e.authorization_code=911233215A
+einvoice.e.dsptbm=168XVB14
+einvoice.e.nsrsbh=91440300741233215A
+einvoice.e.xhf_nsrsbh=91440300741233215A
+einvoice.e.api.url=http://ei.szhtxx.com:8090/front/request/91440300591872133B
+einvoice.e.password=9608701637B0NJR1pBY593gsoSb5zg+w==

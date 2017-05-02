@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<interface xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 version="DZFP1.0">
+	<globalInfo>
+		<terminalCode>0</terminalCode>
+		<appId>ZZS_PT_DZFP</appId>
+		<version>2.0</version>
+		<interfaceCode>${model.globalInfo.interfaceCode?if_exists}</interfaceCode>
+		<userName>${model.globalInfo.userName?if_exists}</userName>
+		<passWord>${model.globalInfo.passWord?if_exists}</passWord>
+		<taxpayerId>${model.globalInfo.taxpayerId?if_exists}</taxpayerId>
+		<authorizationCode>${model.globalInfo.authorizationCode?if_exists}</authorizationCode>
+		<requestCode>${model.globalInfo.requestCode?if_exists}</requestCode>
+		<requestTime>${model.globalInfo.requestTime}</requestTime>
+		<responseCode>121</responseCode>
+		<dataExchangeId>${model.globalInfo.dataExchangeId?if_exists}</dataExchangeId>
+	</globalInfo>
+	<returnStateInfo>
+		<returnCode></returnCode>
+		<returnMessage></returnMessage>
+	</returnStateInfo>
+	<Data>
+		<dataDescription>
+			<zipCode>0</zipCode>
+			<encryptCode>2</encryptCode>
+			<codeType>CA</codeType>
+		</dataDescription>
+		<content>${model.data.content?if_exists}</content>
+	</Data>
+</interface>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+       xsi:schemaLocation="http://cxf.apache.org/jaxws
+	                       http://cxf.apache.org/schemas/jaxws.xsd
+	                       http://cxf.apache.org/transports/http/configuration 
+	                       http://cxf.apache.org/schemas/configuration/http-conf.xsd 
+	                       http://www.springframework.org/schema/beans 
+	                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-lazy-init="true">
+
+    <description>service setting</description>
+
+    <!-- 邮件发送 -->
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${mail.host}"/><!-- 发送邮件的SMTP服务器 -->
+        <property name="username" value="${mail.username}"/><!-- 发件人的用户名 -->
+        <property name="password" value="${mail.pwd}"/><!-- 发件人的密码 -->
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.timeout">25000</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- 线程池配置,溢出策略:CallerRunsPolicy(等待执行)-->
+    <bean id="taskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="20"/>
+        <property name="queueCapacity" value="1000"/>
+        <property name="keepAliveSeconds" value="200"/>
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"></bean>
+        </property>
+    </bean>
+
+    <!-- ==============WebService======================= -->
+    <!-- jax-ws endpoint定义  -->
+    <jaxws:endpoint address="/purchaseService"><!-- wsdlLocation="/WEB-INF/wms.wsdl"-->
+        <jaxws:implementor>
+            <!-- WebService的实现Bean定义 -->
+            <bean class="com.gionee.wms.web.ws.PurchaseSoapServiceImpl"/>
+        </jaxws:implementor>
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+            <bean class="com.gionee.wms.web.ws.interceptor.IpAddressInterceptor"/>
+            <!-- 自定义soapHeader添加认证 -->
+            <bean class="com.gionee.wms.web.ws.interceptor.ReadHeaderIntercepter">
+                <property name="namespaceURI" value="http://wms.cm.com/api/v1"/>
+                <property name="qualifiedName" value="authInfo"/>
+                <property name="userNameTag" value="userName"/>
+                <property name="passwordTag" value="password"/>
+                <property name="userName" value="${wms.ws.sap.username}"/>
+                <property name="password" value="${wms.ws.sap.password}"/>
+            </bean>
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:endpoint>
+
+    <!-- 基于soapHeader的SAP WS client -->
+    <jaxws:client id="sapServiceClient" serviceClass="com.gionee.dc.web.service.SaleInvoice"
+                  address="${wms.sap.ws.url}">
+        <jaxws:outInterceptors>
+            <bean class="com.gionee.wms.web.ws.interceptor.WriteHeaderInterceptor">
+                <property name="namespaceURI" value="http://service.web.dc.gionee.com/"/>
+                <property name="qualifiedName" value="AuthInfo"/>
+                <property name="userNameTag" value="LoginId"/>
+                <property name="passwordTag" value="Password"/>
+                <property name="userName" value="${wms.sap.ws.username}"/>
+                <property name="password" value="${wms.sap.ws.password}"/>
+            </bean>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+
+    <!-- soap sf ws client -->
+    <jaxws:client id="iOutsideToLscmService" serviceClass="com.sf.integration.warehouse.service.IOutsideToLscmService"
+                  address="${wms.sf.ws.url}">
+        <jaxws:outInterceptors>
+            <bean class="com.gionee.wms.web.ws.interceptor.WriteHeaderInterceptor">
+                <property name="namespaceURI" value="http://service.warehouse.integration.sf.com/"/>
+                <property name="qualifiedName" value="AuthInfo"/>
+                <property name="userNameTag" value="LoginId"/>
+                <property name="passwordTag" value="Password"/>
+                <property name="userName" value="${wms.sf.ws.username}"/>
+                <property name="password" value="${wms.sf.ws.password}"/>
+            </bean>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+
+    <!-- soap sf osip client -->
+    <jaxws:client id="sfexpressService" serviceClass="com.sf.integration.expressservice.service.IExpressService"
+                  address="${wms.sf.oisp.url}">
+        <jaxws:outInterceptors>
+            <bean class="com.gionee.wms.web.ws.interceptor.WriteHeaderInterceptor">
+                <property name="namespaceURI" value="http://service.expressservice.integration.sf.com/"/>
+                <property name="qualifiedName" value="AuthInfo"/>
+                <property name="userNameTag" value="LoginId"/>
+                <property name="passwordTag" value="Password"/>
+                <property name="userName" value="${wms.sf.ws.username}"/>
+                <property name="password" value="${wms.sf.ws.password}"/>
+            </bean>
+            <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+
+
+    <!-- 客户端调用WS超时设置(单位ms) -->
+    <http-conf:conduit name="*.http-conduit">
+        <http-conf:client ConnectionTimeout="30000" ReceiveTimeout="60000"/>
+    </http-conf:conduit>
+</beans>
