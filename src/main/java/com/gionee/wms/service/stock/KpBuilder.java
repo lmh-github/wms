@@ -80,7 +80,7 @@ public class KpBuilder implements EInvoiceBuildService {
         modelMap.put("KPLX", "1"); // 开票类型 1正票
         modelMap.put("TSCHBZ", "0"); // 特殊冲红标志
         modelMap.put("CZDM", "10"); // 操作代码 10 正票正常开具
-        modelMap.put("QD_BZ", "1"); // 清单标志
+        modelMap.put("QD_BZ", "0"); // 清单标志
         modelMap.put("KPHJJE", hjxmje.setScale(2, ROUND_DOWN).toString()); // 价税合计金额
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.setScale(2, ROUND_DOWN).toString()); // 合计税额

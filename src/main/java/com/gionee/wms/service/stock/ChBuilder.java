@@ -86,7 +86,7 @@ public class ChBuilder implements EInvoiceBuildService {
         modelMap.put("YFP_HM", invoiceInfo.getFpHm()); // 原发票号码
         modelMap.put("TSCHBZ", "0"); // 特殊冲红标志（冲红电子）
         modelMap.put("CHYY", "订单取消冲红"); // 冲红原因
-        modelMap.put("QD_BZ", "1"); // 清单标志
+        modelMap.put("QD_BZ", "0"); // 清单标志
         modelMap.put("KPHJJE", hjxmje.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 价税合计金额
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 合计税额

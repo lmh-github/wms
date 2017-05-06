@@ -170,13 +170,13 @@ public class DockSFServlet extends HttpServlet {
                         String quantity = item.getQuantity();
                         String skuCode = getLocalSkuCode(applicationContext, sf_sku);
 
-                        Map<String, Object> criteria = Maps.newHashMap();
-                        criteria.put("warehouseCode", WmsConstants.WarehouseCodeEnum.SF_WAREHOUSE.getCode());
-                        criteria.put("skuCode", skuCode);
-                        Stock stock = stockDao.queryStock(criteria);
-                        stock.setSalesQuantity(stock.getSalesQuantity() - (int) NumberUtils.toDouble(quantity, 0));
+                        //Map<String, Object> criteria = Maps.newHashMap();
+                        //criteria.put("warehouseCode", WmsConstants.WarehouseCodeEnum.SF_WAREHOUSE.getCode());
+                        //criteria.put("skuCode", skuCode);
+                        //Stock stock = stockDao.queryStock(criteria);
+                        //stock.setSalesQuantity(stock.getSalesQuantity() - (int) NumberUtils.toDouble(quantity, 0));
 
-                        stockDao.updateStockQuantity(stock);
+                        //stockDao.updateStockQuantity(stock);
                     }
                     // End 减库存操作
 
