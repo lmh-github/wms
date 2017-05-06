@@ -100,6 +100,8 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     private SystemConfigService configService; // 系统配置
     @Autowired
     private InvoiceInfoService invoiceInfoSerivce;
+    @Autowired
+    private SalesOrderNodeInfoService salesOrderNodeInfoService;
 
     @Override
     public List<SalesOrder> getSalesOrderList(Map<String, Object> criteria, Page page) throws ServiceException {
@@ -214,6 +216,8 @@ public class SalesOrderServiceImpl implements SalesOrderService {
             }
             // 记录一张发票信息
             invoiceInfoSerivce.saveByOrder(order);
+            // 记录订单节点信息
+            salesOrderNodeInfoService.saveFromSalesOrder(order, orderGoodsList);
 
             // 保存操作日志
             SalesOrderLog salesOrderLog = new SalesOrderLog();
@@ -324,6 +328,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                     }
                 }
                 orderDao.batchAddOrderGoods(orderGoodsList);
+                salesOrderNodeInfoService.updateFromSalesOrder(order, orderGoodsList); // 更新节点信息
             }
         } catch (DataAccessException e) {
             throw new ServiceException(WmsCodeEnum.SYSTEM_ERROR.getCode(), e);
@@ -1026,6 +1031,14 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     @Transactional
     public ServiceCtrlMessage copy(Long id) {
         SalesOrder salesOrder = getSalesOrder(id);
+
+        SystemConfig systemConfig = configService.getByKey("ORDER_COPY_CHECK"); // 订单复制校验，源订单是否是取消状态
+        if (systemConfig != null && org.apache.commons.lang3.BooleanUtils.toBoolean(systemConfig.getValue())) {
+            if (salesOrder.getOrderStatus().intValue() != OrderStatus.CANCELED.getCode()) {
+                return new ServiceCtrlMessage(false, "源订单未取消，无法复制！");
+            }
+        }
+
         String orderCode = salesOrder.getOrderCode();
 
         int seq = 1; // 序号
@@ -1049,7 +1062,6 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrder.setOrderStatus(OrderStatus.FILTERED.getCode()); // 已筛单状态
         salesOrder.setOrderNotifyStatus(NotifyStatus.UNNOTIFIED.getCode()); // 未通知
         salesOrder.setOrderNotifyCount(0); //
-        salesOrder.setJoinTime(new Date());
         salesOrder.setDeliveryCode(newOrderCode + "01");
         if (WmsConstants.ENABLED_TRUE == salesOrder.getInvoiceEnabled()) {
             salesOrder.setInvoiceStatus(WmsConstants.ENABLED_FALSE);
@@ -1070,6 +1082,8 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrder.setInvoiceMobile(oldInvoiceInfo.getMobile());
         salesOrder.setInvoiceEmail(oldInvoiceInfo.getEmail());
         invoiceInfoSerivce.saveByOrder(salesOrder);
+
+        salesOrderNodeInfoService.saveFromSalesOrder(salesOrder, goodsList);
 
         // 保存操作日志
         SalesOrderLog salesOrderLog = new SalesOrderLog();
@@ -1101,12 +1115,6 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         List<SalesOrderGoods> orderGoodsList = getOrderGoodsList(order.getId()); // 订单商品列表
         if (OrderSource.TMALL_GIONEE.getCode().equals(order.getOrderSource())) {
             for (SalesOrderGoods g : orderGoodsList) {
-                // if ("1196".equals(g.getSkuCode())) { // V580订单限制推送
-                // return new ServiceCtrlMessage(false, "V580订单已经由菜鸟发货，无法推送到顺丰！");
-                // }
-                // if ("1194".equals(g.getSkuCode())) { // V580订单限制推送
-                // return new ServiceCtrlMessage(false, "金钢全网通(SKU：1194)订单已经由菜鸟发货，无法推送到顺丰！");
-                // }
                 if (donotPushSfSkus.contains(g.getSkuCode())) {
                     return new ServiceCtrlMessage(false, "(SKU：" + g.getSkuCode() + ")订单不能推送到顺丰！");
                 }
@@ -1115,7 +1123,17 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         SystemConfig config = configService.getByKey(WmsConstants.ORDER_PUSH_CHECK_STOCK);
         if (config != null && BooleanUtils.toBoolean(config.getValue())) {
-            if (!checkOrderRealTimeInventoryBalance(order, orderGoodsList)) {
+            List<Warehouse> warehouseList = warehouseService.getValidWarehouses();
+
+            boolean hasStock = false;
+            for (Warehouse warehouse : warehouseList) {
+                // 非东莞仓库的顺丰仓，都有库存的时候才可以推送
+                if (!WarehouseCodeEnum.DONG_GUAN_WAREHOUSE.getCode().equals(warehouse.getWarehouseCode()) && checkOrderRealTimeInventoryBalance(order, orderGoodsList, warehouse.getWarehouseCode())) {
+                    hasStock = true;
+                    break;
+                }
+            }
+            if (!hasStock) {
                 return new ServiceCtrlMessage(false, "库存不足，推送失败！");
             }
         }
@@ -1133,7 +1151,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
      * @param order order
      * @return true:可以推送
      */
-    private boolean checkOrderRealTimeInventoryBalance(SalesOrder order, List<SalesOrderGoods> orderGoodsList) {
+    private boolean checkOrderRealTimeInventoryBalance(SalesOrder order, List<SalesOrderGoods> orderGoodsList, String warehouse) {
         try {
             List<String> skuList = Lists.newArrayList();
             for (SalesOrderGoods g : orderGoodsList) {
@@ -1152,9 +1170,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
             WmsRealTimeInventoryBalanceQueryRequest request = new WmsRealTimeInventoryBalanceQueryRequest();
             request.setCompany(WmsConstants.SF_COMPANY); // 货主
-            request.setWarehouse(WmsConstants.SF_WAREHOUSE); // 仓库
+            request.setWarehouse(warehouse); // 仓库
             request.setInventory_sts(InventoryStatusEnum.ZHENGPIN.getCode());
-            request.setItemList(new ArrayList<String>(skuMap.keySet()));
+            request.setItemList(new ArrayList<>(skuMap.keySet()));
             WmsRealTimeInventoryBalanceQueryResponse response = sfWebService.outsideToLscmService(WmsRealTimeInventoryBalanceQueryRequest.class, WmsRealTimeInventoryBalanceQueryResponse.class, request);
             if (response == null || CollectionUtils.isEmpty(response.getList())) {
                 logger.info(MessageFormat.format("订单号为：{0}，的订单在顺丰仓没有库存！", order.getOrderCode()));
@@ -1336,6 +1354,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
                 String orderid = response.getOrderid();
                 salesOrderMapService.add(new SalesOrderMap(order.getOrderCode(), orderid)); // 记录订单是顺丰ERP订单号的关联，用于在回调时候确认关系 @see com.gionee.wms.web.servlet.DockSFServlet
+                salesOrderNodeInfoService.updatePushTime(order.getOrderCode(), new Date()); // 记录订单推送时间
 
                 return new ServiceCtrlMessage(true, MessageFormat.format("订单号：{0} ，推送成功，返回ERP订单号：{1}！", order.getOrderCode(), response.getOrderid()));
             } else {

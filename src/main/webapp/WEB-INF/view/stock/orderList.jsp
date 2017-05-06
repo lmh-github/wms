@@ -128,7 +128,7 @@
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!toConfigPushCheck.action" target="dialog" rel="dlg_configInput" mask="true" width="400" height="200" warn="推送库存校验配置"><span>推送库存校验配置</span></a></li>
 			<li class="line">line</li>
-			<li><a class="edit" href="${ctx}/stock/salesOrder!copy.action?id={sid_order}" target="ajaxTodo" title="该功能用于复制一个已经推送到顺丰的订单，您确认要继续吗？" mask="true"><span>一键复制</span></a></li>
+			<li><a class="edit" href="${ctx}/stock/salesOrder!copy.action?id={sid_order}" target="ajaxTodo" title="<span style='color:#e91e63;font-size:15px;'>请确定原订单已经取消，如果货已发出需通知物流截件，继续操作请点击&nbsp;确定！</span>" mask="true"><span>一键复制</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/salesOrder.action?exports=1" target="dwzExport" targettype="navTab"><span>导出excel</span></a></li>
 		</ul>

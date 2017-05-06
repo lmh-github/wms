@@ -112,7 +112,8 @@
 		t1.remark_backed as remarkBacked,
 		t1.weight as weight,
         t1.ORDER_PUSH_STATUS as orderPushStatus,
-        t1.order_push_time as orderPushTime
+        t1.order_push_time as orderPushTime,
+        t1.buyer_tax_no as buyerTaxNo
 	</sql>
 
 	<sql id="sql_orderWhere">
@@ -294,7 +295,7 @@
 		from wms_sales_order t1
 		where exists (
 		<if test="skuCodeEqual == null">
-			select * from wms_sales_order_goods t2
+			select 1 from wms_sales_order_goods t2
 			<include refid="sql_orderWhere_goods" />
 		</if>
 		<if test="skuCodeEqual != null">
@@ -307,10 +308,9 @@
 			AND t2.sku_code=#{skuCodeEqual}
 		</if>
 		)
-		order by t1.payment_time
+		ORDER BY t1.join_time
 		<if test="sort == null">desc</if>
 		<if test="sort != null">${sort}</if>
-        ,t1.order_code desc
 		) A
 	<![CDATA[
 			  WHERE rownum<=#{page.endRow} 
@@ -325,7 +325,7 @@
 		from wms_sales_order t1
 		where exists (
 		<if test="skuCodeEqual == null">
-			select * from wms_sales_order_goods t2
+			select 1 from wms_sales_order_goods t2
 			<include refid="sql_orderWhere_goods" />
 		</if>
 		<if test="skuCodeEqual != null">
@@ -410,7 +410,7 @@
 		</selectKey>
 		insert into wms_sales_order
 		(id, order_code, order_source,
-		order_user,order_time,payment_type,payment_code,payment_name,pay_no,paid_amount,consignee,province,city,district,address,zipcode,tel,mobile,best_time,shipping_id,shipping_name,invoice_enabled,invoice_type,invoice_amount,invoice_title,invoice_content,invoice_status,postscript,goods_amount,order_amount,payable_amount,join_time,order_notify_status,order_notify_count,order_status,delivery_code,remark,handled_by,handled_time,payment_time
+		order_user,order_time,payment_type,payment_code,payment_name,pay_no,paid_amount,consignee,province,city,district,address,zipcode,tel,mobile,best_time,shipping_id,shipping_name,invoice_enabled,invoice_type,invoice_amount,invoice_title,buyer_tax_no,invoice_content,invoice_status,postscript,goods_amount,order_amount,payable_amount,join_time,order_notify_status,order_notify_count,order_status,delivery_code,remark,handled_by,handled_time,payment_time
         ,ORDER_PUSH_STATUS)
 		select
 		#{id},
@@ -438,6 +438,7 @@
 		#{invoiceType, jdbcType=VARCHAR},
 		#{invoiceAmount, jdbcType=VARCHAR},
 		#{invoiceTitle, jdbcType=VARCHAR},
+		#{buyerTaxNo, jdbcType=VARCHAR},
 		#{invoiceContent, jdbcType=VARCHAR},
 		#{invoiceStatus, jdbcType=INTEGER},
 		#{postscript, jdbcType=VARCHAR},

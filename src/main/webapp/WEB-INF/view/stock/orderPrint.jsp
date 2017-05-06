@@ -352,7 +352,7 @@ function doPrint(orderIdStr, type){
     {
     	for(i=0;i<idArray.length;i++){
     		var shippingCode = $("#shipping_code").val();
-    		if(shippingCode == 'sf_express')
+    		if(shippingCode == 'sf_express' || shippingCode == 'sf') // 包含东莞顺丰直发
     		{
 	    		var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
 	        	LODOP.PRINT_INIT("${printerPre}printSF");

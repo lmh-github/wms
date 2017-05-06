@@ -186,7 +186,7 @@
 			<legend>其它信息</legend>
 			<dl class="nowrap">
 				<dt>备注：</dt>
-				<dd><textarea name="order.remark" cols="80" rows="2" class="textInput valid">${order.remark }</textarea></dd>
+				<dd><textarea name="order.remark" cols="80" rows="2" class="textInput valid" style="width: 566px;height: 50px;">${order.remark }</textarea></dd>
 			</dl>
 		</fieldset>
 		

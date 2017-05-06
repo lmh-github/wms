@@ -16,6 +16,10 @@
 
     <description>公用配置</description>
 
+    <bean id="idGenerator" class="com.gionee.wms.service.common.DatabaseIDGenerator">
+        <property name="idBlockSize" value="1" />
+    </bean>
+
     <!-- 自动扫描，实现注解IOC -->
     <context:component-scan base-package="com.gionee.wms.dao,
     com.gionee.wms.service,

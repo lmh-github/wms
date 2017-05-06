@@ -31,8 +31,8 @@
     <!-- 线程池配置,溢出策略:CallerRunsPolicy(等待执行)-->
     <bean id="taskExecutor"
           class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="20"/>
-        <property name="maxPoolSize" value="30"/>
+        <property name="corePoolSize" value="5"/>
+        <property name="maxPoolSize" value="5"/>
         <property name="queueCapacity" value="1000"/>
         <property name="keepAliveSeconds" value="200"/>
         <property name="rejectedExecutionHandler">

@@ -693,7 +693,8 @@ $.extend($.validator, {
 					if ( this.settings.errorPlacement ) {
 						this.settings.errorPlacement(label, $(element) );
 					} else {
-					label.insertAfter(element);
+					//label.insertAfter(element);
+                    $(element).parent().append(label);
 					}
 				}
 			}

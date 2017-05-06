@@ -73,7 +73,11 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
         invoiceInfo.setOrderCode(order.getOrderCode());
         invoiceInfo.setMobile(defaultString(order.getInvoiceMobile(), order.getMobile()));
         invoiceInfo.setEmail(order.getInvoiceEmail());
-        invoiceInfo.setStatus(WAIT_MAKE.toString()); // 未开发票
+        if (order.getOrderAmount() != null && order.getOrderAmount().doubleValue() <= 20D) {
+            invoiceInfo.setStatus(DO_NOTHING.toString()); // 无须开票
+        } else {
+            invoiceInfo.setStatus(WAIT_MAKE.toString()); // 未开发票
+        }
         invoiceInfo.setInvoiceType("E"); // 电子发票
         invoiceInfo.setOpDate(new Date());
         invoiceInfo.setOpUser(ActionUtils.getLoginName());

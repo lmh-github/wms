@@ -12,7 +12,7 @@ table, caption, tbody, tfoot, thead, tr, th, td { padding:0; margin:0; font-size
 
 /* Remember to define focus styles! */
 :focus { outline: 0;}
-body { width:100%; height:100%; text-align:center; color:black; }
+body { width:100%; height:100%; text-align:center; color:black;position: absolute;left: 0;right: 0;bottom: 0;top:0; }
 ul, ol { list-style:none;}
 
 /* Tables still need 'cellspacing="0"' in the markup. */
@@ -108,7 +108,7 @@ a:hover {text-decoration:underline;}
 .alert { overflow:hidden; z-index:1011; display:block; width:300px; margin-left:-150px; position:absolute; top:0; left:50%;}
 .alert .alertContent { display:block; overflow:hidden; padding:5px 5px 1px 5px; border-style:solid; border-width:0 1px;}
 .alert .alertInner { display:block; padding:0 9px 9px 9px; text-align:left; border-style:solid; border-width:1px;}
-.alert .alertInner .msg { margin:10px; max-height: 200px; overflow: auto; line-height: 1.3em}
+.alert .alertInner .msg { margin:10px; max-height: 200px; overflow: visible; line-height: 1.3em}
 .alert h1 { display:block; overflow:hidden; height:30px; margin-bottom:10px; padding:0 0 0 25px; line-height:30px; border-style:solid; border-width:0 0 1px 0; line-height:30px;}
 .alert .error h1 { background-position:2px -42px;}
 .alert .info h1,
@@ -375,7 +375,7 @@ table.nowrap tbody tr {border-bottom:solid 1px #ededed;}
 /* ----------------------------------------------------------------- Form */
 /* TextInput */
 .textInput, input.focus, input.required, input.error, input.readonly, input.disabled,
-textarea.focus, textarea.required, textarea.error, textarea.readonly, textarea.disabled { padding:2px; margin:0; height:16px; font-size:12px; border-style:solid; border-width:1px;}
+textarea.focus, textarea.required, textarea.error, textarea.readonly, textarea.disabled { padding:2px; margin:0; height:16px; font-size:12px; border-style:solid; border-width:1px;width: 146px;}
 input.required, textarea.required { background-position:100% 0;}
 input.gray, textarea.gray{color:gray;}
 select{height: 21px;border:1px solid #a2bac0;vertical-align: middle;width: 152px;}
@@ -490,7 +490,7 @@ body { overflow:hidden;}
 .pageFormContent span.info{color:#7F7F7F;display:block;line-height:21px;float:left;}
 
 .pageFormContent dl { float:left; display:block; width:380px; height:21px; margin:0; padding:5px 0; position:relative;}
-.pageFormContent dt { float:left; width:70px; padding:0 5px; line-height:21px;}
+.pageFormContent dt { float:left; width:85px; padding:0 5px; line-height:21px;}
 .pageFormContent dd {display:block;line-height:21px;width:220px;float:left;}
 .pageFormContent dl.nowrap, .nowrap dl{width:100%; height:auto; clear: both;}
 .pageFormContent dl.nowrap dd, .nowrap dd {width: 560px;}
@@ -599,16 +599,28 @@ a.btnAttach{background-position: -183px 0}
 .sortDragPlaceholder {border:1px dashed #ccc;}
 #printBox {display:none}
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    background: #cccccc
+    width: 10px;
+    height: 10px
+}
+
+::-webkit-scrollbar-button:vertical {
+    display: none
+}
+
+::-webkit-scrollbar-corner,::-webkit-scrollbar-track {
+    background-color: #e2e2e2
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #999;
-    border-radius: 10px
+    border-radius: 0;
+    background-color: rgba(0,0,0,.3)
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #666666
+::-webkit-scrollbar-thumb:vertical:hover {
+    background-color: rgba(0,0,0,.35)
 }
+
+::-webkit-scrollbar-thumb:vertical:active {
+    background-color: rgba(0,0,0,.38)
+}
+object{display: none;}

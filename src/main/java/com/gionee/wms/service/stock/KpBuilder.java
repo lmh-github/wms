@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.gionee.wms.common.WmsConstants.OrderSource.OFFICIAL_GIONEE;
+import static com.gionee.wms.common.WmsConstants.OrderSource.TMALL_GIONEE;
 import static java.math.BigDecimal.ROUND_DOWN;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 /**
  * 开票
@@ -66,12 +69,13 @@ public class KpBuilder implements EInvoiceBuildService {
         modelMap.put("NSRMC", EInvoiceConfig.E_NSRMC); // 开票方名称
         modelMap.put("DKBZ", "1"); // 代开标志 自开(0) 默认为自开
         modelMap.put("KPXM", "手机"); // 主要开票商品，或者第一条商品，取项目信息中第一条
-        modelMap.put("BMB_BBH", "1.0"); //编码表版本号，目前为1.0
+        modelMap.put("BMB_BBH", "12.0"); //编码表版本号，目前为12.0
         modelMap.put("XHF_NSRSBH", EInvoiceConfig.E_XHF_NSRSBH); // 销货方识别号
         modelMap.put("XHFMC", EInvoiceConfig.E_XHFMC); // 销货方名称
         modelMap.put("XHF_DZ", EInvoiceConfig.E_XHF_DZ); // 销货方地址
         modelMap.put("XHF_DH", EInvoiceConfig.E_XHF_DH); // 销货方电话
-        modelMap.put("GHFMC", order.getConsignee()); // 购货方名称，即发票抬头 购货方为“ 个人” 时，可输入名称，输入名称是为“个人(名称)”，”（”为半角；例 个人(王杰)
+        modelMap.put("GHFMC", defaultString(order.getInvoiceTitle(), order.getConsignee())); // 购货方名称，即发票抬头 购货方为“ 个人” 时，可输入名称，输入名称是为“个人(名称)”，”（”为半角；例 个人(王杰)
+        modelMap.put("GHF_NSRSBH", order.getBuyerTaxNo()); // 购货方识别号（纳税人识别号）
         modelMap.put("GHF_SJ", order.getMobile()); // 购货方手机
         modelMap.put("GHFQYLX", "01"); // 购货方企业类型（03 个人）
         modelMap.put("KPY", EInvoiceConfig.E_KPY); // 开票员
@@ -80,16 +84,29 @@ public class KpBuilder implements EInvoiceBuildService {
         modelMap.put("KPLX", "1"); // 开票类型 1正票
         modelMap.put("TSCHBZ", "0"); // 特殊冲红标志
         modelMap.put("CZDM", "10"); // 操作代码 10 正票正常开具
-        modelMap.put("QD_BZ", "1"); // 清单标志
+        modelMap.put("QD_BZ", "0"); // 清单标志
         modelMap.put("KPHJJE", hjxmje.setScale(2, ROUND_DOWN).toString()); // 价税合计金额
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.setScale(2, ROUND_DOWN).toString()); // 合计税额
         modelMap.put("DDH", order.getOrderCode()); // 订单号
-        modelMap.put("BZ", "订单号：" + order.getOrderCode());
+        modelMap.put("BZ", "订单号：" + order.getOrderCode() + getOrderSource(order));
 
         return modelMap;
     }
 
+    /**
+     * 返回对应的订单平台
+     * @param order
+     * @return
+     */
+    private String getOrderSource(SalesOrder order) {
+        if (order.getOrderSource() == null || OFFICIAL_GIONEE.getCode().equals(order.getOrderSource())) {
+            return "  G";// 官网
+        } else if (TMALL_GIONEE.getCode().equals(order.getOrderSource())) {
+            return "  T";// 天猫
+        }
+        return "  " + order.getOrderSource();
+    }
 
     /** {@inheritDoc} */
     @Override

@@ -173,6 +173,10 @@ public class OrderInfoDTO implements Serializable {
      * 发票接收邮箱
      */
     private String invoiceEmail;
+    /**
+     * 纳税人识别号
+     */
+    private String buyerTaxNo;
 
     public String getOrderCode() {
         return orderCode;
@@ -428,6 +432,14 @@ public class OrderInfoDTO implements Serializable {
 
     public void setInvoiceEmail(String invoiceEmail) {
         this.invoiceEmail = invoiceEmail;
+    }
+
+    public String getBuyerTaxNo() {
+        return buyerTaxNo;
+    }
+
+    public void setBuyerTaxNo(String buyerTaxNo) {
+        this.buyerTaxNo = buyerTaxNo;
     }
 
     @Override

@@ -61,5 +61,9 @@
 		   set default_status = 0
 		 where default_status = 1
 	</update>
+
+    <select id="getWarehouseNameByCode" parameterType="string" resultType="string">
+        SELECT WAREHOUSE_NAME FROM WMS_WAREHOUSE WHERE WAREHOUSE_CODE = #{warehouseCode}
+    </select>
 	
  </mapper>

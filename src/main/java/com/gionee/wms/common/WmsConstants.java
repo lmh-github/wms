@@ -1,5 +1,7 @@
 package com.gionee.wms.common;
 
+import com.google.common.collect.Maps;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -597,7 +599,19 @@ public class WmsConstants {
         /**
          * 杭州玩风
          */
-		HZWF("21", "杭州玩风");
+		HZWF("21", "杭州玩风"),
+        /**
+         * 智轩优品
+         */
+        ZXYP("22", "智轩优品"),
+        /**
+         * 悦高数码
+         */
+        YGSM("23", "悦高数码"),
+        /**
+         * 自媒体
+         */
+        ZMT("24", "自媒体活动");
 
 		private final String code;
 		private final String name;
@@ -614,6 +628,15 @@ public class WmsConstants {
 		public String getName() {
 			return name;
 		}
+
+        public static Map<String, String> getValueMap() {
+            Map<String, String> valueMap = Maps.newHashMap();
+            for (OrderSource o : OrderSource.values()) {
+                valueMap.put(o.getCode(), o.getName());
+            }
+            return valueMap;
+        }
+
 	}
 
 	public static String getOrderSource(String orderSource) {
@@ -646,16 +669,10 @@ public class WmsConstants {
 		TMALL_GIONEE("2", "金立天猫"),
 		/** YHD */
 		YHD("10", "1号店"),
-		/** PAIPAI_GIONEE */
-		PAIPAI_GIONEE("9", "金立拍拍网"),
-		/** VIP_GIONEE */
-		VIP_GIONEE("5", "金立唯品"),
 		/** TAOBAO_FX_GIONEE */
 		TAOBAO_FX_GIONEE("7", "金立淘宝分销"),
 		/** SELF_ORDER */
 		SELF_ORDER("8", "内部购机"),
-		/** WEI_DIAN */
-		WEI_DIAN("11", "微店"),
 		/**
 		 * 移动互联网
 		 */
@@ -693,7 +710,19 @@ public class WmsConstants {
         /**
          * 杭州玩风
          */
-        HZWF("21", "杭州玩风");
+        HZWF("21", "杭州玩风"),
+        /**
+         * 智轩优品
+         */
+        ZXYP("22", "智轩优品"),
+        /**
+         * 悦高数码
+         */
+        YGSM("23", "悦高数码"),
+        /**
+         * 自媒体
+         */
+        ZMT("24", "自媒体活动");
 
 		private final String code;
 		private final String name;
@@ -710,7 +739,17 @@ public class WmsConstants {
 		public String getName() {
 			return name;
 		}
-	}
+
+		public static OrderSourceGionee get(String code) {
+            OrderSourceGionee[] values = OrderSourceGionee.values();
+            for (OrderSourceGionee e : values) {
+                if (e.getCode().equals(code)) {
+                    return e;
+                }
+            }
+            return null;
+        }
+    }
 
 	/**
 	 * 销售订单来源，IUNI
@@ -1550,7 +1589,9 @@ public class WmsConstants {
 		/** 订单取消 */
         ORDER_CANCEL("订单取消"),
 		/** 发票冲红 */
-		RED("已冲红");
+		RED("已冲红"),
+        /** 无须开票 */
+        DO_NOTHING("无须开票");
 
         EInvoiceStatus(String text){
             this.text = text;

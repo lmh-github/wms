@@ -1,6 +1,4 @@
 <%@ page pageEncoding="UTF-8"%>
-<%@page import="com.gionee.wms.dto.Menu"%>
-<%@page import="java.util.List"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="s" uri="/struts-tags"%>
@@ -8,130 +6,124 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<link rel="shortcut icon" href="${ctx}/static/favicon.ico" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=7" />
-<meta HTTP-EQUIV="pragma" CONTENT="no-cache">
-<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
-<meta HTTP-EQUIV="expires" CONTENT="0">
-<title>电商仓管系统</title>
+    <link rel="shortcut icon" href="${ctx}/static/favicon.ico"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=7"/>
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
+    <title>电商仓管系统</title>
 
-<link href="${ctx}/static/themes/default/style.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
-<link href="${ctx}/static/themes/css/core.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
-<link href="${ctx}/static/themes/css/print.css" rel="stylesheet" type="text/css" media="print"/>
-<link href="${ctx}/static/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" media="screen"/>
-<!--[if IE]>
-<link href="themes/css/ieHack.css" rel="stylesheet" type="text/css" media="screen"/>
-<![endif]-->
+    <link href="${ctx}/static/themes/default/style.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="${ctx}/static/themes/css/core.css?_=01" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="${ctx}/static/themes/css/print.css" rel="stylesheet" type="text/css" media="print"/>
+    <link href="${ctx}/static/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" media="screen"/>
+    <!--[if IE]>
+    <link href="themes/css/ieHack.css" rel="stylesheet" type="text/css" media="screen"/>
+    <![endif]-->
 
-<script src="${ctx}/static/js/jquery-1.8.3.min.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/jquery.cookie.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/jquery.validate.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/jquery.bgiframe.js" type="text/javascript"></script>
-<script src="${ctx}/static/ckeditor-4.1.2/ckeditor.js" type="text/javascript"></script>
-<script src="${ctx}/static/uploadify/scripts/jquery.uploadify.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery-1.8.3.min.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery.cookie.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery.validate.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery.bgiframe.js" type="text/javascript"></script>
+    <script src="${ctx}/static/ckeditor-4.1.2/ckeditor.js" type="text/javascript"></script>
+    <script src="${ctx}/static/uploadify/scripts/jquery.uploadify.js" type="text/javascript"></script>
 
-<script src="${ctx}/static/js/dwz.core.js?_=01" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.util.date.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.validate.method.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.barDrag.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.drag.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.tree.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.accordion.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.ui.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.theme.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.switchEnv.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.alertMsg.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.contextmenu.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.navTab.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.tab.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.resize.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.dialog.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.dialogDrag.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.sortDrag.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.cssTable.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.stable.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.taskBar.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.ajax.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.pagination.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.database.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.datepicker.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.effects.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.panel.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.checkbox.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.history.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.combox.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/dwz.print.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/gionee.util.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/gionee.weight.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/area.js" type="text/javascript"></script>
-<!--
-<script src="bin/dwz.min.js" type="text/javascript"></script>
--->
-<script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
-<script src="${ctx}/static/js/tooltip.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.core.js?_=01" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.util.date.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.validate.method.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.barDrag.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.drag.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.tree.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.accordion.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.ui.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.theme.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.switchEnv.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.alertMsg.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.contextmenu.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.navTab.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.tab.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.resize.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.dialog.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.dialogDrag.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.sortDrag.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.cssTable.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.stable.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.taskBar.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.ajax.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.pagination.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.database.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.datepicker.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.effects.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.panel.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.checkbox.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.history.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.combox.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.print.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/gionee.util.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/gionee.weight.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/area.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/tooltip.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-$(function(){
-	DWZ.init("${ctx}/static/dwz.frag.xml", {
-//		loginUrl:"login_dialog.html", loginTitle:"登录",	// 弹出登录对话框
-//		loginUrl:"${ctx}/account/login.action",	// 跳到本地登录页面
-		loginUrl:"${ssoUrl}",	// 跳到SSO登录页面
-		statusCode:{ok:200, error:300, timeout:301}, //【可选】
-		pageInfo:{pageNum:"page.currentPage", numPerPage:"page.pageSize", orderField:"orderField", orderDirection:"orderDirection"}, //【可选】
-		debug:false,	// 调试模式 【true|false】
-		callback:function(){
-			initEnv();
-			//$("#themeList").theme({themeBase:"themes"}); // themeBase 相对于index页面的主题base路径
-		}
-	});
-	initAudio();
-	try {
-		document.all.mscomm1.PortOpen=true;
-	} catch (ex) {
-		alert("初始化串口失败: "+ex.message);
-	}
+$(function () {
+    DWZ.init("${ctx}/static/dwz.frag.xml", {
+        loginUrl: "${ssoUrl}",	// 跳到SSO登录页面
+        statusCode: {ok: 200, error: 300, timeout: 301}, //【可选】
+        pageInfo: {
+            pageNum: "page.currentPage",
+            numPerPage: "page.pageSize",
+            orderField: "orderField",
+            orderDirection: "orderDirection"
+        }, //【可选】
+        debug: false,	// 调试模式 【true|false】
+        callback: function () {
+            initEnv();
+        }
+    });
+    initAudio();
+    try {
+        document.all.mscomm1.PortOpen = true;
+    } catch (ex) {
+        alert("初始化串口失败: " + ex.message);
+    }
 });
 
 function initAudio() {
-	var Sys = {};
-	try {
-		var ua = navigator.userAgent.toLowerCase();
-		if (window.ActiveXObject)
-			Sys.ie = ua.match(/msie ([\d.]+)/)[1];
-		else if (document.getBoxObjectFor)
-			Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1];
-		else if (window.MessageEvent && !document.getBoxObjectFor)
-			Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1];
-		else if (window.opera)
-			Sys.opera = ua.match(/opera.([\d.]+)/)[1];
-		else if (window.openDatabase)
-			Sys.safari = ua.match(/version\/([\d.]+)/)[1];
-	} catch(err) {
-		alert("初始化音频控件失败:" + err.message);
-	}
-	if (Sys.chrome) {
-		$("#audioArea")
-				.html(
-						'<audio controls="controls" id="audio_error"><source src="${ctx}/static/audio/audio_error.wav"></audio>');
-	} else {
-		$("#audioArea")
-				.html(
-						'<EMBED id="audio_error" src="${ctx}/static/audio/audio_error.wav" align="center" border="0" width="1" height="1" autostart="false" loop="false"/>');
-	}
+    var Sys = {};
+    try {
+        var ua = navigator.userAgent.toLowerCase();
+        if (window.ActiveXObject)
+            Sys.ie = ua.match(/msie ([\d.]+)/)[1];
+        else if (document.getBoxObjectFor)
+            Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1];
+        else if (window.MessageEvent && !document.getBoxObjectFor)
+            Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1];
+        else if (window.opera)
+            Sys.opera = ua.match(/opera.([\d.]+)/)[1];
+        else if (window.openDatabase)
+            Sys.safari = ua.match(/version\/([\d.]+)/)[1];
+    } catch (err) {
+        alert("初始化音频控件失败:" + err.message);
+    }
+    if (Sys.chrome) {
+        $("#audioArea").html('<audio controls="controls" id="audio_error"><source src="${ctx}/static/audio/audio_error.wav"></audio>');
+    } else {
+        $("#audioArea").html('<EMBED id="audio_error" src="${ctx}/static/audio/audio_error.wav" align="center" border="0" width="1" height="1" autostart="false" loop="false"/>');
+    }
 }
-
 
 function soundError() {
-	try {
-		document.getElementById("audio_error").play();
-	} catch(err) {
-		// do nothing
-	}
+    try {
+        document.getElementById("audio_error").play();
+    } catch (err) {
+        // do nothing
+    }
 }
 
-window['downLoadEvent'] = function(e) {
+window['downLoadEvent'] = function (e) {
     var content = e.contentWindow.document.body.innerHTML;
     $(e).remove();
     if (/HTTP Status 404/g.test(content)) {
@@ -159,7 +151,6 @@ window['downLoadEvent'] = function(e) {
 				<ul class="themeList" id="themeList" style="display: none;">
 					<li theme="default"><div class="selected">蓝色</div></li>
 					<li theme="green"><div>绿色</div></li>
-					<!--<li theme="red"><div>红色</div></li>-->
 					<li theme="purple"><div>紫色</div></li>
 					<li theme="silver"><div>银色</div></li>
 					<li theme="azure"><div>天蓝</div></li>
@@ -246,12 +237,6 @@ for (Menu menu : menuGroups) {
 							<p><span>欢迎登录系统！</span></p>
 						</div>
 						<div class="pageFormContent" layoutH="80" style="margin-right:230px">
-
-
-						</div>
-
-						<div style="width:230px;position: absolute;top:60px;right:0;display: none;" >
-							<iframe width="100%" height="430" class="share_self"  frameborder="0" scrolling="no" src=""></iframe>
 						</div>
 					</div>
 
@@ -261,7 +246,7 @@ for (Menu menu : menuGroups) {
 
 	</div>
 
-</body>
+
 <div id="audioArea" style="display: none;"></div>
 <object id="mscomm1" classid="clsid:648A5600-2C6E-101B-82B6-000000000014" codebase="${ctx}/static/weight/mscomm32.cab#version=1,0,0,1" style="height: 0;width: 0; position: absolute;left: -999px;top: -999px;" >
   <param name="CommPort" value="3">
@@ -279,11 +264,31 @@ for (Menu menu : menuGroups) {
   <param name="EOFEnable" value="0">
   <param name="InputMode" value="0">
 </object>
-
 <SCRIPT   LANGUAGE="javascript"   FOR="mscomm1"   EVENT="OnComm">
    <!--
    // MSComm1控件每遇到 OnComm 事件就调用 MSComm1_OnComm()函数
            msComm_OnComm();
     //-->
 </SCRIPT>
+<script type="text/javascript" src="${ctx}/static/layer/layer.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.post("${ctx}/workorder/todo.do", function (data) {
+            if (data.result) {
+                if (data.data > 0) {
+                    layer.open({
+                        type: 1
+                        ,title: false
+                        ,offset: 'cc' //具体配置参考：offset参数项
+                        ,content: '<div style="padding: 30px 80px;font-size: 16px;">您有【<span style="color: red;font-size: 18px;">' + data.data + '</span>】张工单待处理！</div>'
+                        ,shade: 0 //不显示遮罩
+                        ,time: 5000
+                        ,anim: 0
+                    });
+                }
+            }
+        }, "JSON");
+    });
+</script>
+</body>
 </html>

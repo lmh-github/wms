@@ -69,7 +69,7 @@ public class ChBuilder implements EInvoiceBuildService {
         modelMap.put("NSRMC", EInvoiceConfig.E_NSRMC); // 开票方名称
         modelMap.put("DKBZ", "1"); // 代开标志 自开(0) 默认为自开
         modelMap.put("KPXM", "11"); // 主要开票商品，或者第一条商品，取项目信息中第一条
-        modelMap.put("BMB_BBH", "1.0"); //编码表版本号，目前为1.0
+        modelMap.put("BMB_BBH", "12.0"); //编码表版本号，目前为12.0
         modelMap.put("XHF_NSRSBH", EInvoiceConfig.E_XHF_NSRSBH); // 销货方识别号
         modelMap.put("XHFMC", EInvoiceConfig.E_XHFMC); // 销货方名称
         modelMap.put("XHF_DZ", EInvoiceConfig.E_XHF_DZ); // 销货方地址
@@ -86,7 +86,7 @@ public class ChBuilder implements EInvoiceBuildService {
         modelMap.put("YFP_HM", invoiceInfo.getFpHm()); // 原发票号码
         modelMap.put("TSCHBZ", "0"); // 特殊冲红标志（冲红电子）
         modelMap.put("CHYY", "订单取消冲红"); // 冲红原因
-        modelMap.put("QD_BZ", "1"); // 清单标志
+        modelMap.put("QD_BZ", "0"); // 清单标志
         modelMap.put("KPHJJE", hjxmje.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 价税合计金额
         modelMap.put("HJBHSJE", hjxmje.subtract(hjse).multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN)); // 合计不含税金额
         modelMap.put("HJSE", hjse.multiply(new BigDecimal(-1)).setScale(2, ROUND_DOWN).toString()); // 合计税额

@@ -69,6 +69,7 @@ public class SalesOrder {
     private Date orderPushTime;// 订单推送时间
     private String invoiceMobile; // 发票接收手机号
     private String invoiceEmail; // 发票接收邮箱
+    private String buyerTaxNo; // 纳税人识别号
 
     /**
      * 取完整地址
@@ -549,5 +550,13 @@ public class SalesOrder {
 
     public void setInvoiceEmail(String invoiceEmail) {
         this.invoiceEmail = invoiceEmail;
+    }
+
+    public String getBuyerTaxNo() {
+        return buyerTaxNo;
+    }
+
+    public void setBuyerTaxNo(String buyerTaxNo) {
+        this.buyerTaxNo = buyerTaxNo;
     }
 }

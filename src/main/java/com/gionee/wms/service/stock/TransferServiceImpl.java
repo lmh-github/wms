@@ -226,7 +226,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             if (indiv == null) {
                 return new ServiceCtrlMessage(false, "未找到IMEI：" + sv);
             }
-            List<TransferGoods> goodsList = transferDao.getTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("transferId", transferId).put("skuCode", sv).getMap());
+            List<TransferGoods> goodsList = transferDao.getTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("transferId", transferId).put("skuCode", indiv.getSkuCode()).getMap());
             if (goodsList.isEmpty()) {
                 return new ServiceCtrlMessage(false, "IMEI：" + sv + "不属于此调拨单的SKU");
             }

@@ -8,32 +8,11 @@
 package com.gionee.wms.web.servlet;
 
 import com.gionee.wms.common.JaxbUtil;
-import com.gionee.wms.common.WmsConstants;
-import com.gionee.wms.common.WmsConstants.IndivStockStatus;
-import com.gionee.wms.common.WmsConstants.OrderSource;
-import com.gionee.wms.common.WmsConstants.OrderStatus;
-import com.gionee.wms.common.WmsConstants.SkuMapOuterCodeEnum;
-import com.gionee.wms.dao.IndivDao;
-import com.gionee.wms.dao.SalesOrderDao;
-import com.gionee.wms.dao.StockDao;
-import com.gionee.wms.entity.*;
-import com.gionee.wms.service.log.LogService;
-import com.gionee.wms.service.log.SalesOrderLogService;
-import com.gionee.wms.service.stock.InvoiceInfoService;
-import com.gionee.wms.service.stock.SalesOrderMapService;
-import com.gionee.wms.service.stock.SalesOrderService;
-import com.gionee.wms.service.wares.SkuMapService;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.sf.integration.warehouse.request.WmsSailOrderPushInfo;
-import com.sf.integration.warehouse.request.WmsSailOrderPushInfoContainerItem;
-import com.sf.integration.warehouse.request.WmsSailOrderPushInfoHeader;
+import com.gionee.wms.service.stock.DockSfService;
 import com.sf.integration.warehouse.response.DockSFResponse;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -49,7 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,45 +41,6 @@ public class DockSFServlet extends HttpServlet {
 
     /** serialVersionUID */
     private static final long serialVersionUID = -9070068505927381677L;
-    @SuppressWarnings("serial")
-    private static final Map<String, Integer> STATUS_MAP = new HashMap<String, Integer>() {
-        {
-            put("10001", OrderStatus.FILTERED.getCode()); // 生效 ==> 已筛单
-            put("10007", OrderStatus.FILTERED.getCode()); // 待确认 ==> 已筛单
-            put("10008", OrderStatus.FILTERED.getCode()); // 已确认 ==> 已筛单
-            put("10003", OrderStatus.FILTERED.getCode()); // 已下发 ==> 已筛单
-            put("300", OrderStatus.PRINTED.getCode()); // 正在检货 ==> 已打单
-            put("400", OrderStatus.PRINTED.getCode()); // 拣货完成 ==> 已打单
-            put("700", OrderStatus.PICKING.getCode()); // 包装完成 ==> 配货中
-            put("10017", OrderStatus.SHIPPING.getCode()); // 装车完成 ==> 待出库
-            put("10018", OrderStatus.SHIPPING.getCode()); // 封车完成 ==> 待出库
-            put("900", OrderStatus.SHIPPED.getCode()); // 发货确认 ==> 已出库
-            put("10016", OrderStatus.RECEIVED.getCode()); // 已完成 ==> 已签收
-            put("10011", OrderStatus.FILTERED.getCode()); // 已冻结 ==>
-            put("10012", OrderStatus.FILTERED.getCode()); // 已作废 ==>
-            put("10013", OrderStatus.CANCELED.getCode()); // 已取消 ==> 已取消
-        }
-    };
-
-    private static final List<Integer> STATUS_SEQUECE = new ArrayList<>();
-
-    static {
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 生效 ==> 已筛单
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 待确认 ==> 已筛单
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 已确认 ==> 已筛单
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 已下发 ==> 已筛单
-        STATUS_SEQUECE.add(OrderStatus.PRINTED.getCode()); // 正在检货 ==> 已打单
-        STATUS_SEQUECE.add(OrderStatus.PRINTED.getCode()); // 拣货完成 ==> 已打单
-        STATUS_SEQUECE.add(OrderStatus.PICKING.getCode()); // 包装完成 ==> 配货中
-        STATUS_SEQUECE.add(OrderStatus.SHIPPING.getCode()); // 装车完成 ==> 待出库
-        STATUS_SEQUECE.add(OrderStatus.SHIPPING.getCode()); // 封车完成 ==> 待出库
-        STATUS_SEQUECE.add(OrderStatus.SHIPPED.getCode()); // 发货确认 ==> 已出库
-        STATUS_SEQUECE.add(OrderStatus.RECEIVED.getCode()); // 已完成 ==> 已签收
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 已冻结 ==>
-        STATUS_SEQUECE.add(OrderStatus.FILTERED.getCode()); // 已作废 ==>
-        STATUS_SEQUECE.add(OrderStatus.CANCELED.getCode()); // 已取消 ==> 已取消
-    }
-
     private final Logger logger = LoggerFactory.getLogger(DockSFServlet.class);
 
     /** {@inheritDoc} */
@@ -127,180 +67,13 @@ public class DockSFServlet extends HttpServlet {
             }
             logger.info(MessageFormat.format("“出库单状态与明细推送接口”推送的内容为：{0}{1}", SystemUtils.LINE_SEPARATOR, sailOrderPushInfoXML));
 
-            WmsSailOrderPushInfo sailOrderPushInfo = JaxbUtil.unmarshToObjBinding(WmsSailOrderPushInfo.class, sailOrderPushInfoXML);
-            if (sailOrderPushInfo == null) {
-                logger.error("“出库单状态与明细推送接口”推送内容格式错误！");
-                print(response, new DockSFResponse(false, "推送的格式内容错误！"));
-                return;
-            }
-
-            ApplicationContext applicationContext = getApplicationContext(request);
-            SalesOrderMapService salesOrderMapService = applicationContext.getBean(SalesOrderMapService.class);
-            SalesOrderDao salesOrderDao = applicationContext.getBean(SalesOrderDao.class);
-
-            WmsSailOrderPushInfoHeader header = sailOrderPushInfo.getHeader();
-            String erp_order = header.getErp_order();
-            SalesOrderMap salesOrderMap = salesOrderMapService.getByErpOrderCode(erp_order);
-            if (salesOrderMap == null) {
-                logger.error(MessageFormat.format("“出库单状态与明细推送接口”，顺丰ERP订单号：{0}不存在！", erp_order));
-                print(response, new DockSFResponse(false, MessageFormat.format("erp_order：{0}在系统中没有对应数据！", erp_order)));
-                return;
-            }
-
-
-            SalesOrder salesOrder = salesOrderDao.queryOrderByOrderCode(salesOrderMap.getOrder_code());
-
-            String status_code = header.getStatus_code();
-            // 是否确认出库，通知外部系统
-            boolean notifyFlag = false;
-            if ("900".equals(status_code)) { // 已出库状态
-                Map<String, String> queryImeisMap = Maps.newHashMap();
-                queryImeisMap.put("order_code", salesOrderMap.getOrder_code());
-                List<SalesOrderImei> imeiList = salesOrderMapService.queryImeis(queryImeisMap);
-                List<WmsSailOrderPushInfoContainerItem> containerList = sailOrderPushInfo.getContainerList();
-
-                if (CollectionUtils.isNotEmpty(containerList) && CollectionUtils.isEmpty(imeiList)) {
-                    // 该部分为减库存操作
-                    StockDao stockDao = applicationContext.getBean(StockDao.class);
-                    for (WmsSailOrderPushInfoContainerItem item : containerList) {
-                        String sf_sku = item.getItem();
-                        if (StringUtils.isBlank(sf_sku)) {
-                            continue;
-                        }
-                        String quantity = item.getQuantity();
-                        String skuCode = getLocalSkuCode(applicationContext, sf_sku);
-
-                        Map<String, Object> criteria = Maps.newHashMap();
-                        criteria.put("warehouseCode", WmsConstants.WarehouseCodeEnum.SF_WAREHOUSE.getCode());
-                        criteria.put("skuCode", skuCode);
-                        Stock stock = stockDao.queryStock(criteria);
-                        stock.setSalesQuantity(stock.getSalesQuantity() - (int) NumberUtils.toDouble(quantity, 0));
-
-                        stockDao.updateStockQuantity(stock);
-                    }
-                    // End 减库存操作
-
-                    // 该部分为串号操作
-                    // WmsSailOrderPushInfoContainerItem item = containerList.get(0);
-                    List<String> serial_number_list = Lists.newArrayList();
-                    for (WmsSailOrderPushInfoContainerItem item : containerList) {
-                        if (CollectionUtils.isEmpty(item.getSerial_number())) {
-                            continue;
-                        } else {
-                            serial_number_list.addAll(item.getSerial_number());
-                        }
-                    }
-                    if (CollectionUtils.isNotEmpty(serial_number_list)) {
-                        List<SalesOrderImei> imeis = Lists.newArrayList();
-                        List<Indiv> indivs = Lists.newArrayList();
-                        IndivDao indivDao = applicationContext.getBean(IndivDao.class);
-                        for (String imei : serial_number_list) {
-                            imeis.add(new SalesOrderImei(salesOrderMap.getOrder_code(), erp_order, imei));
-                            // 个体订单标示指向此订单，退货时可根据此关联进行，退货入库状态修改
-                            Indiv indiv = new Indiv();
-                            indiv.setIndivCode(imei);
-                            indivs.add(indiv);
-                        }
-                        salesOrderMapService.batchAddImes(imeis);
-                        // 更新个体订单关联
-                        Map<String, Object> criteria = Maps.newHashMap();
-                        criteria.put("orderId", salesOrder.getId());
-                        criteria.put("orderCode", salesOrder.getOrderCode());
-                        criteria.put("indivCodes", indivs);
-                        criteria.put("stockStatus", IndivStockStatus.OUT_WAREHOUSE.getCode()); // 设置已出库状态
-                        indivDao.batchUpdateIndivsStock(criteria);
-                    }
-                    // End 串号操作
-                }
-                notifyFlag = true;
-            } else {
-                salesOrderMap.setActual_ship_date_time(header.getActual_ship_date_time());
-                salesOrderMap.setCarrier(StringUtils.trimToNull(header.getCarrier()));
-                salesOrderMap.setCarrier_service(StringUtils.trimToNull(header.getCarrier_service()));
-                salesOrderMapService.update(salesOrderMap);
-            }
-
-            int newOrderStatus = STATUS_MAP.get(status_code);
-            if (STATUS_SEQUECE.indexOf(newOrderStatus) < STATUS_SEQUECE.indexOf(salesOrder.getOrderStatus())) {
-                newOrderStatus = salesOrder.getOrderStatus();
-            }
-
-            // 修改订单状态和运单号
-            String waybill_no = StringUtils.trimToNull(header.getWaybill_no()); // 运单号
-            Map<String, Object> params = Maps.newHashMap();
-            params.put("orderStatus", newOrderStatus);
-            params.put("orderCode", salesOrderMap.getOrder_code());
-            params.put("shippingNo", waybill_no);
-            params.put("orderId", salesOrder.getId());
-            salesOrderDao.updateOrder(params);
-
-            // 订单被取消
-            if (OrderStatus.CANCELED.getCode() == newOrderStatus) {
-                InvoiceInfoService invoiceInfoService = applicationContext.getBean(InvoiceInfoService.class);
-                invoiceInfoService.cancelOrder(salesOrderMap.getOrder_code());
-            }
-            // 通知外部系统，修改订单状态
-            if (notifyFlag) {
-                SalesOrderService orderService = applicationContext.getBean(SalesOrderService.class);
-                if (salesOrder.getOrderSource().equals(OrderSource.OFFICIAL_GIONEE)) {
-                    // 官网
-                    orderService.notifyOrder(Lists.newArrayList(salesOrder));
-                } else {
-                    // 其他电商平台
-                    orderService.notifyTOP(Lists.newArrayList(salesOrder));
-                }
-            }
-            print(response, new DockSFResponse(true, "成功！"));
-            addOpLog(sailOrderPushInfo, applicationContext, params); // 记录操作日志
+            DockSFResponse dockSFResponse = getApplicationContext(request).getBean(DockSfService.class).dock(sailOrderPushInfoXML);
+            print(response, dockSFResponse);
         } catch (Exception e) {
             logger.error("“出库单状态与明细推送接口”推送接口被调用出现异常！", e);
             e.printStackTrace();
             print(response, new DockSFResponse(false, "请求的内容出现异常！"));
         }
-
-    }
-
-    /**
-     * 顺丰SKU转成本系统中的SKU
-     * @param applicationContext applicationContext
-     * @param sf_sku             sf_sku
-     * @return
-     */
-    private String getLocalSkuCode(ApplicationContext applicationContext, String sf_sku) {
-        SkuMapService skuMapService = applicationContext.getBean(SkuMapService.class);
-        SkuMap skuMap = skuMapService.getSkuMapByOutSkuCode(sf_sku, SkuMapOuterCodeEnum.SF.getCode());
-        String skuCode = skuMap.getSkuCode();
-        return skuCode;
-    }
-
-    /**
-     * 记录操作日志
-     * @param sailOrderPushInfo
-     * @param applicationContext
-     * @throws Exception
-     */
-    private void addOpLog(WmsSailOrderPushInfo sailOrderPushInfo, ApplicationContext applicationContext, Map<String, Object> param) throws Exception {
-        LogService logService = applicationContext.getBean(LogService.class);
-        Log log = new Log();
-        // log.setContent(MessageFormat.format("“出库单状态与明细推送接口”，推送内容为：{0}", JSONObject.fromObject(sailOrderPushInfo).toString()));
-        log.setOpName("出库单状态与明细推送接口");
-        log.setOpTime(new Date());
-        log.setOpUserName("WMS系统,出库单状态与明细推送接口");
-        log.setType(WmsConstants.LogType.BIZ_LOG.getCode());
-        // log.setContent(log.getContent().substring(0, 1999));
-        log.setContent(StringUtils.EMPTY);
-        logService.insertLog(log);
-
-
-        SalesOrderLogService salesOrderLogService = applicationContext.getBean(SalesOrderLogService.class);
-        SalesOrderLog lg = new SalesOrderLog();
-        lg.setOpTime(new Date());
-        lg.setOpUser("WMS业务记录者(sf推送)");
-        lg.setOrderStatus(Integer.parseInt(param.get("orderStatus") + ""));
-        lg.setOrderId(Long.parseLong(param.get("orderId") + ""));
-        lg.setRemark("出库单状态与明细推送接口");
-        salesOrderLogService.insertSalesOrderLog(lg);
-
 
     }
 
