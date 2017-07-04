@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.UcUserDao">
+
+    <sql id="columns">
+        ID,
+        UC_ACCOUNT,
+        USER_NAME,
+        STATUS,
+        CREATE_TIME
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.UcUser">
+        <selectKey resultType="long" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_USER(
+        <include refid="columns"/>
+        )
+        VALUES (
+        #{id, jdbcType=NUMERIC},
+        #{ucAccount, jdbcType=VARCHAR},
+        #{userName, jdbcType=VARCHAR},
+        #{status, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.gionee.wms.entity.UcUser">
+        update WMS_USER
+        <set>
+            USER_NAME = #{userName},
+            STATUS = #{status}
+        </set>
+        where id = #{id}
+    </update>
+
+    <resultMap id="result" type="com.gionee.wms.entity.UcUser">
+        <id property="id" column="id"/>
+        <result property="ucAccount" column="UC_ACCOUNT"/>
+        <result property="userName" column="USER_NAME"/>
+        <result property="status" column="STATUS"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+    <select id="get" resultMap="result">
+        select
+        <include refid="columns"/>
+        from WMS_USER
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <if test="id == null and account != null">
+                UC_ACCOUNT = #{account}
+            </if>
+            <if test="userName != null">
+                AND USER_NAME = #{userName}
+            </if>
+        </where>
+    </select>
+
+    <select id="query" parameterType="map" resultMap="result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                    select
+                    <include refid="columns"/>
+                    from WMS_USER
+                    <where>
+                        <if test="account != null">UC_ACCOUNT = #{account}</if>
+                        <if test="userName != null">AND USER_NAME = #{userName}</if>
+                        <if test="status != null">AND STATUS = #{status}</if>
+                    </where>
+                    ORDER BY CREATE_TIME DESC
+                    ) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        select
+        count(1)
+        from WMS_USER
+        <where>
+            <if test="account != null">UC_ACCOUNT = #{account}</if>
+            <if test="userName != null">AND USER_NAME = #{userName}</if>
+            <if test="status != null">AND STATUS = #{status}</if>
+        </where>
+    </select>
+
+</mapper>

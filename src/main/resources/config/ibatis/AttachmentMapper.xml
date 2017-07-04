@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.AttachmentDao">
+
+    <sql id="columns">
+        ID,
+        BILL_CODE,
+        BILL_TYPE,
+        FILE_NAME,
+        ABSTRACT_PATH,
+        FILE_TYPE,
+        CREATE_BY,
+        CREATE_TIME,
+        STATUS
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.Attachment">
+        <selectKey resultType="long" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_ATTACHMENT(
+        <include refid="columns"/>
+        )
+        VALUES (
+        #{id, jdbcType=NUMERIC},
+        #{billCode, jdbcType=VARCHAR},
+        #{billType, jdbcType=VARCHAR},
+        #{fileName, jdbcType=VARCHAR},
+        #{abstractPath, jdbcType=VARCHAR},
+        #{fileType, jdbcType=VARCHAR},
+        #{createBy, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP},
+        #{status, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE WMS_ATTACHMENT
+        <set>
+            <if test="status != null">STATUS = #{status},</if>
+        </set>
+        WHERE
+        <if test="id !=null">
+            id = #{id}
+        </if>
+    </update>
+
+    <delete id="delete">
+        DELETE FROM WMS_ATTACHMENT WHERE ID = #{_paramater}
+    </delete>
+
+    <sql id="query-where">
+        <if test="billCode != null">AND BILL_CODE = #{billCode}</if>
+        <if test="billType != null">AND BILL_TYPE = #{billType}</if>
+        <if test="status != null">AND STATUS = #{status}</if>
+    </sql>
+
+    <resultMap id="result" type="com.gionee.wms.entity.Attachment">
+        <id property="id" column="id"/>
+        <result property="billCode" column="BILL_CODE"/>
+        <result property="billType" column="BILL_TYPE"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="abstractPath" column="ABSTRACT_PATH"/>
+        <result property="fileType" column="FILE_TYPE"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+
+    <select id="list" parameterType="map" resultMap="result">
+        select
+        <include refid="columns"/>
+        from WMS_ATTACHMENT
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+    <select id="get" parameterType="long" resultMap="result">
+        select
+        <include refid="columns"/>
+        from WMS_ATTACHMENT
+        WHERE ID = #{_paramater}
+    </select>
+
+</mapper>

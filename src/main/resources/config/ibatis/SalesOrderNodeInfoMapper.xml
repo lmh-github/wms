@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gionee.wms.dao.SalesOrderNodeInfoDao">
+
+    <sql id="columns">
+        ID,
+        ORDER_CODE,
+        TARGET_WAREHOUSE,
+        REAL_WAREHOUSE,
+        ORDER_CREATE_TIME,
+        ORDER_FILTER_TIME,
+        ORDER_PUSH_TIME,
+        ORDER_PRINT_TIME,
+        ORDER_SEND_TIME,
+        ORDER_FINISH_TIME,
+        ORDER_SKU_INFO,
+        ORDER_RECEIVE_INFO,
+        EXPRESS,
+        EXPRESS_NO
+    </sql>
+
+    <insert id="insert">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            select
+            WMS_SEQ_COMMON.nextval from dual
+        </selectKey>
+        INSERT INTO WMS_SALES_ORDER_NODE_INFO
+        (
+            ID,
+            ORDER_CODE,
+            ORDER_CREATE_TIME,
+            ORDER_FILTER_TIME,
+            ORDER_SKU_INFO,
+            ORDER_RECEIVE_INFO,
+            EXPRESS
+        )
+        VALUES (
+            #{id, jdbcType=NUMERIC},
+            #{orderCode, jdbcType=VARCHAR},
+            #{orderCreateTime, jdbcType=TIMESTAMP},
+            #{orderFilterTime, jdbcType=TIMESTAMP},
+            #{orderSkuInfo, jdbcType=VARCHAR},
+            #{orderReceiveInfo, jdbcType=VARCHAR},
+            #{express, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.gionee.wms.entity.SalesOrderNodeInfo">
+        UPDATE WMS_SALES_ORDER_NODE_INFO
+        <set>
+            TARGET_WAREHOUSE = #{targetWarehouse, jdbcType=VARCHAR},
+            REAL_WAREHOUSE = #{realWarehouse, jdbcType=VARCHAR},
+            ORDER_CREATE_TIME = #{orderCreateTime, jdbcType=TIMESTAMP},
+            ORDER_FILTER_TIME = #{orderFilterTime, jdbcType=TIMESTAMP},
+            ORDER_PUSH_TIME = #{orderPushTime, jdbcType=TIMESTAMP},
+            ORDER_PRINT_TIME = #{orderPrintTime, jdbcType=TIMESTAMP},
+            ORDER_SEND_TIME = #{orderSendTime, jdbcType=TIMESTAMP},
+            ORDER_FINISH_TIME = #{orderFinishTime, jdbcType=TIMESTAMP},
+            ORDER_SKU_INFO = #{orderSkuInfo, jdbcType=VARCHAR},
+            ORDER_RECEIVE_INFO = #{orderReceiveInfo, jdbcType=VARCHAR},
+            EXPRESS = #{express, jdbcType=VARCHAR},
+            EXPRESS_NO = #{expressNo, jdbcType=VARCHAR}
+        </set>
+        WHERE ORDER_CODE = #{orderCode, jdbcType=VARCHAR}
+    </update>
+
+    <resultMap id="salesOrderNodeInfoResult" type="com.gionee.wms.entity.SalesOrderNodeInfo">
+        <id property="id" column="id"/>
+        <result property="orderCode" column="ORDER_CODE"/>
+        <result property="targetWarehouse" column="TARGET_WAREHOUSE"/>
+        <result property="realWarehouse" column="REAL_WAREHOUSE"/>
+        <result property="orderCreateTime" column="ORDER_CREATE_TIME"/>
+        <result property="orderFilterTime" column="ORDER_FILTER_TIME"/>
+        <result property="orderPushTime" column="ORDER_PUSH_TIME"/>
+        <result property="orderPrintTime" column="ORDER_PRINT_TIME"/>
+        <result property="orderSendTime" column="ORDER_SEND_TIME"/>
+        <result property="orderFinishTime" column="ORDER_FINISH_TIME"/>
+        <result property="orderSkuInfo" column="ORDER_SKU_INFO"/>
+        <result property="orderReceiveInfo" column="ORDER_RECEIVE_INFO"/>
+        <result property="express" column="EXPRESS"/>
+        <result property="expressNo" column="EXPRESS_NO"/>
+    </resultMap>
+    
+    <resultMap id="resultMap" type="map">
+        <result column="ORDER_CODE" property="orderCode"/>
+        <result column="TARGET_WAREHOUSE" property="targetWarehouse"/>
+        <result column="REAL_WAREHOUSE" property="realWarehouse"/>
+        <result column="PROVINCE" property="province"/>
+        <result column="CITY" property="city"/>
+        <result column="DISTRICT" property="district"/>
+        <result column="ORDER_SOURCE" property="orderSource"/>
+        <result column="ORDER_TIME" property="orderTime"/>
+        <result column="PAYMENT_TIME" property="paymentTime"/>
+        <result column="JOIN_TIME" property="joinTime"/>
+        <result column="ORDER_PUSH_TIME" property="orderPushTime"/>
+        <result column="ORDER_PRINT_TIME" property="orderPrintTime"/>
+        <result column="ORDER_SEND_TIME" property="orderSendTime"/>
+        <result column="ORDER_FINISH_TIME" property="orderFinishTime"/>
+        <result column="ORDER_SKU_INFO" property="orderSkuInfo"/>
+        <result column="ADDRESS" property="address"/>
+        <result column="ORDER_AMOUNT" property="orderAmount"/>
+        <result column="EXPRESS" property="express"/>
+        <result column="EXPRESS_NO" property="expressNo"/>
+    </resultMap>
+
+    <select id="get" resultMap="salesOrderNodeInfoResult">
+        select * from WMS_SALES_ORDER_NODE_INFO
+        WHERE ORDER_CODE = #{orderCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="query" parameterType="map" resultMap="resultMap">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                        O.ORDER_CODE,
+                        N.TARGET_WAREHOUSE,
+                        N.REAL_WAREHOUSE,
+                        O.PROVINCE,
+                        O.CITY,
+                        O.DISTRICT,
+                        O.ORDER_SOURCE,
+                        O.ORDER_TIME,
+                        O.PAYMENT_TIME,
+                        O.JOIN_TIME,
+                        O.ORDER_PUSH_TIME,
+                        N.ORDER_PRINT_TIME,
+                        N.ORDER_SEND_TIME,
+                        N.ORDER_FINISH_TIME,
+                        N.ORDER_SKU_INFO,
+                        O.ADDRESS,
+                        O.ORDER_AMOUNT,
+                        N.EXPRESS,
+                        N.EXPRESS_NO
+                      FROM WMS_SALES_ORDER O RIGHT JOIN WMS_SALES_ORDER_NODE_INFO N ON O.ORDER_CODE = N.ORDER_CODE
+                      <where>
+                          O.ORDER_PUSH_STATUS = 1
+                          <if test="paymentTimeBegin != null">
+                              AND O.PAYMENT_TIME &gt;= #{paymentTimeBegin}
+                          </if>
+                          <if test="paymentTimeEnd != null">
+                              AND O.PAYMENT_TIME &lt;= #{paymentTimeEnd}
+                          </if>
+                          <if test="orderSource != null">
+                              AND O.ORDER_SOURCE = #{orderSource}
+                          </if>
+                          <if test="orderCode != null">
+                              AND O.ORDER_CODE = #{orderCode}
+                          </if>
+                          <if test="finishTimeBegin != null">
+                              AND N.ORDER_FINISH_TIME &gt;= #{finishTimeBegin}
+                          </if>
+                          <if test="finishTimeEnd != null">
+                              AND N.ORDER_FINISH_TIME &lt;= #{finishTimeEnd}
+                          </if>
+                          <if test="skuCode != null">
+                              AND EXISTS (
+                                SELECT 1 FROM WMS_SALES_ORDER_GOODS G WHERE G.ORDER_ID = O.ID AND G.SKU_CODE = #{skuCode}
+                              )
+                          </if>
+                          <if test="skuName != null">
+                              AND EXISTS (
+                                SELECT 1 FROM WMS_SALES_ORDER_GOODS G WHERE G.ORDER_ID = O.ID AND G.SKU_NAME = #{skuName}
+                              )
+                          </if>
+                      </where>
+                      ORDER BY O.JOIN_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT
+          COUNT(1)
+        FROM WMS_SALES_ORDER O RIGHT JOIN WMS_SALES_ORDER_NODE_INFO N ON O.ORDER_CODE = N.ORDER_CODE
+        <where>
+            O.ORDER_PUSH_STATUS = 1
+            <if test="paymentTimeBegin != null">
+                AND O.PAYMENT_TIME &gt;= #{paymentTimeBegin}
+            </if>
+            <if test="paymentTimeEnd != null">
+                AND O.PAYMENT_TIME &lt;= #{paymentTimeEnd}
+            </if>
+            <if test="orderSource != null">
+                AND O.ORDER_SOURCE = #{orderSource}
+            </if>
+            <if test="orderCode != null">
+                AND O.ORDER_CODE = #{orderCode}
+            </if>
+            <if test="finishTimeBegin != null">
+                AND N.ORDER_FINISH_TIME &gt;= #{finishTimeBegin}
+            </if>
+            <if test="finishTimeEnd != null">
+                AND N.ORDER_FINISH_TIME &lt;= #{finishTimeEnd}
+            </if>
+            <if test="skuCode != null">
+                AND EXISTS (
+                  SELECT 1 FROM WMS_SALES_ORDER_GOODS G WHERE G.ORDER_ID = O.ID AND G.SKU_CODE = #{skuCode}
+                )
+            </if>
+            <if test="skuName != null">
+                AND EXISTS (
+                  SELECT 1 FROM WMS_SALES_ORDER_GOODS G WHERE G.ORDER_ID = O.ID AND G.SKU_NAME = #{skuName}
+                )
+            </if>
+        </where>
+    </select>
+
+</mapper>

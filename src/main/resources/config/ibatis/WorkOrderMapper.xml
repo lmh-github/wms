@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.WorkOrderDao">
+
+    <sql id="columns">
+        ID,
+        WORK_CODE,
+        ORDER_CODE,
+        SPONSOR,
+        WORKER,
+        LV,
+        PLATFORM,
+        DESCRIPTION,
+        STATUS,
+        RESULT_MSG,
+        UPER,
+        UP_TIME,
+        SUGGEST,
+        CREATE_TIME,
+        ACCEPT_TIME,
+        LAST_TIME
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.WorkOrder">
+        <selectKey resultType="long" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_WORK_ORDER(
+        <include refid="columns"/>
+        )
+        VALUES (
+        #{id, jdbcType=NUMERIC},
+        #{workCode, jdbcType=VARCHAR},
+        #{orderCode, jdbcType=VARCHAR},
+        #{sponsor, jdbcType=VARCHAR},
+        #{worker, jdbcType=VARCHAR},
+        #{lv, jdbcType=VARCHAR},
+        #{platform, jdbcType=VARCHAR},
+        #{description, jdbcType=VARCHAR},
+        #{status, jdbcType=VARCHAR},
+        #{resultMsg, jdbcType=VARCHAR},
+        #{uper, jdbcType=VARCHAR},
+        #{upTime, jdbcType=TIMESTAMP},
+        #{suggest, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP},
+        #{acceptTime, jdbcType=TIMESTAMP},
+        #{lastTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE WMS_WORK_ORDER
+        <set>
+            <if test="worker != null">WORKER = #{worker},</if>
+            <if test="lv != null">LV = #{lv},</if>
+            <if test="platform != null">PLATFORM = #{platform},</if>
+            <if test="description != null">DESCRIPTION = #{description},</if>
+            <if test="status != null">STATUS = #{status},</if>
+            <if test="resultMsg != null">RESULT_MSG = #{resultMsg},</if>
+            <if test="uper != null">UPER = #{uper},</if>
+            <if test="suggest != null">SUGGEST = #{suggest},</if>
+            <if test="upTime != null">UP_TIME = #{upTime},</if>
+            <if test="acceptTime != null">ACCEPT_TIME = #{acceptTime},</if>
+            <if test="lastTime != null">LAST_TIME = #{lastTime}</if>
+        </set>
+        WHERE
+        <if test="id !=null">
+            id = #{id}
+        </if>
+    </update>
+
+    <sql id="query-where">
+        <if test="workCode != null">AND W.WORK_CODE = #{workCode}</if>
+        <if test="orderCode != null">AND W.ORDER_CODE = #{orderCode}</if>
+        <if test="sponsor != null">AND W.SPONSOR = #{sponsor}</if>
+        <if test="worker != null">AND W.WORKER = #{worker}</if>
+        <if test="lv != null">AND W.LV = #{lv}</if>
+        <if test="platform != null">AND W.PLATFORM = #{platform}</if>
+        <if test="description != null">AND W.DESCRIPTION = #{description}</if>
+        <if test="status != null">AND W.STATUS = #{status}</if>
+        <if test="resultMsg != null">AND W.RESULT_MSG = #{resultMsg}</if>
+        <if test="uper != null">AND W.UPER = #{uper}</if>
+        <if test="suggest != null">AND W.SUGGEST = #{suggest}</if>
+        <if test="createTimeBegin != null">AND W.CREATE_TIME &gt;= #{createTimeBegin}</if>
+        <if test="createTimeEnd != null">AND W.CREATE_TIME &lt;= #{createTimeEnd }</if>
+        <if test="acceptTimeBegin != null">AND W.ACCEPT_TIME &gt;= #{acceptTimeBegin}</if>
+        <if test="acceptTimeEnd != null">AND W.ACCEPT_TIME &lt;= #{acceptTimeEnd }</if>
+        <if test="lastTimeBegin != null">AND W.LAST_TIME &gt;= #{lastTimeBegin}</if>
+        <if test="lastTimeEnd != null">AND W.LAST_TIME &lt;= #{lastTimeEnd }</if>
+        <if test="upTimeBegin != null">AND W.UP_TIME &gt;= #{upTimeBegin}</if>
+        <if test="upTimeEnd != null">AND W.UP_TIME &lt;= #{upTimeEnd }</if>
+    </sql>
+
+    <resultMap id="query-result" type="com.gionee.wms.entity.WorkOrder">
+        <id property="id" column="id"/>
+        <result property="workCode" column="WORK_CODE"/>
+        <result property="orderCode" column="ORDER_CODE"/>
+        <result property="sponsor" column="SPONSOR"/>
+        <result property="worker" column="WORKER"/>
+        <result property="lv" column="LV"/>
+        <result property="platform" column="PLATFORM"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="status" column="STATUS"/>
+        <result property="resultMsg" column="RESULT_MSG"/>
+        <result property="uper" column="UPER"/>
+        <result property="upTime" column="UP_TIME"/>
+        <result property="suggest" column="SUGGEST"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="acceptTime" column="ACCEPT_TIME"/>
+        <result property="lastTime" column="LAST_TIME"/>
+        <collection property="attachmentList" column="WORK_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment" select="atta-select"/>
+<!--        <collection property="attachmentList" column="BILL_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment">
+            <id property="id" column="AID"/>
+            <result property="billCode" column="BILL_CODE"/>
+            <result property="fileName" column="FILE_NAME"/>
+            <result property="abstractPath" column="ABSTRACT_PATH"/>
+        </collection>-->
+    </resultMap>
+    
+    <resultMap id="attachment-result" type="com.gionee.wms.entity.Attachment">
+        <id property="id" column="id"/>
+        <result property="billCode" column="BILL_CODE"/>
+        <result property="fileName" column="FILE_NAME"/>
+        <result property="abstractPath" column="ABSTRACT_PATH"/>
+    </resultMap>
+
+    <select id="atta-select" parameterType="string" resultMap="attachment-result">
+        SELECT ID, BILL_CODE, FILE_NAME, ABSTRACT_PATH, FILE_TYPE FROM WMS_ATTACHMENT WHERE BILL_CODE = #{_paramater} AND BILL_TYPE = '工单'
+    </select>
+
+    <select id="query" parameterType="map" resultMap="query-result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                            <include refid="columns"/>
+                      FROM WMS_WORK_ORDER W
+                      <where>
+                          <include refid="query-where"/>
+                      </where>
+                      ORDER BY CREATE_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_WORK_ORDER W
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+    <select id="queryToDoCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_WORK_ORDER
+        WHERE (WORKER = #{worker} OR UPER = #{uper})
+        AND STATUS IN <foreach item="status" index="index" collection="statusList" open="(" separator="," close=")">#{status}</foreach>
+    </select>
+
+    <select id="get" parameterType="long" resultMap="query-result">
+        SELECT
+        <include refid="columns"/>
+        FROM WMS_WORK_ORDER
+        WHERE ID = #{id}
+    </select>
+
+    <resultMap id="export-result" type="map">
+        <result property="orderCode" column="ORDER_CODE" javaType="string"/>
+        <result property="sponsor" column="SPONSOR" javaType="string"/>
+        <result property="worker" column="WORKER" javaType="string"/>
+        <result property="lv" column="LV" javaType="string"/>
+        <result property="platform" column="PLATFORM" javaType="string"/>
+        <result property="description" column="DESCRIPTION" javaType="string"/>
+        <result property="status" column="STATUS" javaType="string"/>
+        <result property="resultMsg" column="RESULT_MSG" javaType="string"/>
+        <result property="uper" column="UPER" javaType="string"/>
+        <result property="upTime" column="UP_TIME" javaType="string"/>
+        <result property="suggest" column="SUGGEST" javaType="string"/>
+        <result property="createTime" column="CREATE_TIME" javaType="string"/>
+        <result property="acceptTime" column="ACCEPT_TIME" javaType="string"/>
+        <result property="lastTime" column="LAST_TIME" javaType="string"/>
+    </resultMap>
+
+    <select id="exportQuery" parameterType="map" resultMap="export-result">
+        SELECT
+            WORK_CODE,
+            ORDER_CODE,
+            SPONSOR,
+            WORKER,
+            LV,
+            PLATFORM,
+            DESCRIPTION,
+            STATUS,
+            RESULT_MSG,
+            UPER,
+            TO_CHAR(UP_TIME, 'yyyy-mm-dd hh24:mi:ss') UP_TIME,
+            SUGGEST,
+            TO_CHAR(CREATE_TIME, 'yyyy-mm-dd hh24:mi:ss') CREATE_TIME,
+            TO_CHAR(ACCEPT_TIME, 'yyyy-mm-dd hh24:mi:ss') ACCEPT_TIME,
+            TO_CHAR(LAST_TIME, 'yyyy-mm-dd hh24:mi:ss') LAST_TIME
+        FROM WMS_WORK_ORDER W
+        <where>
+            <include refid="query-where"/>
+        </where>
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+</mapper>
