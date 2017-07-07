@@ -66,6 +66,7 @@
     <script src="${ctx}/static/js/area.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/tooltip.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/xheditor/xheditor-1.2.2.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 $(function () {
