@@ -69,7 +69,7 @@
     <div class="panelBar">
         <ul class="toolBar">
             <li>
-                <a class="add" href="${ctx}/activity/to_add.do" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="690"><span>新建活动</span></a>
+                <a class="add" href="${ctx}/activity/to.do?to=add" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="690"><span>新建活动</span></a>
             </li>
             <li class="line">line</li>
             <li>

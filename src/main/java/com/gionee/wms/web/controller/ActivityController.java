@@ -79,14 +79,6 @@ public class ActivityController {
     }
 
     /**
-     * @return
-     */
-    @RequestMapping("to_add.do")
-    public String toAdd() {
-        return "activity/add";
-    }
-
-    /**
      * @param queryMap
      * @param activity
      * @return
