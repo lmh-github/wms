@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.ActivityDao">
+
+
+    <resultMap id="query-result" type="com.gionee.wms.entity.Activity">
+        <id property="id" column="ID"/>
+        <result property="sponsor" column="SPONSOR"/>
+        <result property="platform" column="PLATFORM"/>
+        <result property="startTime" column="START_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="area" column="AREA"/>
+        <result property="status" column="STATUS"/>
+        <result property="giving" column="GIVING"/>
+        <result property="gift" column="GIFT"/>
+        <result property="prize" column="PRIZE"/>
+        <result property="accessory" column="ACCESSORY"/>
+        <result property="regulation" column="REGULATION"/>
+        <result property="remarks" column="REMARKS" />
+        <result property="fileName" column="FILENAME" />
+    </resultMap>
+
+    <sql id="columns">
+        ID,
+        SPONSOR,
+        PLATFORM,
+        START_TIME,
+        END_TIME,
+        AREA,
+        STATUS,
+        GIVING,
+        GIFT,
+        PRIZE,
+        ACCESSORY,
+        REGULATION,
+        REMARKS,
+        FILENAME
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.Activity">
+        <selectKey resultType="long" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_ACTIVITY(
+        <include refid="columns"/>
+        )
+        VALUES (
+            #{id, jdbcType=NUMERIC},
+            #{sponsor, jdbcType=VARCHAR},
+            #{platform, jdbcType=VARCHAR},
+            #{startTime, jdbcType=TIMESTAMP},
+            #{endTime, jdbcType=TIMESTAMP},
+            #{area, jdbcType=VARCHAR},
+            #{status, jdbcType=VARCHAR},
+            #{giving, jdbcType=VARCHAR},
+            #{gift, jdbcType=VARCHAR},
+            #{prize, jdbcType=TIMESTAMP},
+            #{accessory, jdbcType=BLOB},
+            #{regulation, jdbcType=CLOB},
+            #{remarks, jdbcType=VARCHAR},
+            #{fileName, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE WMS_ACTIVITY
+        <set>
+            <if test="platform != null">PLATFORM = #{platform},</if>
+            <if test="startTime != null">END_TIME = #{startTime},</if>
+            <if test="endTime != null">START_TIME = #{endTime},</if>
+            <if test="area != null">AREA = #{area},</if>
+            <if test="status != null">STATUS = #{status},</if>
+            <if test="giving != null">GIVING = #{giving},</if>
+            <if test="gift != null">GIFT = #{gift},</if>
+            <if test="prize != null">PRIZE = #{prize},</if>
+            <if test="accessory != null">ACCESSORY = #{accessory},</if>
+            <if test="regulation != null">REGULATION = #{regulation},</if>
+            <if test="remarks != null">REMARKS = #{remarks},</if>
+            <if test="fileName != null">FILENAME = #{fileName}</if>
+        </set>
+        WHERE
+        <if test="id !=null">
+            ID = #{id}
+        </if>
+    </update>
+
+    <sql id="query-where">
+        <if test="sponsor != null">AND SPONSOR = #{sponsor}</if>
+        <if test="platform != null">AND PLATFORM = #{platform}</if>
+        <if test="startTime != null">AND START_TIME &gt;= #{startTime}</if>
+        <if test="startTimeBegin != null">AND START_TIME &gt;= #{startTimeBegin}</if>
+        <if test="endTime != null">AND END_TIME &gt;= #{endTime}</if>
+        <if test="endTimeBegin != null">AND END_TIME &gt;= #{endTimeBegin}</if>
+        <if test="area != null">AND AREA = #{area}</if>
+        <if test="status != null">AND STATUS = #{status}</if>
+        <if test="giving != null">AND GIVING = #{giving}</if>
+        <if test="gift != null">AND GIFT = #{gift}</if>
+        <if test="prize != null">AND PRIZE = #{prize}</if>
+        <if test="accessory != null">AND ACCESSORY = #{accessory}</if>
+        <if test="regulation != null">AND REGULATION = #{regulation}</if>
+        <if test="remarks != null">AND REMARKS = #{remarks}</if>
+        <if test="other != null">
+            AND
+            (
+                SPONSOR LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR PLATFORM LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR AREA LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR STATUS LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR GIVING LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR GIFT LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR PRIZE LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR REGULATION LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+                OR REMARKS LIKE CONCAT(CONCAT('%', #{other,jdbcType=VARCHAR}), '%')
+            )
+        </if>
+    </sql>
+
+    <select id="query" parameterType="map" resultMap="query-result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                            <include refid="columns"/>
+                      FROM WMS_ACTIVITY W
+                      <where>
+                          <include refid="query-where"/>
+                      </where>
+                      ORDER BY START_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_ACTIVITY W
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+    <select id="get" parameterType="long" resultMap="query-result">
+        SELECT
+        <include refid="columns"/>
+        FROM WMS_ACTIVITY
+        WHERE ID = #{id}
+    </select>
+</mapper>
