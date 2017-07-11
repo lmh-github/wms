@@ -67,8 +67,11 @@
     <script src="${ctx}/static/js/dwz.regional.zh.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/tooltip.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/xheditor/xheditor-1.2.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="${ctx}/dwr/util.js"></script>
+    <script type="text/javascript" src="${ctx}/dwr/engine.js"></script>
+    <script type="text/javascript" src="${ctx}/dwr/interface/messageService.js"></script>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 $(function () {
     DWZ.init("${ctx}/static/dwz.frag.xml", {
         loginUrl: "${ssoUrl}",	// 跳到SSO登录页面
@@ -140,7 +143,7 @@ window['downLoadEvent'] = function (e) {
 </script>
 </head>
 
-<body scroll="no">
+<body scroll="no" onload=" messageService.push(${user.id});dwr.engine.setActiveReverseAjax(true);dwr.engine.setNotifyServerOnPageUnload(true);;">
 	<div id="layout">
 		<div id="header">
 			<div class="headerNav">
@@ -244,8 +247,7 @@ for (Menu menu : menuGroups) {
 				</div>
 			</div>
 		</div>
-
-	</div>
+    </div>
 
 
 <div id="audioArea" style="display: none;"></div>
@@ -273,6 +275,19 @@ for (Menu menu : menuGroups) {
 </SCRIPT>
 <script type="text/javascript" src="${ctx}/static/layer/layer.js"></script>
 <script type="text/javascript">
+    function showMessage(msg){
+        //边缘弹出
+        var index = layer.open({
+            type: 1
+            ,title:false
+            ,offset: 'rb' //具体配置参考：offset参数项
+            ,content: '<div style="padding: 30px 80px;font-size: 16px;">'+msg+'</div>'
+            ,btnAlign: 'c' //按钮居中
+            ,shade: 0 //不显示遮罩
+        });
+        $('#layui-layer'+index).css({'margin-top':'-40px',"margin-left":'-10px'});
+    }
+
     $(function () {
         $.post("${ctx}/workorder/todo.do", function (data) {
             if (data.result) {

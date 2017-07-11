@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-    <form id="inputForm" enctype="multipart/form-data" action="${ctx}/activity/save.json?callbackType=closeCurrent&navTabId=tab_list.do" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
+    <form id="inputForm" enctype="multipart/form-data" action="${ctx}/activity/save.json?callbackType=closeCurrent&navTabId=tab_list.do" method="post" class="pageForm required-validate" onsubmit="notify();return iframeCallback(this, dialogAjaxDone);">
 
     <input type="hidden" name="id" value="${activity.id }"/>
     <div class="pageContent">
@@ -125,4 +125,11 @@
         </div>
     </div>
 </form>
+<script>
+    function notify() {
+        if(!$("input[name=id]").val()){
+            messageService.sendMessageAuto("您有新的活动通知请在“活动管理“查看");
+        }
+    }
 
+</script>
