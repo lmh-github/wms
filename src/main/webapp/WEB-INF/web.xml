@@ -157,7 +157,7 @@
         <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
         <init-param>
             <param-name>debug</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
         <init-param>
             <param-name>activeReverseAjaxEnabled</param-name>

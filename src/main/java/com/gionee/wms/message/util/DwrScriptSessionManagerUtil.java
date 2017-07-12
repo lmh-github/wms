@@ -1,5 +1,6 @@
 package com.gionee.wms.message.util;
 
+import com.gionee.wms.dto.ShiroUser;
 import com.gionee.wms.entity.User;
 import org.directwebremoting.Container;
 import org.directwebremoting.ServerContextFactory;
@@ -25,7 +26,7 @@ public class DwrScriptSessionManagerUtil extends DwrServlet {
 
             public void sessionCreated(ScriptSessionEvent ev) {
                 HttpSession session = WebContextFactory.get().getSession();
-                Long userId = ((User) session.getAttribute("user")).getId();
+                Long userId = ((ShiroUser) session.getAttribute("user")).getId();
                 System.out.println("ScriptSession is created!");
                 ev.getSession().setAttribute("userId", userId);
             }

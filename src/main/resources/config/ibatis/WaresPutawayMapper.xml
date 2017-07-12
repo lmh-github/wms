@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.WaresPutawayDao">
+
+
+    <resultMap id="query-result" type="com.gionee.wms.entity.WaresPutaway">
+        <id property="id" column="ID"/>
+        <result property="sponsor" column="SPONSOR"/>
+        <result property="platform" column="PLATFORM"/>
+        <result property="type" column="TYPE"/>
+        <result property="waresM" column="MODEL"/>
+        <result property="version" column="VERSION"/>
+        <result property="operationTime" column="OPERATION_TIME"/>
+        <result property="status" column="STATUS"/>
+        <result property="remarks" column="REMARKS" />
+    </resultMap>
+
+    <sql id="columns">
+        ID,
+        SPONSOR,
+        PLATFORM,
+        TYPE,
+        MODEL,
+        VERSION,
+        OPERATION_TIME,
+        STATUS,
+        REMARKS
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.WaresPutaway">
+        <selectKey resultType="long" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_WARES_PUTAWAY(
+        <include refid="columns"/>
+        )
+        VALUES (
+            #{id, jdbcType=NUMERIC},
+            #{sponsor, jdbcType=VARCHAR},
+            #{platform, jdbcType=VARCHAR},
+            #{type, jdbcType=VARCHAR},
+            #{waresM, jdbcType=VARCHAR},
+            #{version, jdbcType=VARCHAR},
+            #{operationTime, jdbcType=TIMESTAMP},
+            #{status, jdbcType=VARCHAR},
+            #{remarks, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE WMS_WARES_PUTAWAY
+        <set>
+            <if test="platform != null">PLATFORM = #{platform},</if>
+            <if test="type != null">TYPE = #{type},</if>
+            <if test="waresM != null">MODEL = #{waresM},</if>
+            <if test="version != null">VERSION = #{version},</if>
+            <if test="operationTime != null">OPERATION_TIME = #{operationTime},</if>
+            <if test="status != null">STATUS = #{status},</if>
+            <if test="remarks != null">REMARKS = #{remarks},</if>
+        </set>
+        WHERE
+        <if test="id !=null">
+            ID = #{id}
+        </if>
+    </update>
+
+    <sql id="query-where">
+        <if test="platform != null">AND PLATFORM = #{platform}</if>
+        <if test="waresM != null">AND MODEL = #{waresM}</if>
+        <if test="status != null">AND STATUS = #{status}</if>
+    </sql>
+
+    <select id="query" parameterType="map" resultMap="query-result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                            <include refid="columns"/>
+                      FROM WMS_WARES_PUTAWAY W
+                      <where>
+                          <include refid="query-where"/>
+                      </where>
+                      ORDER BY OPERATION_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_WARES_PUTAWAY W
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+    <select id="get" parameterType="long" resultMap="query-result">
+        SELECT
+        <include refid="columns"/>
+        FROM WMS_WARES_PUTAWAY
+        WHERE ID = #{id}
+    </select>
+</mapper>
