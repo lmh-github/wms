@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://getahead.org/dwr/dwr20.dtd">
+<!-- 通用dwr配置 -->
+<dwr>
+    <allow>
+        <!-- 从Spring中获取Java对象 -->
+        <create javascript="messageService" creator="new">
+            <param name="class" value="com.gionee.wms.message.service.impl.MessageServiceImpl" />
+        </create>
+
+    </allow>
+</dwr>
