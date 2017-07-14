@@ -27,7 +27,7 @@
                 </dl>
                 <dl>
                     <dt>开始日期：</dt>
-                    <dd><fmt:formatDate value="${activity.endTime }" pattern="yyyy-MM-dd HH:mm:ss"/></dd>
+                    <dd><fmt:formatDate value="${activity.startTime }" pattern="yyyy-MM-dd HH:mm:ss"/></dd>
                 </dl>
                 <dl>
                     <dt>结束日期：</dt>
