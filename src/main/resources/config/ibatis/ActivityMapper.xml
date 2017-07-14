@@ -66,8 +66,8 @@
         UPDATE WMS_ACTIVITY
         <set>
             <if test="platform != null">PLATFORM = #{platform},</if>
-            <if test="startTime != null">END_TIME = #{startTime},</if>
-            <if test="endTime != null">START_TIME = #{endTime},</if>
+            <if test="startTime != null">START_TIME = #{startTime},</if>
+            <if test="endTime != null">END_TIME = #{endTime},</if>
             <if test="area != null">AREA = #{area},</if>
             <if test="status != null">STATUS = #{status},</if>
             <if test="giving != null">GIVING = #{giving},</if>
