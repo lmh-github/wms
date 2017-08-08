@@ -1285,7 +1285,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
             if (order.getInvoiceEnabled() != null && order.getInvoiceEnabled().intValue() == 1 && order.getInvoiceAmount().doubleValue() > 0) { // 需要发票的时候
                 // header.setInvoice("N"); // 是否需要发票
-                header.setInvoice("Y"); // 是否需要发票
+                header.setInvoice("N"); // 是否需要发票
                 header.setInvoice_title("系统"); // 发票抬头
                 header.setInvoice_content("手机"); // 发票内容
                 header.setInvoice_type(com.gionee.wms.common.WmsConstants.InvoiceType.PLAIN.getName());

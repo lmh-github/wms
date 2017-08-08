@@ -35,19 +35,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SfexpressServiceResponse }
-     * 
-     */
-    public SfexpressServiceResponse createSfexpressServiceResponse() {
-        return new SfexpressServiceResponse();
-    }
-
-    /**
      * Create an instance of {@link SfexpressService }
      * 
      */
     public SfexpressService createSfexpressService() {
         return new SfexpressService();
+    }
+
+    /**
+     * Create an instance of {@link SfexpressServiceResponse }
+     * 
+     */
+    public SfexpressServiceResponse createSfexpressServiceResponse() {
+        return new SfexpressServiceResponse();
     }
 
     /**
