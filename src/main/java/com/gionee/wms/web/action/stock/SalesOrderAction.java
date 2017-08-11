@@ -32,10 +32,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.struts2.ServletActionContext;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.xml.sax.InputSource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -81,7 +87,9 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     @Autowired
     private SalesOrderMapService salesOrderMapService;
 
-    /** 页面相关属性 **/
+    /**
+     * 页面相关属性
+     **/
     private String orderCode;
     private String orderUser;
     private String consignee;
@@ -134,19 +142,31 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     private List<SalesOrderLog> salesOrderLogList;// 订单日志
     private String queryFrom;// menu:点击菜单查询；button:点击按钮查询
 
-    /** 订单推送到顺丰状态 */
+    private Map<String, Object> bspSourceMap;// 面单打印数据源
+
+
+    /**
+     * 订单推送到顺丰状态
+     */
     private Integer orderPushStatus;
-    /** 订单推送开始时间 */
+    /**
+     * 订单推送开始时间
+     */
     private Date orderPushTimeBegin;
-    /** 订单推送结束时间 */
+    /**
+     * 订单推送结束时间
+     */
     private Date orderPushTimeEnd;
 
     private Integer paymentType;// 支付类型(1:在线支付 2:货到付款)
     private String paymentName;// 支付方式名称
 
     private Map<String, Long> batchMap;
+    private String errorMsg = "";
 
-    /** 订单自动推送配置 */
+    /**
+     * 订单自动推送配置
+     */
     private SystemConfig config;
 
     public String execute() throws Exception {
@@ -243,6 +263,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 特殊功能，用于修改订单为已签收状态
+     *
      * @return
      * @throws Exception
      */
@@ -281,6 +302,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 打印订单
+     *
      * @return
      * @throws Exception
      */
@@ -422,6 +444,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 打印订单
+     *
      * @return
      * @throws Exception
      */
@@ -743,7 +766,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     /**
      * 打印预览运单
      */
-    public String previewShipping() {
+    public String previewShipping() throws Exception {
         Validate.notNull(id);
         order = salesOrderService.getSalesOrder(id);
         // 组装运单备注的商品详情，格式：SKU名称*数量
@@ -785,8 +808,15 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             model.put("j_city", "东莞市");
             model.put("j_county", "大岭山镇");
             model.put("j_address", "湖畔工业区金立工业园");
-            sfOrder(TemplateHelper.generate(model, "e-sf-create.ftl"));
+            String mailNo = sfOrder(TemplateHelper.generate(model, "e-sf-create.ftl"));
+
+            bspSourceMap = new HashMap<>();
+            bspSourceMap.put("sfCode", mailNo);
+            bspSourceMap.put("order", order);
         } catch (Exception e) {
+            if(e instanceof ServiceException){
+                errorMsg = e.getMessage();
+            }
             e.printStackTrace();
         }
 
@@ -795,6 +825,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 发送电子面单请求
+     *
      * @param xml
      * @return
      * @throws Exception
@@ -818,13 +849,36 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             IOUtils.closeQuietly(os);
         }
         InputStream in = conn.getInputStream();
+        String errorMsg = "系统异常";
         try {
             byte[] data = new byte[in.available()];
             in.read(data);
-            String reponseXml = new String(data, "utf8");
-
-            return "";
-
+            String responseXml = new String(data, "utf8");
+            StringReader read = new StringReader(responseXml);
+            InputSource source = new InputSource(read);
+            SAXBuilder sb = new SAXBuilder();
+            Document doc = sb.build(source);
+            Element root = doc.getRootElement();
+            List nodes = root.getChildren();
+            Element element;
+            for (Object node : nodes) {
+                //循环依次得到子元素
+                element = (Element) node;
+                if ("Body".equals(element.getName())) {
+                    for (Content content : element.getContent()) {
+                        Element childElement = (Element) content;
+                        for (Attribute attribute : childElement.getAttributes()) {
+                            if ("mailno".equals(attribute.getName())) {
+                                return attribute.getValue();
+                            }
+                        }
+                    }
+                }
+                if ("ERROR".equals(element.getName())) {
+                    errorMsg = element.getContent(0).getValue();
+                }
+            }
+            throw new ServiceException(errorMsg);
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -1088,6 +1142,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 进入订单状态统计页面
+     *
      * @return
      * @throws Exception
      */
@@ -1119,6 +1174,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 配置自动推送
+     *
      * @return
      * @throws Exception
      */
@@ -1129,6 +1185,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 库存校验
+     *
      * @return
      * @throws Exception
      */
@@ -1139,6 +1196,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 修改自动推送配置
+     *
      * @return
      * @throws Exception
      */
@@ -1150,6 +1208,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 订单手动推送到顺丰
+     *
      * @return String
      * @throws Exception
      */
@@ -1169,6 +1228,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 一键复制订单
+     *
      * @return
      * @throws Exception
      */
@@ -1185,6 +1245,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 查看串号
+     *
      * @return
      */
     public String queryImeis() {
