@@ -144,7 +144,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     private Map<String, Object> bspSourceMap;// 面单打印数据源
 
-
     /**
      * 订单推送到顺丰状态
      */
@@ -808,13 +807,11 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             model.put("j_city", "东莞市");
             model.put("j_county", "大岭山镇");
             model.put("j_address", "湖畔工业区金立工业园");
-            String mailNo = sfOrder(TemplateHelper.generate(model, "e-sf-create.ftl"));
-
             bspSourceMap = new HashMap<>();
-            bspSourceMap.put("sfCode", mailNo);
             bspSourceMap.put("order", order);
+            sfOrder(TemplateHelper.generate(model, "e-sf-create.ftl"));
         } catch (Exception e) {
-            if(e instanceof ServiceException){
+            if (e instanceof ServiceException) {
                 errorMsg = e.getMessage();
             }
             e.printStackTrace();
@@ -830,7 +827,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
      * @return
      * @throws Exception
      */
-    public String sfOrder(String xml) throws Exception {
+    public void sfOrder(String xml) throws Exception {
         String uri = "http://bsp-ois.sit.sf-express.com:9080/bsp-ois/sfexpressService";
         String checkWord = "j8DzkIFgmlomPt0aLuwU";
         URL url = new URL(uri);
@@ -849,7 +846,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             IOUtils.closeQuietly(os);
         }
         InputStream in = conn.getInputStream();
-        String errorMsg = "系统异常";
         try {
             byte[] data = new byte[in.available()];
             in.read(data);
@@ -869,16 +865,18 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
                         Element childElement = (Element) content;
                         for (Attribute attribute : childElement.getAttributes()) {
                             if ("mailno".equals(attribute.getName())) {
-                                return attribute.getValue();
+                                bspSourceMap.put("sfCode", attribute.getValue());
+                            }
+                            if ("destcode".equals(attribute.getName())) {
+                                bspSourceMap.put("destcode", attribute.getValue());
                             }
                         }
                     }
                 }
                 if ("ERROR".equals(element.getName())) {
-                    errorMsg = element.getContent(0).getValue();
+                    throw new ServiceException(element.getContent(0).getValue());
                 }
             }
-            throw new ServiceException(errorMsg);
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -1756,5 +1754,22 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     public void setOrderPushTimeEnd(Date orderPushTimeEnd) {
         this.orderPushTimeEnd = orderPushTimeEnd;
     }
+
+    public Map<String, Object> getBspSourceMap() {
+        return bspSourceMap;
+    }
+
+    public void setBspSourceMap(Map<String, Object> bspSourceMap) {
+        this.bspSourceMap = bspSourceMap;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
 
 }
