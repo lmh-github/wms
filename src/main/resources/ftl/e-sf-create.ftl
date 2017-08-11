@@ -1,61 +1,32 @@
-<Request service='OrderService' lang='zh-CN'>
-	<Head>BSPdevelop</Head>
-	<Body>
-	<Order
-					orderid='TE20150104'
-					j_company='罗湖火车站'
-					j_contact='小雷'
-					j_tel='13810744'
-					j_mobile='13111744'
-					j_province='广东省'
-					j_city='深圳'
-					j_county='福田区'
-					j_address='罗湖火车站东区调度室'
-					d_company='顺丰速运'
-					d_contact='小邱'
-					d_tel='15819050'
-					d_mobile='15539050'
-					d_address='北京市海淀区中关村'
-					express_type='1'
-					pay_method='1'
-					parcel_quantity='1'
-					cargo_length='33'
-					cargo_width='33'
-					cargo_height='33'
-					remark=''>
-		<Cargo
-						name='LV1'
-						count='3'
-						unit='a'
-						weight=''
-						amount=''
-						currency=''
-						source_area=''>
-		</Cargo>
-		<Cargo
-						name='LV2'
-						count='3'
-						unit='a'
-						weight=''
-						amount=''
-						currency=''
-						source_area=''>
-		</Cargo>
-		<AddedService
-						name='COD'
-						value='3000'
-						value1='0123456789'>
-		</AddedService>
-		<AddedService
-						name='INSURE'
-						value='2304.23'>
-		</AddedService>
-		<AddedService
-						name='URGENT'>
-		</AddedService>
-		<Extra
-						e1='abc'
-						e2='abc'/>
-	</Order>
-	</Body>
+<?xml version="1.0" encoding="utf-8"?>
+<Request service="OrderService" lang="zh-CN">
+    <Head>BSPdevelop</Head>
+    <Body>
+    <Order orderid="${order.orderCode!}"
+           is_gen_bill_no="1"
+           j_company="${j_company!}"
+           j_contact="${j_contact!}"
+           j_tel="400-779-6666"
+           j_mobile=""
+           j_province="${j_province!}"
+           j_city="${j_city!}"
+           j_county="${j_county!}"
+           j_address="${j_address!}"
+           d_company="{order.consignee?if_exists}"
+           d_contact="{order.consignee?if_exists}"
+           d_tel="${order.tel?if_exists}"
+           d_mobile="${order.mobile?if_exists}"
+           d_address="${order.fullAddress?if_exists}"
+           express_type="1"
+           pay_method="1"
+           parcel_quantity="1"
+           cargo_length="33"
+           cargo_width="33"
+           cargo_height="33"
+           remark="">
+        <Cargo name="LV1" count="3" unit="a" weight="" amount="" currency="" source_area=""></Cargo>
+        <Cargo name="LV2" count="3" unit="a" weight="" amount="" currency="" source_area=""></Cargo>
+        <AddedService name="COD" value="3000" value1="0123456789"></AddedService>
+    </Order>
+    </Body>
 </Request>
