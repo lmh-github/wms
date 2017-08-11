@@ -359,9 +359,10 @@ function doPrint(orderIdStr, type){
 	    		LODOP.SET_PRINTER_INDEXA('${printerPre}printSF');
     			LODOP.SET_PRINT_PAGESIZE(0,0,0,"SF");
         		LODOP.SET_SHOW_MODE("BKIMG_IN_PREVIEW",1);
+        		console.log("${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
         		LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
 	    		//LODOP.PREVIEW();
-	    		LODOP.PRINT();
+	    		//LODOP.PRINT();
     		}
     		if(shippingCode == 'yto')
     		{
