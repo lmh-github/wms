@@ -361,17 +361,15 @@ function doPrint(orderIdStr, type){
                 LODOP.SET_PRINT_PAGESIZE(1, "100mm", "150mm", "");
                 LODOP.SET_SHOW_MODE("90%", 1);
                 LODOP.SET_PRINT_MODE("PRINT_PAGE_PERCENT","Width:80.5%;Height:74.7%");
-                //LODOP.ADD_PRINT_URL(0, 0, "100%", "100%", "nsf.html");
-                //LODOP.ADD_PRINT_LINE("90mm", "0mm", "90mm", "100mm", 2, 1);
-        		//console.log("${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
         		$.get("${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i] + "&_" + new Date().getTime(), function (html) {
                     html = $.trim(html);
                     if(/^sfCode/.test(html)){
                         var matchs = html.match(/^sfCode(\d+)([\s\S]*)/);
+                        LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", matchs[2]);
                         LODOP.ADD_PRINT_BARCODE("18mm", "11mm", "63mm", "15mm", "128A", matchs[1]);
                         LODOP.ADD_PRINT_BARCODE("128mm", "45mm", "63mm", "15mm", "128A", matchs[1]);
-                        LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", matchs[2]);
                         LODOP.PRINT();
+                        //LODOP.PREVIEW();
 
                     }else {
                         alert(html);
