@@ -5,20 +5,25 @@
  */
 package com.gionee.wms.common;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +31,7 @@ import java.util.Map;
 
 /**
  * HTTP工具类
+ *
  * @author ZuoChangjun 2013-7-30
  */
 public class HttpClientUtil {
@@ -48,6 +54,7 @@ public class HttpClientUtil {
 
     /**
      * get方式请求
+     *
      * @param url
      * @return
      * @throws ClientProtocolException
@@ -74,11 +81,65 @@ public class HttpClientUtil {
             //client.getConnectionManager().shutdown();
         }
         return result;
+    }
 
+    public static HttpEntity httpGetByInputStream(String url) {
+        return httpGetByInputStream(url, 0);
+    }
+
+    private static HttpEntity httpGetByInputStream(String url, int executionCount) {
+        executionCount++;
+        if (executionCount > 10) {
+            throw new RuntimeException("系统异常");
+        }
+        HttpRequestRetryHandler handler = new HttpRequestRetryHandler() {
+            @Override
+            public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+                if (executionCount > 10) {
+                    return false;
+                }
+                System.out.println(executionCount);
+                if (exception instanceof UnknownHostException || exception instanceof ConnectTimeoutException
+                    || !(exception instanceof SSLException)) {
+                    return true;
+                }
+                HttpClientContext clientContext = HttpClientContext.adapt(context);
+                HttpRequest request = clientContext.getRequest();
+                // 如果请求被认为是幂等的，那么就重试。即重复执行不影响程序其他效果的
+                return !(request instanceof HttpEntityEnclosingRequest);
+            }
+        };
+
+        HttpClient client = HttpClientBuilder.create()
+            .setRetryHandler(handler)
+            .build();
+
+        HttpGet get = new HttpGet(url);
+        RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(5000)
+            .setSocketTimeout(5000)
+            .build();
+
+        get.setConfig(requestConfig);
+        HttpEntity result;
+        try {
+            HttpResponse res = client.execute(get);
+            if (res.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = res.getEntity();
+            } else {
+                Thread.sleep(1000 * 60);
+                return httpGetByInputStream(url, executionCount);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+
+        }
+        return result;
     }
 
     /**
      * post方式请求
+     *
      * @param url
      * @param jsonParams
      * @return

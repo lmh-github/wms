@@ -1,7 +1,6 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.*;
-import com.gionee.wms.common.Base64;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.dao.SalesOrderDao;
 import com.gionee.wms.dto.*;
@@ -17,6 +16,7 @@ import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
 import net.sf.json.xml.XMLSerializer;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.HttpGet;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,9 +136,8 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
                 // 异步下载保存发票文件，并且转换成图片文件存储
                 // 预计5分钟后才可以生成发票签章，需要延迟下载
-                //downFileAnd2Img(orderCode, contentResp.getPdfUrl());
-
-                return new ServiceCtrlMessage<>(true, null, contentResp);
+                downFileAnd2Img(orderCode, contentResp.getPdfUrl());
+                return new ServiceCtrlMessage<>(true, null, null);
             }
 
             invoiceInfo.setStatus(FAILURE.toString()); // 开票失败
@@ -157,6 +156,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             return new ServiceCtrlMessage(false, e.getMessage());
         }
     }
+
 
     /**
      * 月末最后一天处理
@@ -389,8 +389,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             @Override
             public void run() {
                 try {
-                    URL url = new URL(pdfUrl);
-                    URLConnection urlConnection = url.openConnection();
                     BufferedInputStream bufferedInputStream = null; // 用于IO复用
                     InputStream inputStream = null;
                     String pdf = orderCode + ".pdf";
@@ -398,7 +396,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
                     String img = orderCode + ".jpg";
                     FileOutputStream imgOutputStream = new FileOutputStream(new File(EInvoiceDir.IMG.getSavePath(img)));
                     try {
-                        inputStream = urlConnection.getInputStream();
+                        inputStream = HttpClientUtil.httpGetByInputStream(pdfUrl).getContent();
                         bufferedInputStream = new BufferedInputStream(inputStream);
                         bufferedInputStream.mark(Integer.MAX_VALUE); // 最大值，标记整个流可以复用
                         IOUtils.copy(bufferedInputStream, pdfOutputStream);
