@@ -807,6 +807,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             model.put("j_city", "东莞市");
             model.put("j_county", "大岭山镇");
             model.put("j_address", "湖畔工业区金立工业园");
+            model.put("orderGoods", orderGoods);
             bspSourceMap = new HashMap<>();
             bspSourceMap.put("order", order);
             sfOrder(TemplateHelper.generate(model, "e-sf-create.ftl"));
@@ -828,8 +829,9 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
      * @throws Exception
      */
     public void sfOrder(String xml) throws Exception {
-        String uri = "http://bsp-ois.sit.sf-express.com:9080/bsp-ois/sfexpressService";
-        String checkWord = "j8DzkIFgmlomPt0aLuwU";
+        System.out.println(xml);
+        String uri = "http://bsp-oisp.sf-express.com/bsp-oisp/sfexpressService";
+        String checkWord = "8epor8qSO19VcRdIwRPL0j7XnyuOPBgs";
         URL url = new URL(uri);
         String verifyCode = Util.md5EncryptAndBase64(xml + checkWord);
 
