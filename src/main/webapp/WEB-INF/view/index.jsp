@@ -22,7 +22,7 @@
     <link href="themes/css/ieHack.css" rel="stylesheet" type="text/css" media="screen"/>
     <![endif]-->
 
-    <script src="${ctx}/static/js/jquery-1.8.3.min.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery-1.11.1.min.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/jquery.cookie.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/jquery.validate.js" type="text/javascript"></script>
     <script src="${ctx}/static/js/jquery.bgiframe.js" type="text/javascript"></script>
@@ -306,5 +306,7 @@ for (Menu menu : menuGroups) {
         }, "JSON");
     });
 </script>
+    <script type="text/javascript" src="${ctx}/static/searchableSelect/jquery.searchableSelect.js"></script>
+    <link href="${ctx}/static/searchableSelect/jquery.searchableSelect.css" rel="stylesheet" type="text/css" media="screen"/>
 </body>
 </html>

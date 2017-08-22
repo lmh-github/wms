@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for sfexpressService complex type.
+ * <p>sfexpressService complex type的 Java 类。
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>以下模式片段指定包含在此类中的预期内容。
  * 
  * <pre>
  * &lt;complexType name="sfexpressService">
@@ -37,7 +37,7 @@ public class SfexpressService {
     protected String arg1;
 
     /**
-     * Gets the value of the arg0 property.
+     * 获取arg0属性的值。
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class SfexpressService {
     }
 
     /**
-     * Sets the value of the arg0 property.
+     * 设置arg0属性的值。
      * 
      * @param value
      *     allowed object is
@@ -61,7 +61,7 @@ public class SfexpressService {
     }
 
     /**
-     * Gets the value of the arg1 property.
+     * 获取arg1属性的值。
      * 
      * @return
      *     possible object is
@@ -73,7 +73,7 @@ public class SfexpressService {
     }
 
     /**
-     * Sets the value of the arg1 property.
+     * 设置arg1属性的值。
      * 
      * @param value
      *     allowed object is

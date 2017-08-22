@@ -83,11 +83,11 @@
 			</li>
           <li>
             <label>是否推送：</label>
-            <select name="orderPushStatus">
-                      <option value="" ${orderPushStatus == null ? "selected" : "" }>请选择</option>
-                      <option value="1" <s:property value="orderPushStatus == 1 ? 'selected' : ''"/>>是</option>
-                      <option value="0" <s:property value="orderPushStatus == 0 ? 'selected' : ''"/>>否</option>
-                    </select>
+              <select name="orderPushStatus">
+                  <option value="" ${orderPushStatus == null ? "selected" : "" }>请选择</option>
+                  <option value="1" <s:property value="orderPushStatus == 1 ? 'selected' : ''"/>>是</option>
+                  <option value="0" <s:property value="orderPushStatus == 0 ? 'selected' : ''"/>>否</option>
+              </select>
           </li>
 		</ul>
 		<div class="subBar">
@@ -95,7 +95,7 @@
 				<li><div class="buttonActive"><div class="buttonContent"><button id="but_submit" type="submit">检索</button></div></div></li>
 			</ul>
 		</div>
-		
+
 		<div class="panelBar">
 			<ul class="toolBar">
 				<s:iterator value="shippingSumList" id="shippingSum">
@@ -122,14 +122,6 @@
 			<li><a class="icon" onclick="ExecSfPrint()"><span>只打印购物清单拣货单</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" onclick="batchPrint('invoice')"><span>只打发票</span></a></li>
-			<!-- 
-			<li class="line">line</li>
-			<li><a class="edit" onclick="inputShipping()"><span>编辑配送信息</span></a></li>
-			 -->
-			 <!-- 
-			<li class="line">line</li>
-			<li><a class="edit" href="${ctx}/stock/salesOrder!setInvoiceStatus.action" target="selectedTodo" rel="orderIds" title="确定要设置吗？"><span>设置发票已出</span></a></li>
-			 -->
 		</ul>
 	</div>
 	<table class="list" width="100%" layoutH="169">
@@ -203,7 +195,7 @@
 			</select>
 			<span>条，共${page.totalRow}条</span>
 		</div>
-		
+
 		<div class="pagination" targetType="navTab" totalCount="${page.totalRow }" numPerPage="${page.pageSize }" pageNumShown="10" currentPage="${page.currentPage}"></div>
 
 	</div>
@@ -212,158 +204,145 @@
 <div id="audioArea" style="display: none">
 </div>
 
-<object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+<object  id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0>
        <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0></embed>
 </object>
 <script type="text/javascript">
-$(
-		function initAudio() {
-			var Sys = {};
-			var ua = navigator.userAgent.toLowerCase();
-			if (window.ActiveXObject)
-				Sys.ie = ua.match(/msie ([\d.]+)/)[1];
-			else if (document.getBoxObjectFor)
-				Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1];
-			else if (window.MessageEvent && !document.getBoxObjectFor)
-				Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1];
-			else if (window.opera)
-				Sys.opera = ua.match(/opera.([\d.]+)/)[1];
-			else if (window.openDatabase)
-				Sys.safari = ua.match(/version\/([\d.]+)/)[1];
-			if (Sys.chrome) {
-				$("#audioArea")
-						.html(
-								'<audio controls="controls" id="audio_error"><source src="${ctx}/static/audio/audio_error.wav"></audio>');
-			} else {
-				$("#audioArea")
-						.html(
-								'<EMBED id="audio_error" src="${ctx}/static/audio/audio_error.wav" align="center" border="0" width="1" height="1" autostart="false" loop="false"/>');
-			}
-		}
-);
+$(function initAudio() {
+    var Sys = {};
+    var ua = navigator.userAgent.toLowerCase();
+    if (window.ActiveXObject)
+        Sys.ie = ua.match(/msie ([\d.]+)/)[1];
+    else if (document.getBoxObjectFor)
+        Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1];
+    else if (window.MessageEvent && !document.getBoxObjectFor)
+        Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1];
+    else if (window.opera)
+        Sys.opera = ua.match(/opera.([\d.]+)/)[1];
+    else if (window.openDatabase)
+        Sys.safari = ua.match(/version\/([\d.]+)/)[1];
+    if (Sys.chrome) {
+        $("#audioArea")
+            .html(
+                '<audio controls="controls" id="audio_error"><source src="${ctx}/static/audio/audio_error.wav"></audio>');
+    } else {
+        $("#audioArea")
+            .html(
+                '<EMBED id="audio_error" src="${ctx}/static/audio/audio_error.wav" align="center" border="0" width="1" height="1" autostart="false" loop="false"/>');
+    }
+});
 
 //设置快递号，然后提交查询
-function filterShipping(shippingId, shippingCode){
-	$("#shipping_id").val(shippingId);
-	$("#shipping_code").val(shippingCode);
-	$("#but_submit").submit();
+function filterShipping(shippingId, shippingCode) {
+    $("#shipping_id").val(shippingId);
+    $("#shipping_code").val(shippingCode);
+    $("#but_submit").submit();
 }
 
 var idstr = '';
 //获取checkboc ids
-function getSelectedIds(){
-	//获取选择的orderIds值
-	var id_array=new Array();
-	$('input[name="orderIds"]:checked').each(function(){
-		id_array.push($(this).val());//向数组中添加元素
-	});
-	idstr=id_array.join(',');//将数组元素连接起来以构建一个字符串
+function getSelectedIds() {
+    //获取选择的orderIds值
+    var id_array = new Array();
+    $('input[name="orderIds"]:checked').each(function () {
+        id_array.push($(this).val());//向数组中添加元素
+    });
+    idstr = id_array.join(',');//将数组元素连接起来以构建一个字符串
 }
 
 //编辑配送信息
-function inputShipping(){
-	//获取选择的orderIds值
-	getSelectedIds();
-	if(idstr == '')
-	{
-		alertMsg.error('请选择订单！');
-		return;
-	}
-	var url = "${ctx}/stock/salesOrder!inputShippingInfo.action?ids="+idstr;
-	var options = '{target:selectedTodo,rel:orderIds,width:100px,height:100px,max:true,mask:true,mixable:true,minable:true,resizable:true,drawable:true,fresh:true,close:"function"}';
-	$.pdialog.open(url, 'dlg_input_shipping', '编辑配送信息', options);
+function inputShipping() {
+    //获取选择的orderIds值
+    getSelectedIds();
+    if (idstr == '') {
+        alertMsg.error('请选择订单！');
+        return;
+    }
+    var url = "${ctx}/stock/salesOrder!inputShippingInfo.action?ids=" + idstr;
+    var options = '{target:selectedTodo,rel:orderIds,width:100px,height:100px,max:true,mask:true,mixable:true,minable:true,resizable:true,drawable:true,fresh:true,close:"function"}';
+    $.pdialog.open(url, 'dlg_input_shipping', '编辑配送信息', options);
 }
 
 //打印所有
-function allPrint(){
-	getSelectedIds();
-	if(idstr == '')
-	{
-		alertMsg.error('请选择订单！');
-		return;
-	}
-	var shippingId = $("#shipping_id").val();
-	if(shippingId == '')
-	{
-		alertMsg.error('请首先过滤快递类型');
-		return;
-	}
-	
-	//创建拣货批次
-	var shippingId = $("#shipping_id").val();
-	var shippingCode = $("#shipping_code").val();
-	$.ajax({
-		url:'${ctx}/stock/salesOrder!addDeliveryBatch.action?ids='+idstr+'&shippingId='+shippingId,
-		dataType:'json',
-		type:'POST',
-		data:'',
-		timeout: 30000,
-		error:function()
-		{
-			alertMsg.info("请求失败或超时,请稍后再试！");
-		},
-		success:function(data)
-		{
-			if(shippingCode != 'zt'){
-				//打运单
-				doPrint(idstr, 'shipping');
-				//打发票
-				//doPrint(idstr, 'invoice');
-			}
-			//打拣货单
-			doPrint(idstr, 'picking');
-			//打购物清单
-			doPrint(idstr, 'shopping');
-			alertMsg.info('批次创建成功');
-			//清除物流信息
-			$("#shipping_id").val();
-			$("#shipping_code").val();
-			//刷新本页面
-			navTab.reload('${ctx}/stock/salesOrder!orderPrint.action', null);
-		}
-		
-	});
-	
+function allPrint() {
+    getSelectedIds();
+    if (idstr == '') {
+        alertMsg.error('请选择订单！');
+        return;
+    }
+    var shippingId = $("#shipping_id").val();
+    if (shippingId == '') {
+        alertMsg.error('请首先过滤快递类型');
+        return;
+    }
+
+    //创建拣货批次
+    var shippingId = $("#shipping_id").val();
+    var shippingCode = $("#shipping_code").val();
+    $.ajax({
+        url: '${ctx}/stock/salesOrder!addDeliveryBatch.action?ids=' + idstr + '&shippingId=' + shippingId,
+        dataType: 'json',
+        type: 'POST',
+        data: '',
+        timeout: 30000,
+        error: function () {
+            alertMsg.info("请求失败或超时,请稍后再试！");
+        },
+        success: function (data) {
+            if (shippingCode != 'zt') {
+                //打运单
+                doPrint(idstr, 'shipping');
+                //打发票
+                //doPrint(idstr, 'invoice');
+            }
+            //打拣货单
+            doPrint(idstr, 'picking');
+            //打购物清单
+            doPrint(idstr, 'shopping');
+            alertMsg.info('批次创建成功');
+            //清除物流信息
+            $("#shipping_id").val();
+            $("#shipping_code").val();
+            //刷新本页面
+            navTab.reload('${ctx}/stock/salesOrder!orderPrint.action', null);
+        }
+    });
 }
 
 //批打
-function batchPrint(type){
-	getSelectedIds();
-	if(idstr == '')
-	{
-		document.getElementById("audio_error").play();
-		alertMsg.error('请选择订单！');
-		return;
-	}
-	var shippingId = $("#shipping_id").val();
-	if(shippingId == '')
-	{
-		document.getElementById("audio_error").play();
-		alertMsg.error('请首先点击过滤快递类型');
-		return;
-	}
-	doPrint(idstr, type);
+function batchPrint(type) {
+    getSelectedIds();
+    if (idstr == '') {
+        document.getElementById("audio_error").play();
+        alertMsg.error('请选择订单！');
+        return;
+    }
+    var shippingId = $("#shipping_id").val();
+    if (shippingId == '') {
+        document.getElementById("audio_error").play();
+        alertMsg.error('请首先点击过滤快递类型');
+        return;
+    }
+    doPrint(idstr, type);
 }
 
-function doPrint(orderIdStr, type){
-    var urlArray = new Array();
+function doPrint(orderIdStr, type) {
     var idArray = orderIdStr.split(",");
-    if(type == 'shipping')
-    {
-    	for(i=0;i<idArray.length;i++){
-    		var shippingCode = $("#shipping_code").val();
-    		if(shippingCode == 'sf_express' || shippingCode == 'sf') // 包含东莞顺丰直发
-    		{
-	    		var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-	        	LODOP.PRINT_INIT("${printerPre}printSF");
-	    		LODOP.SET_PRINTER_INDEXA('${printerPre}printSF');
+    if (type == 'shipping') {
+        for (var i = 0; i < idArray.length; i++) {
+            var shippingCode = $("#shipping_code").val();
+            if (shippingCode == 'sf_express' || shippingCode == 'sf') // 包含东莞顺丰直发
+            {
+                var LODOP = getLodop(document.getElementById('LODOP_OB'), document.getElementById('LODOP_EM'));
+                LODOP.PRINT_INIT("${printerPre}printSF");
+                LODOP.SET_PRINTER_INDEXA('${printerPre}printSF');
 
                 LODOP.SET_PRINT_PAGESIZE(1, "100mm", "150mm", "");
                 LODOP.SET_SHOW_MODE("90%", 1);
-                LODOP.SET_PRINT_MODE("PRINT_PAGE_PERCENT","Width:80.5%;Height:74.7%");
-        		$.get("${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i] + "&_" + new Date().getTime(), function (html) {
+                LODOP.SET_PRINT_MODE("PRINT_PAGE_PERCENT", "Width:80.5%;Height:74.7%");
+                $.get("${urlPre}/stock/salesOrder!previewShipping.action?id=" + idArray[i] + "&_" + new Date().getTime(), function (html) {
                     html = $.trim(html);
-                    if(/^sfCode/.test(html)){
+                    if (/^sfCode/.test(html)) {
                         var matchs = html.match(/^sfCode(\d+)([\s\S]*)/);
                         LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", matchs[2]);
                         LODOP.ADD_PRINT_BARCODE("18mm", "11mm", "63mm", "15mm", "128A", matchs[1]);
@@ -371,123 +350,37 @@ function doPrint(orderIdStr, type){
                         LODOP.PRINT();
                         //LODOP.PREVIEW();
 
-                    }else {
+                    } else {
                         alert(html);
                         return;
                     }
                 });
-        		//LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
-	    		//LODOP.PREVIEW();
-	    		//LODOP.PRINT();
-    		}
-    		if(shippingCode == 'yto')
-    		{
-    			var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-	        	LODOP.PRINT_INIT("${printerPre}printYT");
-	    		LODOP.SET_PRINTER_INDEXA('${printerPre}printYT');
-    			LODOP.SET_PRINT_PAGESIZE(0,0,0,"YT");
-        		LODOP.SET_SHOW_MODE("BKIMG_IN_PREVIEW",1);
-        		LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
-	    		//LODOP.PREVIEW();
-	    		LODOP.PRINT();
-    		}
-    		if(shippingCode == 'ems')
-    		{
-    			var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-	        	LODOP.PRINT_INIT("${printerPre}printEMS");
-	    		LODOP.SET_PRINTER_INDEXA('${printerPre}printEMS');
-    			LODOP.SET_PRINT_PAGESIZE(0,0,0,"EMS");
-        		LODOP.SET_SHOW_MODE("BKIMG_IN_PREVIEW",1);
-        		LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
-	    		//LODOP.PREVIEW();
-	    		LODOP.PRINT();
-    		}
+                //LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShipping.action?id="+idArray[i]);
+                //LODOP.PREVIEW();
+                //LODOP.PRINT();
+            }
         }
     }
-    if(type == 'shopping')
-    {
-    	for(i=0;i<idArray.length;i++){
-    		var j = i+1;
-    		var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-        	LODOP.PRINT_INIT("printGW");
-        	LODOP.SET_PRINTER_INDEXA('printGW');
-    		LODOP.SET_PRINT_PAGESIZE(0,0,0,"GW");
-    		LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewShoppingList.action?id="+idArray[i]+"&rownum="+j);
-    		//LODOP.PREVIEW();
-    		LODOP.PRINT();
+    if (type == 'shopping') {
+        for (var i = 0; i < idArray.length; i++) {
+            var j = i + 1;
+            var LODOP = getLodop(document.getElementById('LODOP_OB'), document.getElementById('LODOP_EM'));
+            LODOP.PRINT_INIT("printGW");
+            LODOP.SET_PRINTER_INDEXA('printGW');
+            LODOP.SET_PRINT_PAGESIZE(0, 0, 0, "GW");
+            LODOP.ADD_PRINT_URL(0, 0, "100%", "100%", "${urlPre}/stock/salesOrder!previewShoppingList.action?id=" + idArray[i] + "&rownum=" + j);
+            //LODOP.PREVIEW();
+            LODOP.PRINT();
         }
     }
-    if(type == 'picking')
-    {
-    	var LODOP = getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-    	LODOP.PRINT_INIT("printJH");
-    	LODOP.SET_PRINTER_INDEXA('printJH');//18.8.0.250HP LaserJet 1020
-		LODOP.SET_PRINT_PAGESIZE(0,0,0,"JH");
-		LODOP.ADD_PRINT_URL(0,0,"100%","100%","${urlPre}/stock/salesOrder!previewPicking.action?ids="+idstr);
-		//LODOP.PREVIEW();
-		LODOP.PRINT();
-    }
-    
-    if(type == 'invoice')
-    {
-    	//调用后台接口打印发票
-    	/* $.ajax({
-			url:'${ctx}/stock/salesOrder!printInvoice.action?ids='+idstr,
-			dataType:'json',
-			type:'POST',
-			data:'',
-			timeout: 30000,
-			error:function()
-			{},
-			success:function(data)
-			{
-				//刷新本页面
-				//navTab.reload('${ctx}/stock/salesOrder!orderPrint.action', null);
-			}
-		}); */
-  		$.post("${ctx}/stock/salesOrder!getPrintInvoiceData.action", {ids: idstr}, function(data) {
-  			if (data.message) {
-  				return alertMsg.error(data.message);
-  			}
-  			var successOrder = [], successBatch = {};
-  			$.each(data, function() {
-  				try{
-      				var m_ObjSoapKp = document.getElementById("m_ObjSoapKp");
-      				m_ObjSoapKp.SoapAdd="http://127.0.0.1/wsdl/";
-      				//m_ObjSoapKp.SoapAdd="http://localhost:8081/P/data";
-      				m_ObjSoapKp.LoginTaxNo="<%=com.gionee.wms.common.WmsConstants.INVOICE_SELLER_NO%>";
-      				m_ObjSoapKp.LoginPass="<%=com.gionee.wms.common.WmsConstants.INVOICE_SELLER_PASSWORD%>";
-      				m_ObjSoapKp.DJID = this.ID;
-      				$.extend(m_ObjSoapKp, this);
-      				m_ObjSoapKp.MakeInvoice();
-      				
-      				if (m_ObjSoapKp.RetCode == '5011') { // 发票打印成功
-      					successOrder.push(this.orderId);
-      					if(this.batchCode != null && this.batchId != null) {
-      						successBatch[this.batchCode] = this.batchId;
-      					}
-      				}
-  				} catch(e) {
-  					alertMsg.error(e.message);
-  				}
-  			});
-  			
-  			var postData = {};
-  			$.each(successOrder, function(i, v) {
-  				postData['orderIds[' + i + ']'] = v;
-  			});
-  			$.each(successBatch, function(k, v) {
-  				postData["batchMap['" + k + "']"] = v;
-  			});
-  			if ($.isEmptyObject(postData)) {
-  				return;
-  			}
-  			$.post("${ctx}/stock/salesOrder!successInvoice.action", postData, function(data) {
-  				if (data.statusCode == 200) {
-  					alertMsg.correct(data.message);
-  				}
-  			}, "json");
-  		}, "json");
+    if (type == 'picking') {
+        var LODOP = getLodop(document.getElementById('LODOP_OB'), document.getElementById('LODOP_EM'));
+        LODOP.PRINT_INIT("printJH");
+        LODOP.SET_PRINTER_INDEXA('printJH');//18.8.0.250HP LaserJet 1020
+        LODOP.SET_PRINT_PAGESIZE(0, 0, 0, "JH");
+        LODOP.ADD_PRINT_URL(0, 0, "100%", "100%", "${urlPre}/stock/salesOrder!previewPicking.action?ids=" + idstr);
+        //LODOP.PREVIEW();
+        LODOP.PRINT();
     }
 }
 </script>

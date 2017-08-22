@@ -3,6 +3,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="s" uri="/struts-tags"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<c:set var="rand"><%= java.lang.Math.round(java.lang.Math.random() * 100000) %></c:set>
 <h2 class="contentTitle"></h2>
 <form action="<s:if test='id == null'>${ctx}/wares/sku!add.action?callbackType=closeCurrent&navTabId=tab_sku</s:if><s:else>${ctx}/wares/sku!update.action?callbackType=closeCurrent&navTabId=tab_sku</s:else>" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
 <input type="hidden" name="id" value="${id}"/>
@@ -10,10 +11,10 @@
 	<div class="pageFormContent" layoutH="97">
 		<fieldset>
 			<legend></legend>
-			<dl class="nowrap">
+			<dl class="nowrap" style="z-index: 999">
 				<dt>商品型号：</dt>
 				<dd>
-					<select class="required" name="wares.id" ${id==null?"":"disabled='disabled'" } onchange="$.pdialog.reload('${ctx}/wares/sku!input.action?selectEnabled=1&wares.id='+this.value+'&skuCode='+$('#skuCode').val()+'&skuName='+$('#skuName').val())">
+					<select class="required" name="wares.id" ${id==null?"style='visibility:hidden;height:28px;'":"disabled='disabled'" } id="model-select${rand}">
 						<option value="">请选择</option>
 						<c:forEach items="${waresList}" var="item">
 							<option value=${item.id } ${(item.id eq wares.id)?"selected='true'":""}>${item.waresName }</option>
@@ -176,6 +177,21 @@
 		  });
 		});
 	}); // END bind
+
+    setTimeout(function () {
+        var first = false;
+        var modelSelect = $("#model-select${rand}");
+        if (modelSelect.attr("disabled") == null) {
+            modelSelect.searchableSelect({
+                afterSelectItem: function () {
+                    if (first) {
+                        $.pdialog.reload('${ctx}/wares/sku!input.action?selectEnabled=1&wares.id=' + this.element.val() + '&skuCode=' + $('#skuCode').val() + '&skuName=' + $('#skuName').val());
+                    }
+                    first = !first;
+                }
+            });
+        }
+    });
 })();
 </script>
 </div>
