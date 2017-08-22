@@ -109,11 +109,11 @@
                 <td>${item.handledBy }</td>
                 <td>
                     <c:if test="${!(item.status=='2' || item.status=='5') && item.flowType !='待审核'}">
-                        <a title="确实要取消吗？" target="ajaxTodo" href="${ctx}/trans/cancel.do?transferId=${item.transferId}&navTabId=tab_transfer" class="btnDel"></a>
+                        <a title="确实要取消吗？" target="ajaxTodo" href="${ctx}/trans/cancel.do?transferId=${item.transferId}&navTabId=tab_trans_list" class="btnDel"></a>
                     </c:if>
                     <c:if test="${item.flowType =='待审核'}">
-                        <a title="审核通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=0&navTabId=tab_transfer" class="btnSelect"></a>
-                        <a title="审核不通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=1&navTabId=tab_transfer" class="btnDel"></a>
+                        <a title="审核通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=0&navTabId=tab_trans_list" class="btnSelect"></a>
+                        <a title="审核不通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=1&navTabId=tab_trans_list" class="btnDel"></a>
                     </c:if>
                 </td>
             </tr>

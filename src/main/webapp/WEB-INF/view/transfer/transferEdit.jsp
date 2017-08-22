@@ -5,7 +5,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 <h2 class="contentTitle"></h2>
-<form id="fm${rand}" action="${ctx}/trans/addAndEdit.do?callbackType=closeCurrent&navTabId=tab_transfer" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+<form id="fm${rand}" action="${ctx}/trans/addAndEdit.do?callbackType=closeCurrent&navTabId=tab_trans_list" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
     <input type="hidden" name="transferId" value="${transfer.transferId}"/>
     <input type="hidden" name="transType" value="0"/>
     <div class="pageContent">

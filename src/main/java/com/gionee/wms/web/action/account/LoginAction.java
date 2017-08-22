@@ -1,23 +1,5 @@
 package com.gionee.wms.web.action.account;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.struts2.ServletActionContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
-
 import com.gionee.wms.common.ActionUtils;
 import com.gionee.wms.common.ValidateCode;
 import com.gionee.wms.common.WmsConstants;
@@ -25,6 +7,22 @@ import com.gionee.wms.dto.Menu;
 import com.gionee.wms.dto.ShiroUser;
 import com.gionee.wms.service.account.AccountService;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.struts2.ServletActionContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @ClassName: LoginAction
@@ -131,32 +129,37 @@ public class LoginAction extends ActionSupport {
 	 * 递归生成菜单树
 	 */
 	private void generateTree(List<Menu> menuList) {
-		for (Menu menu : menuList) {
-			if (CollectionUtils.isNotEmpty(menu.getChild())) {
-				menuHtml.append("<li><a>" + menu.getName() + "</a>");
-				menuHtml.append("<ul>");
-				generateTree(menu.getChild());
-				menuHtml.append("</ul>");
-				menuHtml.append("</li>");
-			} else {
-				String actionFullName = StringUtils.substringAfterLast(menu.getPath(), "/");
-				String actionName = StringUtils.substringBefore(actionFullName, ".action");
-				if (actionName != null) {
-					if (actionName.indexOf("!") > -1) {
-						String methodName = actionName.substring(actionName.indexOf("!") + 1);
-						actionName = actionName.substring(0, actionName.indexOf("!"))+StringUtils.capitalize(methodName);
-//						actionName = actionName.substring(actionName.indexOf("!") + 1);
-					}
-					actionName = "tab_" + actionName;
-				} else {
-					actionName = "";
-				}
-				menuHtml.append("<li><a href=\"" + ActionUtils.getRequest().getContextPath() + menu.getPath()
-						+ "\" target=\"navTab\" rel=\"" + actionName + "\">" + menu.getName() + "</a></li>");
-			}
+        for (Menu menu : menuList) {
+            if (CollectionUtils.isNotEmpty(menu.getChild())) {
+                menuHtml.append("<li><a>" + menu.getName() + "</a>");
+                menuHtml.append("<ul>");
+                generateTree(menu.getChild());
+                menuHtml.append("</ul>");
+                menuHtml.append("</li>");
+            } else {
+                String actionName;
+                String path = menu.getPath();
+                if (path.indexOf(".do") > -1) {
+                    actionName = StringUtils.substringBefore(path, ".").replaceFirst("^/", "").replaceAll("/", "_");
+                } else {
+                    String actionFullName = StringUtils.substringAfterLast(path, "/");
+                    actionName = StringUtils.substringBefore(actionFullName, ".action");
+                }
+                if (actionName != null) {
+                    if (actionName.indexOf("!") > -1) {
+                        String methodName = actionName.substring(actionName.indexOf("!") + 1);
+                        actionName = actionName.substring(0, actionName.indexOf("!")) + StringUtils.capitalize(methodName);
+                        // actionName = actionName.substring(actionName.indexOf("!") + 1);
+                    }
+                    actionName = "tab_" + actionName;
+                } else {
+                    actionName = "";
+                }
+                menuHtml.append("<li><a href=\"" + ActionUtils.getRequest().getContextPath() + menu.getPath() + "\" target=\"navTab\" rel=\"" + actionName + "\">" + menu.getName() + "</a></li>");
+            }
 
-		}
-	}
+        }
+    }
 
 	public String getLoginName() {
 		return loginName;
