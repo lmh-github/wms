@@ -18,7 +18,8 @@
         SUGGEST,
         CREATE_TIME,
         ACCEPT_TIME,
-        LAST_TIME
+        LAST_TIME,
+        REMARKS
     </sql>
 
     <insert id="insert" parameterType="com.gionee.wms.entity.WorkOrder">
@@ -44,7 +45,8 @@
         #{suggest, jdbcType=VARCHAR},
         #{createTime, jdbcType=TIMESTAMP},
         #{acceptTime, jdbcType=TIMESTAMP},
-        #{lastTime, jdbcType=TIMESTAMP}
+        #{lastTime, jdbcType=TIMESTAMP},
+        #{remarks, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -61,7 +63,8 @@
             <if test="suggest != null">SUGGEST = #{suggest},</if>
             <if test="upTime != null">UP_TIME = #{upTime},</if>
             <if test="acceptTime != null">ACCEPT_TIME = #{acceptTime},</if>
-            <if test="lastTime != null">LAST_TIME = #{lastTime}</if>
+            <if test="lastTime != null">LAST_TIME = #{lastTime},</if>
+            <if test="remarks != null">remarks = #{remarks}</if>
         </set>
         WHERE
         <if test="id !=null">
@@ -108,13 +111,15 @@
         <result property="createTime" column="CREATE_TIME"/>
         <result property="acceptTime" column="ACCEPT_TIME"/>
         <result property="lastTime" column="LAST_TIME"/>
-        <collection property="attachmentList" column="WORK_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment" select="atta-select"/>
-<!--        <collection property="attachmentList" column="BILL_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment">
-            <id property="id" column="AID"/>
-            <result property="billCode" column="BILL_CODE"/>
-            <result property="fileName" column="FILE_NAME"/>
-            <result property="abstractPath" column="ABSTRACT_PATH"/>
-        </collection>-->
+        <result property="remarks" column="remarks"/>
+        <association property="salesOrder" resultMap="com.gionee.wms.dao.SalesOrderDao.work_order_left_join_result" />
+        <!--        <collection property="attachmentList" column="WORK_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment" select="atta-select"/>
+              <collection property="attachmentList" column="BILL_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment">
+                   <id property="id" column="AID"/>
+                   <result property="billCode" column="BILL_CODE"/>
+                   <result property="fileName" column="FILE_NAME"/>
+                   <result property="abstractPath" column="ABSTRACT_PATH"/>
+               </collection>-->
     </resultMap>
     
     <resultMap id="attachment-result" type="com.gionee.wms.entity.Attachment">
@@ -162,9 +167,33 @@
 
     <select id="get" parameterType="long" resultMap="query-result">
         SELECT
-        <include refid="columns"/>
-        FROM WMS_WORK_ORDER
-        WHERE ID = #{id}
+        w.ID,
+        w.WORK_CODE,
+        w.ORDER_CODE,
+        w.SPONSOR,
+        w.WORKER,
+        w.LV,
+        w.PLATFORM,
+        w.DESCRIPTION,
+        w.STATUS,
+        w.RESULT_MSG,
+        w.UPER,
+        w.UP_TIME,
+        w.SUGGEST,
+        w.CREATE_TIME,
+        w.ACCEPT_TIME,
+        w.LAST_TIME,
+        W.REMARKS,
+        s.ID left_order_id,
+        s.ORDER_USER left_order_user,
+        s.CONSIGNEE left_consignee,
+        s.MOBILE left_mobile,
+        g.ID goods_id,
+        g.sku_name goods_sku_name
+        FROM WMS_WORK_ORDER w
+        LEFT JOIN WMS_SALES_ORDER s ON w.ORDER_CODE = s.ORDER_CODE
+        LEFT  JOIN WMS_SALES_ORDER_GOODS g ON  s.ID = g.ORDER_ID
+        WHERE w.ID = #{id}
     </select>
 
     <resultMap id="export-result" type="map">

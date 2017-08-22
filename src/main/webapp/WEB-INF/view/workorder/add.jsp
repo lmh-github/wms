@@ -27,7 +27,7 @@
                     <dt>处理人：</dt>
                     <dd>
                         <input id="worker${rand}" class="required" name="worker" bringBackName="uc.userName" type="text" readonly="readonly" autocomplete="off"/>
-                        <a class="btnLook" href="${ctx}/uc/list.do" lookupGroup="uc" width="660" height="550">查找</a>
+                        <a class="btnLook" href="${ctx}/uc/list.do?switch=true" lookupGroup="uc" width="660" height="550">查找</a>
                     </dd>
                 </dl>
                 <dl>

@@ -22,6 +22,7 @@
 		<result  column="trans_type" property="transType" />
 		<result column="order_push_status" property="orderPushStatus"/>
 		<result column="order_confirm_status" property="orderConfirmStatus"/>
+		<result column="flow_type" property="flowType"/>
 		<!--goodsList属性是个集合类型-->
 		<collection property="goodsList" ofType="TransferGoods">
 			<id column="goods_id" property="id" />
@@ -213,7 +214,8 @@
                     t1.transfer_send    AS transferSend,
                     t1.transfer_invoice AS transferInvoice,
                     t1.order_amount     AS orderAmount,
-                    t2.warehouse_name   AS warehouseName
+                    t2.warehouse_name   AS warehouseName,
+                    t1.flow_type        AS flowType
                 FROM
                 wms_transfer t1
                 LEFT JOIN wms_warehouse t2 ON t1.warehouse_id = t2.id
@@ -326,6 +328,7 @@
         t1.transfer_invoice     AS transferInvoice,
         t1.order_amount         AS orderAmount,
         t1.trans_type           AS transType,
+        t1.flow_type            AS flowType,
         t2.warehouse_name       AS warehouseName,
         t3a.name                AS tSale,
         t3b.name                AS tSend,
@@ -425,10 +428,10 @@
 	<!-- 添加调拨单 -->
 	<insert id="addTransfer" parameterType="Transfer">
 		insert into wms_transfer(id, warehouse_id, transfer_to, remark, logistic_no,
-		create_time, handled_by, consignee, contact, po, logistic_name, transfer_sale, transfer_send, transfer_invoice, order_amount, trans_type)
+		create_time, handled_by, consignee, contact, po, logistic_name, transfer_sale, transfer_send, transfer_invoice, order_amount, trans_type, flow_type)
 		values(#{transferId}, #{warehouseId, jdbcType=VARCHAR}, #{transferTo, jdbcType=VARCHAR},
 		#{remark, jdbcType=VARCHAR}, #{logisticNo, jdbcType=VARCHAR}, sysdate, #{handledBy, jdbcType=VARCHAR}, #{consignee, jdbcType=VARCHAR}, #{contact, jdbcType=VARCHAR}, #{po, jdbcType=VARCHAR}, #{logisticName, jdbcType=VARCHAR},
-		#{transferSale}, #{transferSend}, #{transferInvoice}, #{orderAmount}, #{transType, jdbcType=VARCHAR})
+		#{transferSale}, #{transferSend}, #{transferInvoice}, #{orderAmount}, #{transType, jdbcType=VARCHAR} ,#{flowType, jdbcType=VARCHAR})
 	</insert>
 	
 	<!-- 添加调货单(顺丰) -->
@@ -460,18 +463,19 @@
 	<update id="updateTransfer" parameterType="Transfer">
 		update wms_transfer
 		<set>
-			warehouse_id=#{warehouseId, jdbcType=VARCHAR},
-			transfer_to=#{transferTo, jdbcType=VARCHAR},
-			remark=#{remark, jdbcType=VARCHAR},
-			consignee=#{consignee, jdbcType=VARCHAR},
-			contact=#{contact, jdbcType=VARCHAR},
-			po=#{po, jdbcType=VARCHAR},
-			logistic_name=#{logisticName, jdbcType=VARCHAR},
-			transfer_sale=#{transferSale, jdbcType=VARCHAR},
-			transfer_send=#{transferSend, jdbcType=VARCHAR},
-			transfer_invoice=#{transferInvoice, jdbcType=VARCHAR},
-			order_amount=#{orderAmount, jdbcType=INTEGER},
-			trans_type=#{transType, jdbcType=VARCHAR},
+            <if test="flowType!=null">warehouse_id=#{warehouseId, jdbcType=VARCHAR},</if>
+            <if test="transferTo!=null">transfer_to=#{transferTo, jdbcType=VARCHAR},</if>
+            <if test="remark!=null">remark=#{remark, jdbcType=VARCHAR},</if>
+            <if test="consignee!=null">consignee=#{consignee, jdbcType=VARCHAR},</if>
+            <if test="contact!=null">contact=#{contact, jdbcType=VARCHAR},</if>
+            <if test="po!=null">po=#{po, jdbcType=VARCHAR},</if>
+            <if test="logisticName!=null">logistic_name=#{logisticName, jdbcType=VARCHAR},</if>
+            <if test="transferSale!=null">transfer_sale=#{transferSale, jdbcType=VARCHAR},</if>
+            <if test="transferSend!=null">transfer_send=#{transferSend, jdbcType=VARCHAR},</if>
+            <if test="transferInvoice!=null">transfer_invoice=#{transferInvoice, jdbcType=VARCHAR},</if>
+            <if test="orderAmount!=null">order_amount=#{orderAmount, jdbcType=INTEGER},</if>
+            <if test="transType!=null">trans_type=#{transType, jdbcType=VARCHAR},</if>
+            <if test="flowType!=null">flow_type=#{flowType, jdbcType=VARCHAR},</if>
 			<if test="shippingTime!=null">shipping_time=#{shippingTime},</if>
 			<if test="status!=null">status=#{status, jdbcType=VARCHAR},</if>
 			<if test="logisticNo!=null">logistic_no=#{logisticNo, jdbcType=VARCHAR},</if>

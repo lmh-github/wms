@@ -30,6 +30,7 @@ public class Transfer {
 	private Integer transType;
 	private String orderPushStatus;
 	private String orderConfirmStatus;
+	private String flowType;
 	// 导出添加属性
 	private Integer quantity;
 	public Long getTransferId() {
@@ -188,6 +189,13 @@ public class Transfer {
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
-	
-	
+
+
+    public String getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(String flowType) {
+        this.flowType = flowType;
+    }
 }

@@ -74,6 +74,11 @@
                         <if test="account != null">UC_ACCOUNT = #{account}</if>
                         <if test="userName != null">AND USER_NAME = #{userName}</if>
                         <if test="status != null">AND STATUS = #{status}</if>
+                        <if test="group != null">AND UC_ACCOUNT IN
+                            <foreach collection="group" open="(" close=")" separator="," item="account">
+                                #{account}
+                            </foreach>
+                        </if>
                     </where>
                     ORDER BY CREATE_TIME DESC
                     ) T
@@ -90,6 +95,11 @@
             <if test="account != null">UC_ACCOUNT = #{account}</if>
             <if test="userName != null">AND USER_NAME = #{userName}</if>
             <if test="status != null">AND STATUS = #{status}</if>
+            <if test="group != null">AND UC_ACCOUNT IN
+                <foreach collection="group" open="(" close=")" separator="," item="account">
+                    #{account}
+                </foreach>
+            </if>
         </where>
     </select>
 

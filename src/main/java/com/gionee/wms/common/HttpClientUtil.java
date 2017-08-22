@@ -83,11 +83,11 @@ public class HttpClientUtil {
         return result;
     }
 
-    public static HttpEntity httpGetByInputStream(String url) {
-        return httpGetByInputStream(url, 0);
+    public static HttpEntity httpRetryGet(String url) {
+        return httpRetryGet(url, 0);
     }
 
-    private static HttpEntity httpGetByInputStream(String url, int executionCount) {
+    private static HttpEntity httpRetryGet(String url, int executionCount) {
         executionCount++;
         if (executionCount > 10) {
             throw new RuntimeException("系统异常");
@@ -109,16 +109,9 @@ public class HttpClientUtil {
                 return !(request instanceof HttpEntityEnclosingRequest);
             }
         };
-
-        HttpClient client = HttpClientBuilder.create()
-            .setRetryHandler(handler)
-            .build();
-
         HttpGet get = new HttpGet(url);
-        RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectTimeout(5000)
-            .setSocketTimeout(5000)
-            .build();
+        HttpClient client = HttpClientBuilder.create().setRetryHandler(handler).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(5000).build();
 
         get.setConfig(requestConfig);
         HttpEntity result;
@@ -128,7 +121,7 @@ public class HttpClientUtil {
                 result = res.getEntity();
             } else {
                 Thread.sleep(1000 * 60);
-                return httpGetByInputStream(url, executionCount);
+                return httpRetryGet(url, executionCount);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -141,7 +134,7 @@ public class HttpClientUtil {
      * post方式请求
      *
      * @param url
-     * @param jsonParams
+     * @param params
      * @return
      * @throws ClientProtocolException
      * @throws IOException

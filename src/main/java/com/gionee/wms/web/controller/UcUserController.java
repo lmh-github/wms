@@ -31,6 +31,12 @@ public class UcUserController {
 
     @RequestMapping("list.do")
     public String list(ModelMap modelMap, QueryMap queryMap, Page page) {
+        Object switchGroup = queryMap.getMap().get("switch");
+        if (switchGroup != null && "true".equals(switchGroup)) {
+            // 快速查询常用用户
+            queryMap.put("group", "gongbinbin,rongkuang,huangfengmei".split(","));
+        }
+
         int total = ucUserService.queryCount(queryMap.getMap());
         page.setTotalRow(total);
         page.calculate();

@@ -63,6 +63,17 @@
 		</collection>
 	</resultMap>
 
+    <resultMap id="work_order_left_join_result" type="com.gionee.wms.vo.SalesOrderVo">
+        <id column="left_order_id" property="id" />
+        <result column="left_order_user" property="orderUser" />
+        <result column="left_consignee" property="consignee" />
+        <result column="left_mobile" property="mobile" />
+        <collection property="goodsList" ofType="SalesOrderGoods">
+            <id column="goods_id" property="id" />
+            <result column="goods_sku_name" property="skuName" />
+        </collection>
+    </resultMap>
+
 	<sql id="sql_orderColumns">
 		t1.id as id,
 		t1.order_code as orderCode,

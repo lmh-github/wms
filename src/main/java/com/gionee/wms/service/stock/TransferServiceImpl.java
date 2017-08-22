@@ -334,6 +334,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     public void addTransfer(Transfer transfer) {
         // TODO Auto-generated method stub
         transfer.setTransferId(Long.valueOf(getBizCode(TRANSFER)));
+        transfer.setFlowType("待审核");
         transferDao.addTransfer(transfer);
     }
 

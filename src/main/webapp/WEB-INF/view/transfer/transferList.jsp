@@ -87,6 +87,7 @@
             <th>收货地址</th>
             <th>物流单号</th>
             <th>调货状态</th>
+            <th>审核状态</th>
             <th>备注</th>
             <th>创建时间</th>
             <th>操作人</th>
@@ -102,12 +103,17 @@
                 <td>${item.transferTo }</td>
                 <td>${item.logisticNo }</td>
                 <td><s:property value="#TransferStatus.{?#this.code==#attr.item.status}[0].name"/></td>
+                <td>${item.flowType }</td>
                 <td>${item.remark }</td>
                 <td><fmt:formatDate value="${item.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                 <td>${item.handledBy }</td>
                 <td>
-                    <c:if test="${!(item.status=='2' || item.status=='5')}">
+                    <c:if test="${!(item.status=='2' || item.status=='5') && item.flowType !='待审核'}">
                         <a title="确实要取消吗？" target="ajaxTodo" href="${ctx}/trans/cancel.do?transferId=${item.transferId}&navTabId=tab_transfer" class="btnDel"></a>
+                    </c:if>
+                    <c:if test="${item.flowType =='待审核'}">
+                        <a title="审核通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=0&navTabId=tab_transfer" class="btnSelect"></a>
+                        <a title="审核不通过?" target="ajaxTodo" href="${ctx}/trans/complete.do?transferId=${item.transferId}&flowType=1&navTabId=tab_transfer" class="btnDel"></a>
                     </c:if>
                 </td>
             </tr>

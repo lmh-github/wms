@@ -88,7 +88,7 @@
                     <li>
                         <div class="buttonActive">
                             <div class="buttonContent">
-                                <button type="submit">检索</button>
+                                <button id="work_order_submit" type="submit">检索</button>
                             </div>
                         </div>
                     </li>
@@ -110,23 +110,23 @@
             </li>
             <li class="line">line</li>
             <li>
-                <a class="add" target="ajaxTodo" title="确定接收此工单吗？" href="${ctx}/workorder/accept.do?id={sid_workorder}" mask="true"><span>接收工单</span></a>
+                <a class="add" onclick="filterWorkOrder('待处理')"><span>待领取(${countMap.get("receive")})</span></a>
             </li>
             <li class="line">line</li>
             <li>
-                <a class="add" href="${ctx}/workorder/to.do?to=file_workorder&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="350"><span>上传附件</span></a>
+                <a class="add" onclick="filterWorkOrder('跟进中')"><span>跟进中(${countMap.get("flowUp")})</span></a>
             </li>
             <li class="line">line</li>
             <li>
-                <a class="add" href="${ctx}/workorder/to.do?to=up_workorder&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>升级处理</span></a>
+                <a class="add" onclick="filterWorkOrder('已完成')"><span>已完成(${countMap.get("finish")})</span></a>
             </li>
             <li class="line">line</li>
             <li>
-                <a class="add" href="${ctx}/workorder/to.do?to=finish_workorder&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>完成处理</span></a>
+                <a class="add" onclick="filterWorkOrder('已作废')"><span>已作废(${countMap.get("cancel")})</span></a>
             </li>
             <li class="line">line</li>
             <li>
-                <a class="add" href="${ctx}/workorder/to.do?to=cancel_workorder&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>作废处理</span></a>
+                <a class="add" onclick="filterWorkOrder('全部工单')"><span>全部工单</span></a>
             </li>
         </ul>
     </div>
@@ -138,16 +138,12 @@
             <th>所属平台</th>
             <th>订单号</th>
             <th>问题明细</th>
-            <th>附件</th>
-            <th>处理人</th>
             <th>处理状态</th>
             <th>处理结果</th>
-            <th>处理升级</th>
-            <th>升级时间</th>
-            <th>升级处理建议</th>
-            <th>创建时间</th>
-            <th>接收时间</th>
-            <th>最后处理时间</th>
+            <th>耗时</th>
+            <th>处理人</th>
+            <th>升级处理人</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -166,14 +162,6 @@
                 <td align="center"><s:property value="orderCode"/></td>
                 <td align="center"><s:property value="description"/></td>
                 <td align="center">
-                    <s:if test="attachmentList != null">
-                        <s:iterator value="attachmentList">
-                            <div><a href="javascript:;" onclick="downWorkorder(${id})"><s:property value="fileName"/></a></div>
-                        </s:iterator>
-                    </s:if>
-                </td>
-                <td align="center"><s:property value="worker"/></td>
-                <td align="center">
                     <s:if test="status == '已完成'">
                         <span style="background:green;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
                     </s:if>
@@ -188,12 +176,25 @@
                     </s:else>
                 </td>
                 <td align="center"><s:property value="resultMsg"/></td>
+
+                <td align="center">
+                    <c:if test="${lastTime != null}">
+                        <c:set var="interval" value="${lastTime.time - createTime.time}"/>
+                        <fmt:formatNumber value="${interval/1000/60/60}" pattern="#0.00h"/>
+                    </c:if>
+                </td>
+                <td align="center"><s:property value="worker"/></td>
                 <td align="center"><s:property value="uper"/></td>
-                <td align="center"><fmt:formatDate value="${upTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
-                <td align="center"><s:property value="suggest"/></td>
-                <td align="center"><fmt:formatDate value="${createTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
-                <td align="center"><fmt:formatDate value="${acceptTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
-                <td align="center"><fmt:formatDate value="${lastTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
+
+                <td align="center">
+                    <s:if test="#attr.status != '待处理'">
+                    <a class="add" href="${ctx}/workorder/to.do?to=look&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>查看</span></a>
+                    </s:if>
+                    <s:if test="#attr.status == '待处理'">
+                         <a class="add" target="ajaxTodo" title="确定接收此工单吗？" href="${ctx}/workorder/accept.do?id={sid_workorder}" mask="true"><span>处理</span></a>
+                    </s:if>
+                </td>
+
             </tr>
         </s:iterator>
         </tbody>
@@ -231,9 +232,35 @@
 </script>
 <script type="text/javascript">
     (function () {
+
+
+
         $("#export${rand}").click(function () {
             var params = $("#fm${rand}").serialize();
             $('<iframe style="display:none" src="${ctx}/workorder/export.do?' + params + '&_r=' + (new Date().getTime()) + '" onload="downLoadEvent(this)" />').appendTo("body");
         });
     })();
+
+    var currentUser = "${currentUser}";
+
+
+    function filterWorkOrder(status){
+
+        $("select[name='status']").val("");
+
+        $("input[name='worker']").val("");
+
+        $("select[name='status']").val(status);
+
+        if(status !== '已作废' && status !== '全部工单'){
+
+             $("input[name='worker']").val(currentUser);
+
+        }
+
+        $("#work_order_submit").submit();
+
+
+
+    }
 </script>

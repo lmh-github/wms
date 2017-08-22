@@ -1,5 +1,6 @@
 package com.gionee.wms.entity;
 
+import com.gionee.wms.vo.SalesOrderVo;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
@@ -27,7 +28,9 @@ public class WorkOrder {
     private Date   createTime;
     private Date   acceptTime;
     private Date   lastTime;
+    private SalesOrderVo salesOrder;
     private List<Attachment> attachmentList;
+    private String remarks;
 
     public Long getId() {
         return id;
@@ -168,5 +171,21 @@ public class WorkOrder {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("id", id).append("workCode", workCode).append("orderCode", orderCode).append("sponsor", sponsor).append("worker", worker).append("lv", lv).append("platform", platform).append("description", description).append("status", status).append("resultMsg", resultMsg).append("uper", uper).append("upTime", upTime).append("suggest", suggest).append("createTime", createTime).append("acceptTime", acceptTime).append("lastTime", lastTime).append("attachmentList", attachmentList).toString();
+    }
+
+    public SalesOrderVo getSalesOrder() {
+        return salesOrder;
+    }
+
+    public void setSalesOrder(SalesOrderVo salesOrder) {
+        this.salesOrder = salesOrder;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

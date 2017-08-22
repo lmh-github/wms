@@ -52,6 +52,7 @@ public class TransferController {
 
     /**
      * 列表查询
+     *
      * @param modelMap
      * @param queryMap
      * @param page
@@ -73,6 +74,7 @@ public class TransferController {
 
     /**
      * 导出
+     *
      * @param queryMap
      * @return
      */
@@ -106,6 +108,7 @@ public class TransferController {
 
     /**
      * 取消
+     *
      * @param queryMap
      * @param transferId
      * @return
@@ -122,8 +125,24 @@ public class TransferController {
         }
     }
 
+    @RequestMapping("/complete.do")
+    @ResponseBody
+    public Object complete(QueryMap queryMap, Long transferId, int flowType) {
+        try {
+            Transfer transfer = new Transfer();
+            transfer.setTransferId(transferId);
+            transfer.setFlowType(flowType == 0 ? "通过" : "不通过");
+            transferService.updateTransfer(transfer);
+            return DwzMessage.success("审核成功！", queryMap);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return DwzMessage.error("审核成功出现异常！", queryMap);
+        }
+    }
+
     /**
      * 添加跳转
+     *
      * @param modelMap   modelMap
      * @param transferId
      * @return
@@ -147,6 +166,7 @@ public class TransferController {
 
     /**
      * 添加或者修改
+     *
      * @param queryMap
      * @param transfer
      * @return
@@ -162,6 +182,10 @@ public class TransferController {
                 transferService.addTransfer(transfer);
                 return DwzMessage.success("添加成功！", queryMap);
             } else {
+                // 状态校验
+                if (!"已审核".equals(transferService.getTransferById(transfer.getTransferId()).getFlowType())) {
+                    return DwzMessage.error("财务审核后方可正常流转！", queryMap);
+                }
                 transferService.updateTransfer(transfer);
                 return DwzMessage.success("修改成功！", queryMap);
             }
@@ -173,6 +197,7 @@ public class TransferController {
 
     /**
      * 选择商品跳转
+     *
      * @param transferId
      * @return
      */
@@ -184,6 +209,7 @@ public class TransferController {
 
     /**
      * 添加调拨商品
+     *
      * @param queryMap
      * @param transferId
      * @param goods
@@ -204,6 +230,7 @@ public class TransferController {
 
     /**
      * 删除调拨商品
+     *
      * @param queryMap
      * @param goodsId
      * @return
@@ -222,6 +249,7 @@ public class TransferController {
 
     /**
      * 删除调拨单
+     *
      * @param queryMap
      * @param transferId
      * @return
@@ -244,6 +272,7 @@ public class TransferController {
 
     /**
      * 配货跳转
+     *
      * @param modelMap   modelMap
      * @param transferId 调货单ID
      * @return
@@ -276,6 +305,7 @@ public class TransferController {
 
     /**
      * 扫描配货
+     *
      * @param sv         SKU|IMEI
      * @param num        数量
      * @param transferId 调拨单ID
@@ -305,6 +335,7 @@ public class TransferController {
 
     /**
      * 完成配货，提交运单号，准备出库
+     *
      * @param transferId 调拨单
      * @param logisticNo 运单号
      * @return
@@ -322,6 +353,7 @@ public class TransferController {
 
     /**
      * 加载信息
+     *
      * @param modelMap
      * @param transferId
      */

@@ -16,7 +16,6 @@ import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
 import net.sf.json.xml.XMLSerializer;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpGet;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -396,7 +393,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
                     String img = orderCode + ".jpg";
                     FileOutputStream imgOutputStream = new FileOutputStream(new File(EInvoiceDir.IMG.getSavePath(img)));
                     try {
-                        inputStream = HttpClientUtil.httpGetByInputStream(pdfUrl).getContent();
+                        inputStream = HttpClientUtil.httpRetryGet(pdfUrl).getContent();
                         bufferedInputStream = new BufferedInputStream(inputStream);
                         bufferedInputStream.mark(Integer.MAX_VALUE); // 最大值，标记整个流可以复用
                         IOUtils.copy(bufferedInputStream, pdfOutputStream);

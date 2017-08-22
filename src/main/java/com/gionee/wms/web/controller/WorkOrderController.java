@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,10 +64,48 @@ public class WorkOrderController {
             list = workOrderService.query(queryMap.getMap());
         }
 
+        QueryMap countQueryMap = new QueryMap();
+        Page tmpPage = new Page();
+        tmpPage.setPageSize(9999);
+        tmpPage.setCurrentPage(1);
+        tmpPage.setTotalRow(workOrderService.queryCount(countQueryMap.getMap()));
+        tmpPage.calculate();
+        countQueryMap.put("page", tmpPage);
+        List<WorkOrder> workOrders = workOrderService.query(countQueryMap.getMap());
+        Map<String, Integer> countMap = initCountMap(workOrders);
+
         modelMap.addAllAttributes(queryMap.getMap());
         modelMap.addAttribute("list", list);
         modelMap.addAttribute("page", page);
+        modelMap.addAttribute("countMap", countMap);
+        modelMap.addAttribute("currentUser", getCurrentUser().getUserName());
         return "workorder/list";
+    }
+
+    private Map<String, Integer> initCountMap(List<WorkOrder> workOrders) {
+        Map<String, Integer> countMap = new HashMap<>();
+        countMap.put("receive", 0);
+        countMap.put("flowUp", 0);
+        countMap.put("finish", 0);
+        countMap.put("cancel", 0);
+        if (!CollectionUtils.isEmpty(workOrders)) {
+            String currentUserName = getCurrentUser().getUserName();
+            for (WorkOrder workOrder : workOrders) {
+                if ("待处理".equals(workOrder.getStatus()) && currentUserName.equals(workOrder.getWorker())) {
+                    countMap.put("receive", countMap.get("receive") + 1);
+                }
+                if ("跟进中".equals(workOrder.getStatus()) && currentUserName.equals(workOrder.getWorker())) {
+                    countMap.put("flowUp", countMap.get("flowUp") + 1);
+                }
+                if ("已完成".equals(workOrder.getStatus()) && currentUserName.equals(workOrder.getWorker())) {
+                    countMap.put("finish", countMap.get("finish") + 1);
+                }
+                if ("已作废".equals(workOrder.getStatus())) {
+                    countMap.put("cancel", countMap.get("cancel") + 1);
+                }
+            }
+        }
+        return countMap;
     }
 
     /**
@@ -86,7 +125,7 @@ public class WorkOrderController {
     @ResponseBody
     public Object save(QueryMap queryMap, WorkOrder workOrder) {
         try {
-            UcUser ucUser = ucUserService.get(ActionUtils.getLoginName(), null);
+            UcUser ucUser = getCurrentUser();
             workOrder.setSponsor(ucUser.getUserName());
             ServiceCtrlMessage message = workOrderService.save(workOrder);
             return message.isResult() ? DwzMessage.success("", queryMap) : DwzMessage.error(message.getMessage(), queryMap);
@@ -94,6 +133,10 @@ public class WorkOrderController {
             logger.error(e.getMessage(), e);
             return DwzMessage.error("程序异常：【 " + e.getMessage() + "】", queryMap);
         }
+    }
+
+    private UcUser getCurrentUser() {
+        return ucUserService.get(ActionUtils.getLoginName(), null);
     }
 
     /**
@@ -187,7 +230,7 @@ public class WorkOrderController {
     @ResponseBody
     public Object queryToDo(QueryMap queryMap) {
         try {
-            UcUser ucUser = ucUserService.get(ActionUtils.getLoginName(), null);
+            UcUser ucUser = getCurrentUser();
 
             queryMap.put("worker", ucUser.getUserName());
             queryMap.put("uper", ucUser.getUserName());
