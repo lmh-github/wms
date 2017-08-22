@@ -1,5 +1,6 @@
 package com.gionee.wms.service.stock;
 
+import com.gionee.wms.common.ActionUtils;
 import com.gionee.wms.common.WmsConstants.OrderSourceGionee;
 import com.gionee.wms.dao.SalesOrderDao;
 import com.gionee.wms.dao.UcUserDao;
@@ -30,6 +31,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Service
 public class WorkOrderServiceImpl implements WorkOrderService {
 
+    private static final String SEPARATOR = "^_^";
+
     @Autowired
     private WorkOrderDao workOrderDao;
     @Autowired
@@ -39,7 +42,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Autowired
     private IDGenerator idGenerator;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServiceCtrlMessage save(WorkOrder workOrder) {
         if (isBlank(workOrder.getOrderCode())) {
@@ -69,14 +74,35 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new ServiceCtrlMessage(true, "");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServiceCtrlMessage update(WorkOrder workOrder) {
-        workOrderDao.update(workOrder);
-        return new ServiceCtrlMessage(true, "");
+        if (workOrder.getId() != null && !StringUtils.isEmpty(workOrder.getRemarks())) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String remarksStr = simpleDateFormat.format(new Date()) +
+                " " +
+                ucUserDao.get(null, ActionUtils.getLoginName(), null).getUserName() +
+                ":" +
+                workOrder.getRemarks();
+            workOrder.setRemarks(remarksStr);
+
+            WorkOrder tmp = get(workOrder.getId());
+            if (tmp != null && !StringUtils.isEmpty(tmp.getRemarks())) {
+                workOrder.setRemarks(tmp.getRemarks() + SEPARATOR + workOrder.getRemarks());
+            }
+            workOrderDao.update(workOrder);
+            return new ServiceCtrlMessage(true, "", workOrder.getRemarks());
+        } else {
+            workOrderDao.update(workOrder);
+            return new ServiceCtrlMessage(true, "");
+        }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage accept(Long id) {
@@ -91,7 +117,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new ServiceCtrlMessage(true, "");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage up(WorkOrder workOrder) {
@@ -115,7 +143,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new ServiceCtrlMessage(true, "");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage finish(WorkOrder workOrder) {
@@ -134,7 +164,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new ServiceCtrlMessage(true, "");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage cancel(WorkOrder workOrder) {
@@ -153,32 +185,42 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return new ServiceCtrlMessage(true, "");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<WorkOrder> query(Map<String, Object> params) {
         return workOrderDao.query(params);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int queryCount(Map<String, Object> params) {
         return workOrderDao.queryCount(params);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int queryToDoCount(Map<String, Object> params) {
         params.put("statusList", Lists.newArrayList("待处理", "跟进中"));
         return workOrderDao.queryToDoCount(params);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WorkOrder get(Long id) {
         return workOrderDao.get(id);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Map<String, String>> exportQuery(Map<String, Object> params) {
         return workOrderDao.exportQuery(params);
