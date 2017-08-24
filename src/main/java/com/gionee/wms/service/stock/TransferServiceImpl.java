@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -107,7 +108,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         return transferDao.getTransferListSf(criteria);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Map<String, String>> exportTransferList(Map<String, Object> criteria, Page page) {
         criteria.put("page", page);
@@ -149,7 +152,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage purchaseOrder(Transfer transfer) {
@@ -197,7 +202,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage picking(String sv, Integer num, Long transferId) {
@@ -253,7 +260,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         return new ServiceCtrlMessage(false, "配货失败！");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage dispatch(Long transferId, String logisticNo) {
@@ -539,7 +548,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         transferDao.deleteTransferGoods(transferId);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void confirmDelivery(Transfer transfer, String logisticNo, List<TransferGoods> goodsList) {
         Map<String, Object> criteria = Maps.newHashMap();
@@ -882,5 +893,69 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         return transferDao.getTransferPartnerList(criteria);
     }
 
+    @Override
+    public List<Transfer> convert(List<Transfer> transfers) throws Exception {
+        List<Transfer> transferList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(transfers)) {
+            for (int i = 0; i < transfers.size(); i++) {
+                Transfer transfer = transfers.get(i);
+                transfer.setFlowType("待审核");
+                TransferGoods transferGoods = transfer.getGoodsList().get(0);
+                Sku sku = waresDao.querySkuBySkuCode(transferGoods.getSkuCode());
+                if (sku == null) {
+                    throw new Exception("导入失败,第" + (i + 1) + "行sku code:" + transferGoods.getSkuCode() + "找不到对应商品!");
+                }
+                transferGoods.setSkuName(sku.getSkuName());
+                transferGoods.setSkuId(sku.getId());
+                transferGoods.setMeasureUnit(sku.getWares().getMeasureUnit());
+                // 转换数量
+                BigDecimal quantity = new BigDecimal(String.valueOf(transferGoods.getQuantity()));
+                BigDecimal total = quantity.multiply(transferGoods.getUnitPrice());
+                if (i > 0) {
+                    Transfer previousTransfer = transfers.get(i - 1);
+                    if (previousTransfer.getConsignee().equals(transfer.getConsignee())) {
+                        Transfer baseTransfer = transferList.get(transferList.size() - 1);
+                        baseTransfer.setOrderAmount(baseTransfer.getOrderAmount().add(total));
+                        for (TransferGoods goods : transfer.getGoodsList()) {
+                            goods.setTransferId(baseTransfer.getTransferId().toString());
+                        }
+                        baseTransfer.getGoodsList().addAll(transfer.getGoodsList());
+                    } else {
+                        setGoodsTransferIdAndTotalAndId(transfer, total);
+                        transferList.add(transfer);
+                    }
+                } else {
+                    setGoodsTransferIdAndTotalAndId(transfer, total);
+                    transferList.add(transfer);
+                }
+            }
+        }
+        return transferList;
+    }
 
+    private void setGoodsTransferIdAndTotalAndId(Transfer transfer, BigDecimal total) {
+        transfer.setOrderAmount(total);
+        transfer.setTransferId(Long.valueOf(getBizCode(TRANSFER)));
+        for (TransferGoods goods : transfer.getGoodsList()) {
+            goods.setTransferId(transfer.getTransferId().toString());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void addBatch(List<Transfer> transferList) {
+        List<TransferGoods> transferGoodsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(transferList)) {
+            for (Transfer transfer : transferList) {
+                List<TransferGoods> goods = transfer.getGoodsList();
+                if (goods != null) {
+                    transferGoodsList.addAll(goods);
+                }
+            }
+            transferDao.insertBatch(transferList);
+            if (!CollectionUtils.isEmpty(transferGoodsList)) {
+                transferDao.insertBatchGoods(transferGoodsList);
+            }
+        }
+    }
 }

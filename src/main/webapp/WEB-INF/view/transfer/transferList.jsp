@@ -76,6 +76,10 @@
             <li>
                 <a class="icon" href="${ctx}/stock/transfer!printTransfer.action?transferId={sid_transfer}" target="navTab" targetType="navTab" warn="请选择调拨单"><span>打印调拨单</span></a>
             </li>
+            <li class="line">line</li>
+            <li>
+                <a class="icon" href="${ctx}/trans/toUp.do" target="dialog" width="500" height="300"><span>导入excel</span></a>
+            </li>
         </ul>
     </div>
     <table class="list" width="100%" layoutH="140">

@@ -124,4 +124,17 @@ public interface TransferService {
      * @return
      */
     ServiceCtrlMessage dispatch(Long transferId, String logisticNo);
+
+    /**
+     * 转换EXCEL List
+     * @param transfers
+     * @return
+     */
+    List<Transfer> convert(List<Transfer> transfers) throws Exception;
+
+    /**
+     * 批量增加调拨单
+     * @param transferList
+     */
+    void addBatch(List<Transfer> transferList);
 }

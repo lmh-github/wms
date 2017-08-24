@@ -1,5 +1,7 @@
 package com.gionee.wms.web.controller;
 
+import com.gionee.wms.common.JsonUtils;
+import com.gionee.wms.common.excel.ExcelUtil;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.Page;
@@ -23,13 +25,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.gionee.wms.common.WmsConstants.TransferStatus.DELIVERYING;
@@ -104,6 +104,35 @@ public class TransferController {
             httpHeaders.add("Content-Type", "text/html; charset=utf-8");
             return new ResponseEntity<>("下载出现异常！", httpHeaders, HttpStatus.OK);
         }
+    }
+
+    @RequestMapping("/toUp.do")
+    public String toUpload() {
+        return "transfer/file_transfer";
+    }
+
+    @RequestMapping("/upload.json")
+    @ResponseBody
+    public Object importExcel(MultipartFile multipartFile) {
+        if (multipartFile == null) {
+            return DwzMessage.error("上传出现异常！", null);
+        }
+        Map<String, String> mapping = new LinkedHashMap<>();
+        mapping.put("consignee", "2");
+        mapping.put("transferTo", "3");
+        mapping.put("contact", "4");
+        mapping.put("array,goodsList,skuCode", "5");
+        mapping.put("array,goodsList,unitPrice", "9");
+        mapping.put("array,goodsList,quantity", "8");
+        String jsonStr = ExcelUtil.read(mapping, ExcelUtil.Choose.transfer, multipartFile, 2, 2, 0);
+        JsonUtils jsonUtils = new JsonUtils();
+        try {
+            List<Transfer> transferList = transferService.convert(jsonUtils.jsonToList(jsonStr, Transfer.class));
+            transferService.addBatch(transferList);
+        } catch (Exception e) {
+            return DwzMessage.error(e.getMessage(), null);
+        }
+        return DwzMessage.success("上传成功！", null);
     }
 
     /**
@@ -365,4 +394,13 @@ public class TransferController {
         modelMap.put("indivList", indivList);
     }
 
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.iterator().hasNext();
+
+        System.out.println(list.get(1));
+
+
+    }
 }
