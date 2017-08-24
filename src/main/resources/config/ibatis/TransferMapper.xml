@@ -642,5 +642,35 @@
   		    <if test="id!=null">id=#{id}</if>
   		</where>
 	</select>
-	
+
+    <insert id="insertBatch" parameterType="java.util.List">
+
+        insert into wms_transfer(id,TRANSFER_TO,create_time,CONSIGNEE, contact,order_amount, flow_type)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (
+            #{item.transferId}, #{item.transferTo, jdbcType=VARCHAR},sysdate,
+            #{item.consignee, jdbcType=VARCHAR}, #{item.contact, jdbcType=VARCHAR},
+            #{item.orderAmount},#{item.flowType, jdbcType=VARCHAR}
+        )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertBatchGoods" parameterType="java.util.List">
+        insert into wms_transfer_goods(id, transfer_id,sku_id,
+        sku_code,sku_name,unit_price,quantity,measure_unit)
+        select WMS_SEQ_COMMON.nextval,A.* from
+        (
+        <foreach item="item" collection="list" index="index"
+                 separator="UNION ALL">
+            select
+            #{item.transferId},#{item.skuId},#{item.skuCode},#{item.skuName}
+            ,#{item.unitPrice},#{item.quantity},#{item.measureUnit}
+            from dual
+        </foreach>
+        )A
+    </insert>
+
+
 </mapper>

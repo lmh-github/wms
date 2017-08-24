@@ -68,4 +68,15 @@ public interface TransferDao {
      */
     List<Map<String, Object>> exportTransferList(Map<String, Object> criteria);
 
+    /**
+     * 批量插入
+     * @param transferList
+     */
+    void insertBatch(List<Transfer> transferList);
+
+    /**
+     * 批量插入商品
+     * @param transferGoodsList
+     */
+    void insertBatchGoods(List<TransferGoods> transferGoodsList);
 }
