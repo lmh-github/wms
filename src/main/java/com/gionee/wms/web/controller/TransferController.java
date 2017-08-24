@@ -117,7 +117,7 @@ public class TransferController {
         if (multipartFile == null) {
             return DwzMessage.error("上传出现异常！", null);
         }
-        Map<String, String> mapping = new LinkedHashMap<>();
+        LinkedHashMap<String, String> mapping = new LinkedHashMap<>();
         mapping.put("consignee", "2");
         mapping.put("transferTo", "3");
         mapping.put("contact", "4");

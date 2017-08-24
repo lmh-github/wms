@@ -14,10 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by gionee on 2017/8/22.
@@ -25,7 +22,7 @@ import java.util.Map;
 public class ExcelUtil {
 
 
-    public static String read(Map<String, String> mapping, int choose,
+    public static String read(LinkedHashMap<String, String> mapping, int choose,
                               MultipartFile multipartFile, int startRow, int startCell, int sheetNum) {
         String jsonStr = "";
         if (multipartFile.getOriginalFilename().contains(".xlsx")) {
@@ -138,15 +135,15 @@ public class ExcelUtil {
     }
 
     public static class ConvertBean {
-        private Map<String, String> mapping; //映射map key:字段名 value:cell num
+        private LinkedHashMap<String, String> mapping; //映射map key:字段名 value:cell num
         private static volatile ConvertBean TRANSFER_INSTANCE = null;
         private static volatile ConvertBean IMEI_INSTANCE = null;
 
-        private ConvertBean(Map<String, String> mapping) {
+        private ConvertBean(LinkedHashMap<String, String> mapping) {
             this.mapping = mapping;
         }
 
-        public static ConvertBean getInstance(Map<String, String> mapping, int choose) {
+        public static ConvertBean getInstance(LinkedHashMap<String, String> mapping, int choose) {
             if (Choose.IMEI == choose) {
                 if (IMEI_INSTANCE == null) {
                     synchronized (ConvertBean.class) {
