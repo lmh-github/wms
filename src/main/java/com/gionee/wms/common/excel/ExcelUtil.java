@@ -8,6 +8,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -50,14 +51,17 @@ public class ExcelUtil {
             HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(sheetNum);
 
             for (int i = startRow; i < hssfSheet.getLastRowNum() + 1; i++) {
-                Map<String, Object> map = new HashMap<>();
-                hssfList.add(map);
+                if (isRowEmpty(hssfSheet.getRow(i))) {
 
-                HSSFRow hssfRow = hssfSheet.getRow(i);
-                for (int j = startCell; j < hssfRow.getLastCellNum(); j++) {
-                    HSSFCell hssfCell = hssfRow.getCell(j);
-                    if (hssfCell != null) {
-                        convert(mapping, map, j, hssfCell);
+                    Map<String, Object> map = new HashMap<>();
+                    hssfList.add(map);
+
+                    HSSFRow hssfRow = hssfSheet.getRow(i);
+                    for (int j = startCell; j < hssfRow.getLastCellNum(); j++) {
+                        HSSFCell hssfCell = hssfRow.getCell(j);
+                        if (hssfCell != null) {
+                            convert(mapping, map, j, hssfCell);
+                        }
                     }
                 }
             }
@@ -81,13 +85,15 @@ public class ExcelUtil {
             XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(sheetNum);
 
             for (int i = startRow; i < xssfSheet.getLastRowNum() + 1; i++) {
-                Map<String, Object> map = new HashMap<>();
-                xssfList.add(map);
-                XSSFRow xssfRow = xssfSheet.getRow(i);
-                for (int j = startCell; j < xssfRow.getLastCellNum(); j++) {
-                    XSSFCell xssfCell = xssfRow.getCell(j);
-                    if (xssfCell != null) {
-                        convert(mapping, map, j, xssfCell);
+                if (isRowEmpty(xssfSheet.getRow(i))) {
+                    Map<String, Object> map = new HashMap<>();
+                    xssfList.add(map);
+                    XSSFRow xssfRow = xssfSheet.getRow(i);
+                    for (int j = startCell; j < xssfRow.getLastCellNum(); j++) {
+                        XSSFCell xssfCell = xssfRow.getCell(j);
+                        if (xssfCell != null) {
+                            convert(mapping, map, j, xssfCell);
+                        }
                     }
                 }
             }
@@ -96,6 +102,12 @@ public class ExcelUtil {
         }
 
         return xssfList;
+    }
+
+    // 判断空行
+    private static boolean isRowEmpty(Row row) {
+        Cell cell = row.getCell(0);
+        return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
     }
 
     // 转换
