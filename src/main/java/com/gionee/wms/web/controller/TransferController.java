@@ -132,7 +132,7 @@ public class TransferController {
 
     @RequestMapping("/upload.json")
     @ResponseBody
-    public Object importExcel(MultipartFile multipartFile) {
+    public Object importExcel(MultipartFile multipartFile, QueryMap queryMap) {
         if (multipartFile == null) {
             return DwzMessage.error("上传出现异常！", null);
         }
@@ -149,9 +149,10 @@ public class TransferController {
             List<Transfer> transferList = transferService.convert(jsonUtils.jsonToList(jsonStr, Transfer.class));
             transferService.addBatch(transferList);
         } catch (Exception e) {
-            return DwzMessage.error(e.getMessage(), null);
+            logger.error(e.getMessage(), e);
+            return DwzMessage.error(e.getMessage(), queryMap);
         }
-        return DwzMessage.success("上传成功！", null);
+        return DwzMessage.success("上传成功！", queryMap);
     }
 
     /**
