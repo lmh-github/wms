@@ -644,16 +644,21 @@
 	</select>
 
     <insert id="insertBatch" parameterType="java.util.List">
-
         insert into wms_transfer(id,TRANSFER_TO,create_time,CONSIGNEE, contact,order_amount, flow_type)
-        values
-        <foreach collection="list" item="item" index="index" separator=",">
+        select A.* from
         (
-            #{item.transferId}, #{item.transferTo, jdbcType=VARCHAR},sysdate,
-            #{item.consignee, jdbcType=VARCHAR}, #{item.contact, jdbcType=VARCHAR},
-            #{item.orderAmount},#{item.flowType, jdbcType=VARCHAR}
-        )
-        </foreach>
+            <foreach collection="list" item="item" index="index" separator="UNION ALL">
+                select
+                #{item.transferId},
+                #{item.transferTo, jdbcType=VARCHAR},
+                sysdate,
+                #{item.consignee, jdbcType=VARCHAR},
+                #{item.contact, jdbcType=VARCHAR},
+                #{item.orderAmount},
+                #{item.flowType, jdbcType=VARCHAR}
+                from dual
+            </foreach>
+        )A
     </insert>
 
 
