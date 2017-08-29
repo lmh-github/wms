@@ -7,7 +7,6 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <OBJECT id=m_ObjSoapKp classid="clsid:31EE4CA3-5469-4151-AF4B-01ED9ABD1E35" width=0 height=0 align="center" hspace=0 vspace=0 CODEBASE="SoapKpClient.cab#Version=1,0,0,0"> </OBJECT>
 <script language="javascript" src="${ctx}/static/print/LodopFuncs.js"></script>
-<script language="javascript" src="${ctx}/static/print/sfimage.js"></script>
 <form id="pagerForm" method="post" action="#rel#">
 	<input type="hidden" name="page.currentPage" value="1" />
 	<input type="hidden" name="page.pageSize" value="${page.pageSize}" />

@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="inputForm" action="${ctx}/workorder/cancel.do?callbackType=closeCurrent&navTabId=tab_list.do" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+<form id="inputForm" action="${ctx}/workorder/cancel.do?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
     <input type="hidden" name="id" value="${workOrder.id }"/>
     <div class="pageContent">
         <div class="pageFormContent" layoutH="97">
