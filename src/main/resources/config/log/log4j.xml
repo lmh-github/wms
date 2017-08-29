@@ -4,7 +4,7 @@
 
     <!-- 以下是appender的定义  -->
     <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%n%d %-5p %c{2} - %m%n"/>
         </layout>
@@ -13,7 +13,7 @@
     <appender name="PROJECT" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="info"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%n%d %-5p %c{2} - %m%n"/>
@@ -23,7 +23,7 @@
     <appender name="PROJECT-DEBUG" class="org.apache.log4j.FileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-debug.log"/>
         <param name="append" value="false"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="debug"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
@@ -38,7 +38,7 @@
     <appender name="MYBATIS" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-mybatis.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
         </layout>
@@ -48,7 +48,7 @@
     <appender name="dbDataExceptionAppender" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-db-data-exception.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d %-5p %c{2} - %m%n"/>
         </layout>
@@ -56,7 +56,7 @@
     <appender name="APACHE" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-apache.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
                    value="%d [%X{requestURIWithQueryString}] %-5p %c{2} - %m%n"/>
@@ -65,7 +65,7 @@
     <appender name="KUAIDI" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-kuaidi.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%m%n"/>
         </layout>
@@ -73,7 +73,7 @@
     <appender name="FILTER" class="org.apache.log4j.DailyRollingFileAppender">
         <param name="file" value="${wms.loggingRoot}/wms-filter.log"/>
         <param name="append" value="true"/>
-        <param name="encoding" value="GBK"/>
+        <param name="encoding" value="UTF-8"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%m%n"/>
         </layout>
