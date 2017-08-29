@@ -900,6 +900,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             for (int i = 0; i < transfers.size(); i++) {
                 Transfer transfer = transfers.get(i);
                 transfer.setFlowType("待审核");
+                transfer.setWarehouseId(1643L);
                 TransferGoods transferGoods = transfer.getGoodsList().get(0);
                 Sku sku = waresDao.querySkuBySkuCode(transferGoods.getSkuCode());
                 if (sku == null) {
