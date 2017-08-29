@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="inputForm" enctype="multipart/form-data" action="${ctx}/atta/up.json?callbackType=closeCurrent&navTabId=tab_list.do" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
+<form id="inputForm" enctype="multipart/form-data" action="${ctx}/atta/up.json?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
     <input type="hidden" name="id" value="${workOrder.id }"/>
     <input type="hidden" name="billCode" value="${workOrder.workCode}"/>
     <input type="hidden" name="billType" value="工单"/>
