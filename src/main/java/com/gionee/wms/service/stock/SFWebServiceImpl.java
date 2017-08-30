@@ -7,51 +7,73 @@
  */
 package com.gionee.wms.service.stock;
 
-import javax.xml.bind.JAXBException;
-
+import com.gionee.wms.common.JaxbUtil;
+import com.gionee.wms.common.WmsConstants;
+import com.google.common.collect.Lists;
+import com.sf.integration.warehouse.request.WmsRequest;
+import com.sf.integration.warehouse.service.IOutsideToLscmService;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gionee.wms.common.JaxbUtil;
-import com.gionee.wms.common.WmsConstants;
-import com.sf.integration.warehouse.request.WmsRequest;
-import com.sf.integration.warehouse.service.IOutsideToLscmService;
+import javax.xml.bind.JAXBException;
+import java.util.List;
 
 /**
- * 
  * @author PengBin 00001550<br>
  * @date 2014年8月21日 下午2:28:03
  */
 @Service
 public class SFWebServiceImpl implements SFWebService {
 
-	private final Logger logger = LoggerFactory.getLogger(SFWebServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(SFWebServiceImpl.class);
 
-	@Autowired
-	private IOutsideToLscmService service;
+    @Autowired
+    private IOutsideToLscmService service;
 
-	/** {@inheritDoc} */
-	@Override
-	public <E, T extends WmsRequest> E outsideToLscmService(Class<T> requestClass, Class<E> responseClass, T request) {
-		try {
-			request.setCheckword(WmsConstants.SF_CHECKWORD);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <E, T extends WmsRequest> E outsideToLscmService(Class<T> requestClass, Class<E> responseClass, T request) {
+        try {
+            request.setCheckword(WmsConstants.SF_CHECKWORD);
 
-			String requestXML = JaxbUtil.marshToXmlBinding(requestClass, request);
-			logger.info("invoke outsideToLscmService requestXML:" + SystemUtils.LINE_SEPARATOR + requestXML);
-			String responseXML = service.outsideToLscmService(requestXML);
-			logger.info("invoke outsideToLscmService responseXML:" + SystemUtils.LINE_SEPARATOR + responseXML);
-			E response = JaxbUtil.unmarshToObjBinding(responseClass, responseXML);
-			return response;
+            String requestXML = JaxbUtil.marshToXmlBinding(requestClass, request);
+            logger.info("invoke outsideToLscmService requestXML:" + SystemUtils.LINE_SEPARATOR + requestXML);
+            String responseXML = service.outsideToLscmService(requestXML);
+            logger.info("invoke outsideToLscmService responseXML:" + SystemUtils.LINE_SEPARATOR + responseXML);
+            E response = JaxbUtil.unmarshToObjBinding(responseClass, responseXML);
+            return response;
 
-		} catch (JAXBException e) {
-			e.printStackTrace();
-			logger.error("invoke outsideToLscmService error!" + SystemUtils.LINE_SEPARATOR, e);
-			return null;
-		}
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            logger.error("invoke outsideToLscmService error!" + SystemUtils.LINE_SEPARATOR, e);
+            return null;
+        }
 
-	}
+    }
 
+    @Override
+    public <E, T extends WmsRequest> List<E> outsideToLscmService(Class<T> requestClass, Class<E> responseClass, List<T> requests) {
+        try {
+            List<E> list = Lists.newArrayList();
+            for (T request : requests) {
+                request.setCheckword(WmsConstants.SF_CHECKWORD);
+
+                String requestXML = JaxbUtil.marshToXmlBinding(requestClass, request);
+                logger.info("invoke outsideToLscmService requestXML:" + SystemUtils.LINE_SEPARATOR + requestXML);
+                String responseXML = service.outsideToLscmService(requestXML);
+                logger.info("invoke outsideToLscmService responseXML:" + SystemUtils.LINE_SEPARATOR + responseXML);
+                E response = JaxbUtil.unmarshToObjBinding(responseClass, responseXML);
+                list.add(response);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -36,7 +36,7 @@
 			<result name="success">/WEB-INF/view/stock/stockList.jsp</result>
 			<result name="input">/WEB-INF/view/stock/stockEdit.jsp</result>
 			<result name="input_limit">/WEB-INF/view/stock/stockLimitEdit.jsp</result>
-      
+			<result name="refresh" type="chain">stock</result>
             <result name="sf_inv_list">/WEB-INF/view/stock/sfStockList.jsp</result>
 		</action>
 		

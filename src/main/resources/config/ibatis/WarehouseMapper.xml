@@ -21,6 +21,7 @@
 				  	<if test="warehouseCode != null">and t1.warehouse_code = #{warehouseCode}</if>
 			   		<if test="warehouseName != null">and t1.warehouse_name = #{warehouseName}</if>
 			   		<if test="defaultStatus != null">and t1.default_status = #{defaultStatus}</if>
+			   		<if test="sfWarehouseName != null">and t1.warehouse_name like concat(#{sfWarehouseName},'%')</if>
 			   		<if test="enabled != null">and t1.enabled = #{enabled}</if>
 			      </where> 
 			      order by default_status desc

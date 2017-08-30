@@ -46,7 +46,23 @@ public class WmsRealTimeInventoryBalanceQueryRequest extends WmsRequest {
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	private String warehouse;
 
-	/**
+    public WmsRealTimeInventoryBalanceQueryRequest() {
+    }
+
+    public WmsRealTimeInventoryBalanceQueryRequest(List<String> itemList, String company, String inventory_sts, String warehouse) {
+        this.itemList = itemList;
+        this.company = company;
+        this.inventory_sts = inventory_sts;
+        this.warehouse = warehouse;
+    }
+
+    public WmsRealTimeInventoryBalanceQueryRequest(WmsRealTimeInventoryBalanceQueryRequest request) {
+        this.company = request.getCompany();
+        this.inventory_sts = request.getInventory_sts();
+        this.warehouse = request.getWarehouse();
+    }
+
+    /**
 	 * @return the itemList
 	 */
 	public List<String> getItemList() {

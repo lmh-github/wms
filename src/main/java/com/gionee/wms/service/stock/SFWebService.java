@@ -9,6 +9,8 @@ package com.gionee.wms.service.stock;
 
 import com.sf.integration.warehouse.request.WmsRequest;
 
+import java.util.List;
+
 /**
  * 顺丰WebService接口
  * @author PengBin 00001550<br>
@@ -22,5 +24,12 @@ public interface SFWebService {
 	 * @return
 	 */
 	<E, T extends WmsRequest> E outsideToLscmService(Class<T> requestClass, Class<E> responseClass, T request);
+
+    /**
+     * 批量调用
+     * @param requests
+     * @return
+     */
+	<E, T extends WmsRequest> List<E> outsideToLscmService(Class<T> requestClass, Class<E> responseClass, List<T> requests);
 
 }

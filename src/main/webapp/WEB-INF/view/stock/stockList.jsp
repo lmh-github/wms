@@ -10,7 +10,7 @@
 </form>
 
 <div class="pageHeader">
-	<form rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/stock.action" method="post">
+	<form id="stock_form" rel="pagerForm" onsubmit="return navTabSearch(this);" action="${ctx}/stock/stock.action" method="post">
 	<div class="searchBar">
 		<ul class="searchContent">
 			<li>
@@ -45,6 +45,7 @@
 		<div class="subBar">
 			<ul>
 				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">检索</button></div></div></li>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit" onclick="$('#stock_form').attr('action','${ctx}/stock/stock!refresh.action');">库存刷新</button></div></div></li>
 				<li><div class="buttonActive"><a href="${ctx}/stock/stock.action?exports=1" target="dwzExport" targettype="navTab"><span>导出excel</span></a></div></li>
 			</ul>
 		</div>

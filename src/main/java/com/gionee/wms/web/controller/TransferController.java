@@ -1,7 +1,6 @@
 package com.gionee.wms.web.controller;
 
 import com.gionee.wms.common.JsonUtils;
-import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.excel.ExcelUtil;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
@@ -12,8 +11,6 @@ import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
 import com.gionee.wms.web.extend.DwzMessage;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -112,22 +109,6 @@ public class TransferController {
     @RequestMapping("/toUp.do")
     public String toUpload() {
         return "transfer/file_transfer";
-    }
-
-    public static void main(String[] args) throws Exception {
-        ArrayList<Map<String, Object>> list = new ArrayList<>();
-        Map<String, Object> valueMap = Maps.newHashMap();
-        valueMap.put("consignee", "aaa");
-        List<Map<String, Object>> goodsListMap = Lists.newArrayList();
-        goodsListMap.add(LinkMapUtils.<String, Object>newHashMap().put("skuCode", "123").put("quanity", "10").getMap());
-        valueMap.put("goodList", goodsListMap);
-        list.add(valueMap);
-        list.add(valueMap);
-
-
-        JsonUtils jsonUtils = new JsonUtils();
-        System.out.println(jsonUtils.toJson(list));
-
     }
 
     @RequestMapping("/upload.json")
@@ -412,15 +393,5 @@ public class TransferController {
 
         List<Indiv> indivList = transferService.getIndivList(transferId);
         modelMap.put("indivList", indivList);
-    }
-
-    public static void main1(String[] args) {
-        List<String> list = new ArrayList<>();
-        list.add("1");
-        list.iterator().hasNext();
-
-        System.out.println(list.get(1));
-
-
     }
 }

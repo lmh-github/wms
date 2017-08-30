@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.gionee.wms.dao.StockDao" >
-	<!-- =============库存相关=============== -->
-	<sql id="sql_stockColumns">
+<mapper namespace="com.gionee.wms.dao.StockDao">
+    <!-- =============库存相关=============== -->
+    <sql id="sql_stockColumns">
 		       t3.id                  as "sku.wares.id",
  			   t3.wares_name          as "sku.wares.waresName",
 			   t3.measure_unit        as "sku.wares.measureUnit",
@@ -28,138 +28,146 @@
  			   t1.ver 				  as ver,
  			   t1.sync_status		  as syncStatus
 	</sql>
-	
-	<sql id="sql_stockWhere">
-		<where>
-	   		<if test="id != null">and t1.id=#{id}</if>
-	   		<if test="warehouseId != null">and t1.warehouse_id = #{warehouseId}</if>
-	   		<if test="warehouseCode != null">and t1.warehouse_code = #{warehouseCode}</if>
-	   		<if test="warehouseCode_List != null">and t4.warehouse_code in <foreach collection="warehouseCode_List" index="index" item="item" open="(" separator="," close=")">#{item}</foreach></if>
-	   		<if test="skuId != null">and t1.sku_id=#{skuId}</if>
-	   		<if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
-	   		<if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
-	   		<if test="catPath != null">and instr(t5.cat_path,#{catPath}) = 1</if>
-	   		<if test="syncStatus != null">and t1.sync_status=#{syncStatus}</if>
-	   </where>
-	</sql>
-	
-	<!-- 获取库存详细信息列表(商品、sku、仓库、库存). -->
-	<select id="queryStockByPage" parameterType="map" resultType="Stock">
-		SELECT *
-		 FROM( 
-			  SELECT A.*, rownum r
-		  	  FROM(
-		  	  		select <include refid="sql_stockColumns"/>
-					  from wms_stock t1
-					  join wms_sku t2
-					    on t1.sku_id = t2.id
-					  join wms_wares t3
-						on t2.wares_id = t3.id	    
-					  join wms_warehouse t4
-					    on t1.warehouse_id = t4.id
-				 left join wms_wares_category t5
-					    on t3.cat_id=t5.id
-			      <include refid="sql_stockWhere"/> 
-			      order by sku_code
-		  	  	   ) A
-	<![CDATA[
+
+    <sql id="sql_stockWhere">
+        <where>
+            <if test="id != null">and t1.id=#{id}</if>
+            <if test="warehouseId != null">and t1.warehouse_id = #{warehouseId}</if>
+            <if test="warehouseCode != null">and t1.warehouse_code = #{warehouseCode}</if>
+            <if test="warehouseCode_List != null">and t4.warehouse_code in
+                <foreach collection="warehouseCode_List" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="skuId != null">and t1.sku_id=#{skuId}</if>
+            <if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
+            <if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
+            <if test="catPath != null">and instr(t5.cat_path,#{catPath}) = 1</if>
+            <if test="syncStatus != null">and t1.sync_status=#{syncStatus}</if>
+        </where>
+    </sql>
+
+    <!-- 获取库存详细信息列表(商品、sku、仓库、库存). -->
+    <select id="queryStockByPage" parameterType="map" resultType="Stock">
+        SELECT *
+        FROM(
+        SELECT A.*, rownum r
+        FROM(
+        select
+        <include refid="sql_stockColumns"/>
+        from wms_stock t1
+        join wms_sku t2
+        on t1.sku_id = t2.id
+        join wms_wares t3
+        on t2.wares_id = t3.id
+        join wms_warehouse t4
+        on t1.warehouse_id = t4.id
+        left join wms_wares_category t5
+        on t3.cat_id=t5.id
+        <include refid="sql_stockWhere"/>
+        order by sku_code
+        ) A
+        <![CDATA[
 			  WHERE rownum<=#{page.endRow} 
 			)
 	    WHERE r >= #{page.startRow}
 	]]>
-	</select>
-	
- 	<!-- 查询库存列表总数-->
-	<select id="queryStockTotal" parameterType="map"  resultType="int">
-		select count(1) as total
-		  from wms_stock t1
-		  join wms_sku t2
-		    on t1.sku_id = t2.id
-		  join wms_wares t3
-			on t2.wares_id = t3.id	    
-		  join wms_warehouse t4
-		    on t1.warehouse_id = t4.id
-	 left join wms_wares_category t5
-		    on t3.cat_id=t5.id
-      <include refid="sql_stockWhere"/>  
-	</select>
-	
-	<!-- 获取库存详细信息列表(商品、sku、仓库、库存). -->
-	<select id="queryStockList" parameterType="map" resultType="Stock">
-		select <include refid="sql_stockColumns"/>
-		  from wms_stock t1
-		  join wms_sku t2
-		    on t1.sku_id = t2.id
-		  join wms_wares t3
-			on t2.wares_id = t3.id	    
-		  join wms_warehouse t4
-		    on t1.warehouse_id = t4.id
-	 left join wms_wares_category t5
-		    on t3.cat_id=t5.id
-      <include refid="sql_stockWhere"/>
-      order by sku_code
-	</select>
-	
-	<!-- 查询指定的库存信息 -->
-	<select id="queryStock" parameterType="map" resultType="Stock">
-		select <include refid="sql_stockColumns"/>
-		  from wms_stock t1
-		  join wms_sku t2
-		    on t1.sku_id = t2.id
-		  join wms_wares t3
-			on t2.wares_id = t3.id	    
-		  join wms_warehouse t4
-		    on t1.warehouse_id = t4.id
-		  left join wms_wares_category t5
-		    on t3.cat_id=t5.id
-		 <where>
-		 	<if test="id!=null">and t1.id=#{id}</if>
-		 	<if test="warehouseId!=null">and t1.warehouse_id=#{warehouseId}</if>
-		 	<if test="warehouseCode!=null">and t4.warehouse_code=#{warehouseCode}</if>
-		 	<if test="skuId!=null">and t1.sku_id=#{skuId}</if>
-		 	<if test="skuCode!=null">and t2.sku_code=#{skuCode}</if>
-		 </where>
-	</select>
-	
-	<!-- 添加库存信息 -->
-	<insert id="addStock" parameterType="Stock">
-		<selectKey keyProperty="id" resultType="long" order="BEFORE">
-			select  WMS_SEQ_COMMON.nextval from dual
-		</selectKey>
- 		insert into wms_stock
-		  (id, sku_id, warehouse_id,total_quantity,sales_quantity,unsales_quantity,occupy_quantity,limit_upper,limit_lower,nondefective_pl,defective_pl)
-		values
-		  (#{id},#{sku.id},#{warehouse.id},#{totalQuantity},#{salesQuantity},#{unsalesQuantity},#{occupyQuantity},#{limitUpper},#{limitLower},#{nonDefectivePl},#{defectivePl})
-	</insert>
-	
-	<!-- 更新库存数目 -->
-	<update id="updateStockQuantity" parameterType="Stock">
-  		update wms_stock
-  		<set>
-			<if test="salesQuantity!=null">sales_quantity=#{salesQuantity},</if>
-			<if test="occupyQuantity!=null">occupy_quantity=#{occupyQuantity},</if>
-			<if test="unsalesQuantity!=null">unsales_quantity=#{unsalesQuantity},</if>
-			<if test="totalQuantity!=null">total_quantity=#{totalQuantity},</if>
-			<if test="syncStatus!=null">sync_status=#{syncStatus},</if>
-			ver = ver+1
-		</set>
-  	     where warehouse_id = #{warehouse.id}
-  	   	   and sku_id = #{sku.id}
-  	   	   and ver = #{ver}
-  	</update>
-  	
-  	<!-- 更新安全库存数目 -->
-	<update id="updateStockLimit" parameterType="Stock">
-  		update wms_stock
-  		<set>
-			<if test="limitLower!=null">limit_lower=#{limitLower},</if>
-			<if test="limitUpper!=null">limit_upper=#{limitUpper},</if>
-		</set>
-  	     where id = #{id}
-  	</update>
-  	
-  	<!-- 更新库存盘点信息 -->
-  	<update id="updateStockCheckInfoByCheckId" parameterType="long">
+    </select>
+
+    <!-- 查询库存列表总数-->
+    <select id="queryStockTotal" parameterType="map" resultType="int">
+        select count(1) as total
+        from wms_stock t1
+        join wms_sku t2
+        on t1.sku_id = t2.id
+        join wms_wares t3
+        on t2.wares_id = t3.id
+        join wms_warehouse t4
+        on t1.warehouse_id = t4.id
+        left join wms_wares_category t5
+        on t3.cat_id=t5.id
+        <include refid="sql_stockWhere"/>
+    </select>
+
+    <!-- 获取库存详细信息列表(商品、sku、仓库、库存). -->
+    <select id="queryStockList" parameterType="map" resultType="Stock">
+        select
+        <include refid="sql_stockColumns"/>
+        from wms_stock t1
+        join wms_sku t2
+        on t1.sku_id = t2.id
+        join wms_wares t3
+        on t2.wares_id = t3.id
+        join wms_warehouse t4
+        on t1.warehouse_id = t4.id
+        left join wms_wares_category t5
+        on t3.cat_id=t5.id
+        <include refid="sql_stockWhere"/>
+        order by sku_code
+    </select>
+
+    <!-- 查询指定的库存信息 -->
+    <select id="queryStock" parameterType="map" resultType="Stock">
+        select
+        <include refid="sql_stockColumns"/>
+        from wms_stock t1
+        join wms_sku t2
+        on t1.sku_id = t2.id
+        join wms_wares t3
+        on t2.wares_id = t3.id
+        join wms_warehouse t4
+        on t1.warehouse_id = t4.id
+        left join wms_wares_category t5
+        on t3.cat_id=t5.id
+        <where>
+            <if test="id!=null">and t1.id=#{id}</if>
+            <if test="warehouseId!=null">and t1.warehouse_id=#{warehouseId}</if>
+            <if test="warehouseCode!=null">and t4.warehouse_code=#{warehouseCode}</if>
+            <if test="skuId!=null">and t1.sku_id=#{skuId}</if>
+            <if test="skuCode!=null">and t2.sku_code=#{skuCode}</if>
+        </where>
+    </select>
+
+    <!-- 添加库存信息 -->
+    <insert id="addStock" parameterType="Stock">
+        <selectKey keyProperty="id" resultType="long" order="BEFORE">
+            select WMS_SEQ_COMMON.nextval from dual
+        </selectKey>
+        insert into wms_stock
+        (id, sku_id,
+        warehouse_id,total_quantity,sales_quantity,unsales_quantity,occupy_quantity,limit_upper,limit_lower,nondefective_pl,defective_pl)
+        values
+        (#{id},#{sku.id},#{warehouse.id},#{totalQuantity},#{salesQuantity},#{unsalesQuantity},#{occupyQuantity},#{limitUpper},#{limitLower},#{nonDefectivePl},#{defectivePl})
+    </insert>
+
+    <!-- 更新库存数目 -->
+    <update id="updateStockQuantity" parameterType="Stock">
+        update wms_stock
+        <set>
+            <if test="salesQuantity!=null">sales_quantity=#{salesQuantity},</if>
+            <if test="occupyQuantity!=null">occupy_quantity=#{occupyQuantity},</if>
+            <if test="unsalesQuantity!=null">unsales_quantity=#{unsalesQuantity},</if>
+            <if test="totalQuantity!=null">total_quantity=#{totalQuantity},</if>
+            <if test="syncStatus!=null">sync_status=#{syncStatus},</if>
+            ver = ver+1
+        </set>
+        where warehouse_id = #{warehouse.id}
+        and sku_id = #{sku.id}
+        and ver = #{ver}
+    </update>
+
+    <!-- 更新安全库存数目 -->
+    <update id="updateStockLimit" parameterType="Stock">
+        update wms_stock
+        <set>
+            <if test="limitLower!=null">limit_lower=#{limitLower},</if>
+            <if test="limitUpper!=null">limit_upper=#{limitUpper},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 更新库存盘点信息 -->
+    <update id="updateStockCheckInfoByCheckId" parameterType="long">
 		 update wms_stock t1
 		    set t1.nondefective_pl =
 		       (select t2.first_nondefective_pl
@@ -185,7 +193,7 @@
 		           and t2.sku_id = t1.sku_id
 		           and t2.check_id = #{checkId})
   	</update>
-  	<update id="updateStockCheckInfoByCheckId_bak" parameterType="long">
+    <update id="updateStockCheckInfoByCheckId_bak" parameterType="long">
 		 update wms_stock t1
 		    set t1.nondefective_pl =
 		       (select t2.first_nondefective_pl
@@ -206,151 +214,154 @@
 		           and t2.sku_id = t1.sku_id
 		           and t2.check_code = #{check_code})
   	</update>
-  	
-  	<!-- =============库存流水相关=============== -->
-  	<!-- 自定义resultMap嵌套对象 -->
- 	<resultMap id="stockChangeDetailMap" type="StockChange">
-		<id property="id" column="change_id" />
-		<result property="stockType" column="change_stock_type" />
-		<result property="bizType" column="change_biz_type"/>
-		<result property="createTime" column="change_create_time"/>
-		<result property="originalCode" column="change_original_code"/>
-		<result property="openingStock" column="change_opening_stock"/>
-		<result property="quantity" column="change_quantity"/>
-		<result property="closingStock" column="change_closing_stock"/>
-		<association property="stock" column="stock_id" javaType="Stock">
-			<id property="id" column="stock_id"/>
-			<association property="sku" column="sku_id" javaType="Sku">
-				<id property="id" column="sku_id"/>
-				<result property="skuName" column="sku_name"/>
-				<result property="skuCode" column="sku_code"/>
-				<association property="wares" column="wares_id" javaType="Wares">
-					<id property="id" column="wares_id"/>
-					<result property="measureUnit" column="wares_measure_unit"/>
-				</association>
-			</association>
-			<association property="warehouse" column="warehouse_id" javaType="Warehouse">
-				<id property="id" column="warehouse_id"/>
-				<result property="warehouseCode" column="warehouse_code"/>
-				<result property="warehouseName" column="warehouse_name"/>
-			</association>
-		</association>
-		
-	</resultMap>
-  	<!-- 添加库存流水 
-	<insert id="addStockChange" parameterType="StockChange">
-		<selectKey keyProperty="id" resultType="long" order="BEFORE">
-			select  WMS_SEQ_COMMON.nextval from dual
-		</selectKey>
- 		insert into wms_stock_change
-		  (id, stock_id,stock_type,biz_type,create_time,original_code,opening_stock,quantity,closing_stock)
-		values
-		  (#{id},#{stock.id},#{stockType},#{bizType},#{createTime},#{originalCode},#{openingStock},#{quantity},#{closingStock})
-	</insert>
-	-->
-	<!-- 批量添加库存流水 -->
-	<insert id="addStockChange" parameterType="list">
- 		insert into wms_stock_change(id, stock_id,stock_type,biz_type,create_time,original_code,opening_stock,quantity,closing_stock)
-		select WMS_SEQ_COMMON.nextval,A.* from(
-		<foreach item="item" collection="list" index="index" separator="UNION ALL">
-		   select #{item.stock.id},#{item.stockType},#{item.bizType},#{item.createTime},#{item.originalCode},#{item.openingStock},#{item.quantity},#{item.closingStock} from dual
-		</foreach>
-		  )A
-	</insert>
-	
-	<!-- 获取库存流水列表. -->
-	<select id="queryStockChangeList" parameterType="map" resultMap="stockChangeDetailMap">
-		SELECT *
-		 FROM( 
-			  SELECT A.*, rownum r
-		  	  FROM(
-		  	  		select t2.id as sku_id,
-		  	  			   t2.sku_name as sku_name,
-		  	  			   t2.sku_code as sku_code,
-		  	  			   t5.id as wares_id,
-		  	  			   t5.measure_unit as wares_measure_unit,
-		  	  			   t4.id as warehouse_id,
-		  	  			   t4.warehouse_code as warehouse_code,
-		  	  			   t4.warehouse_name as warehouse_name,
-		  	  			   t3.id as stock_id,
-		  	  			   t1.id as change_id,
-		  	  			   t1.stock_type as change_stock_type,
-		  	  			   t1.biz_type as change_biz_type,
-		  	  			   t1.create_time as change_create_time,
-		  	  			   t1.original_code as change_original_code,
-		  	  			   t1.opening_stock as change_opening_stock,
-		  	  			   t1.quantity as change_quantity,
-		  	  			   t1.closing_stock as change_closing_stock
-					  from wms_stock_change t1
-					  join wms_stock t3
-					  	on t1.stock_id = t3.id
-					  join wms_sku t2
-					    on t3.sku_id = t2.id
-					  join wms_warehouse t4
-					    on t3.warehouse_id = t4.id
-					  join wms_wares t5
-					    on t2.wares_id = t5.id
-				   <where>
-				   		<if test="id != null">t1.id=#{id}</if>
-				   		<if test="warehouseId != null">and t3.warehouse_id = #{warehouseId}</if>
-				   		<if test="skuId != null">and t3.sku_id=#{skuId}</if>
-				   		<if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
-				   		<if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
-				   		<if test="stockType != null">and t1.stock_type=#{stockType}</if>
-				   		<if test="bizType != null">and t1.biz_type=#{bizType}</if>
-				   		<if test="originalCode != null">and t1.original_code=#{originalCode}</if>
-				   		<if test="createTimeBegin != null">and t1.create_time<![CDATA[>=]]>#{createTimeBegin}</if>
-				   		<if test="createTimeEnd != null">and t1.create_time<![CDATA[<=]]>#{createTimeEnd}</if>
-				   </where> 
-				   order by t1.create_time desc, t1.id desc
-		  	  	   ) A
-	<![CDATA[
+
+    <!-- =============库存流水相关=============== -->
+    <!-- 自定义resultMap嵌套对象 -->
+    <resultMap id="stockChangeDetailMap" type="StockChange">
+        <id property="id" column="change_id"/>
+        <result property="stockType" column="change_stock_type"/>
+        <result property="bizType" column="change_biz_type"/>
+        <result property="createTime" column="change_create_time"/>
+        <result property="originalCode" column="change_original_code"/>
+        <result property="openingStock" column="change_opening_stock"/>
+        <result property="quantity" column="change_quantity"/>
+        <result property="closingStock" column="change_closing_stock"/>
+        <association property="stock" column="stock_id" javaType="Stock">
+            <id property="id" column="stock_id"/>
+            <association property="sku" column="sku_id" javaType="Sku">
+                <id property="id" column="sku_id"/>
+                <result property="skuName" column="sku_name"/>
+                <result property="skuCode" column="sku_code"/>
+                <association property="wares" column="wares_id" javaType="Wares">
+                    <id property="id" column="wares_id"/>
+                    <result property="measureUnit" column="wares_measure_unit"/>
+                </association>
+            </association>
+            <association property="warehouse" column="warehouse_id" javaType="Warehouse">
+                <id property="id" column="warehouse_id"/>
+                <result property="warehouseCode" column="warehouse_code"/>
+                <result property="warehouseName" column="warehouse_name"/>
+            </association>
+        </association>
+
+    </resultMap>
+    <!-- 添加库存流水
+  <insert id="addStockChange" parameterType="StockChange">
+      <selectKey keyProperty="id" resultType="long" order="BEFORE">
+          select  WMS_SEQ_COMMON.nextval from dual
+      </selectKey>
+       insert into wms_stock_change
+        (id, stock_id,stock_type,biz_type,create_time,original_code,opening_stock,quantity,closing_stock)
+      values
+        (#{id},#{stock.id},#{stockType},#{bizType},#{createTime},#{originalCode},#{openingStock},#{quantity},#{closingStock})
+  </insert>
+  -->
+    <!-- 批量添加库存流水 -->
+    <insert id="addStockChange" parameterType="list">
+        insert into wms_stock_change(id,
+        stock_id,stock_type,biz_type,create_time,original_code,opening_stock,quantity,closing_stock)
+        select WMS_SEQ_COMMON.nextval,A.* from(
+        <foreach item="item" collection="list" index="index" separator="UNION ALL">
+            select
+            #{item.stock.id},#{item.stockType},#{item.bizType},#{item.createTime},#{item.originalCode},#{item.openingStock},#{item.quantity},#{item.closingStock}
+            from dual
+        </foreach>
+        )A
+    </insert>
+
+    <!-- 获取库存流水列表. -->
+    <select id="queryStockChangeList" parameterType="map" resultMap="stockChangeDetailMap">
+        SELECT *
+        FROM(
+        SELECT A.*, rownum r
+        FROM(
+        select t2.id as sku_id,
+        t2.sku_name as sku_name,
+        t2.sku_code as sku_code,
+        t5.id as wares_id,
+        t5.measure_unit as wares_measure_unit,
+        t4.id as warehouse_id,
+        t4.warehouse_code as warehouse_code,
+        t4.warehouse_name as warehouse_name,
+        t3.id as stock_id,
+        t1.id as change_id,
+        t1.stock_type as change_stock_type,
+        t1.biz_type as change_biz_type,
+        t1.create_time as change_create_time,
+        t1.original_code as change_original_code,
+        t1.opening_stock as change_opening_stock,
+        t1.quantity as change_quantity,
+        t1.closing_stock as change_closing_stock
+        from wms_stock_change t1
+        join wms_stock t3
+        on t1.stock_id = t3.id
+        join wms_sku t2
+        on t3.sku_id = t2.id
+        join wms_warehouse t4
+        on t3.warehouse_id = t4.id
+        join wms_wares t5
+        on t2.wares_id = t5.id
+        <where>
+            <if test="id != null">t1.id=#{id}</if>
+            <if test="warehouseId != null">and t3.warehouse_id = #{warehouseId}</if>
+            <if test="skuId != null">and t3.sku_id=#{skuId}</if>
+            <if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
+            <if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
+            <if test="stockType != null">and t1.stock_type=#{stockType}</if>
+            <if test="bizType != null">and t1.biz_type=#{bizType}</if>
+            <if test="originalCode != null">and t1.original_code=#{originalCode}</if>
+            <if test="createTimeBegin != null">and t1.create_time<![CDATA[>=]]>#{createTimeBegin}</if>
+            <if test="createTimeEnd != null">and t1.create_time<![CDATA[<=]]>#{createTimeEnd}</if>
+        </where>
+        order by t1.create_time desc, t1.id desc
+        ) A
+        <![CDATA[
 			  WHERE rownum<=#{page.endRow} 
 			)
 	    WHERE r >= #{page.startRow}
 	]]>
-	</select>
-	
- 	<!-- 查询库存流水列表总数-->
-	<select id="queryStockChangeListTotal" parameterType="map"  resultType="int">
-		select count(1) as total
-		  from wms_stock_change t1
-		  join wms_stock t3
-		  	on t1.stock_id = t3.id
-		  join wms_sku t2
-		    on t3.sku_id = t2.id
-		  join wms_warehouse t4
-		    on t3.warehouse_id = t4.id
-		  join wms_wares t5
-		    on t2.wares_id = t5.id
-	   <where>
-	   		<if test="id != null">t1.id=#{id}</if>
-	   		<if test="warehouseId != null">and t3.warehouse_id = #{warehouseId}</if>
-	   		<if test="skuId != null">and t3.sku_id=#{skuId}</if>
-	   		<if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
-	   		<if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
-	   		<if test="stockType != null">and t1.stock_type=#{stockType}</if>
-	   		<if test="bizType != null">and t1.biz_type=#{bizType}</if>
-	   		<if test="originalCode != null">and t1.original_code=#{originalCode}</if>
-	   		<if test="createTimeBegin != null">and t1.create_time<![CDATA[>=]]>#{createTimeBegin}</if>
-	   		<if test="createTimeEnd != null">and t1.create_time<![CDATA[<=]]>#{createTimeEnd}</if>
-	   </where> 
-	</select>
-	
-	<!-- 更新库存同步状态 -->
-	<update id="updateStockSyncStatusBySkuIds" parameterType="map">
-  		update wms_stock
-  		<set>
-			sync_status = #{status}
-		</set>
-  	     where id in
-  	     <foreach item="item" index="index" collection="stockIds" open="(" separator="," close=")">
-	 	 	#{item}
-	 	 </foreach>
-	 	 <!-- and warehouse_id=#{warehouseId} -->
-  	</update>
+    </select>
 
-	<insert id="insertStockDelta" parameterType="stockDelta">
+    <!-- 查询库存流水列表总数-->
+    <select id="queryStockChangeListTotal" parameterType="map" resultType="int">
+        select count(1) as total
+        from wms_stock_change t1
+        join wms_stock t3
+        on t1.stock_id = t3.id
+        join wms_sku t2
+        on t3.sku_id = t2.id
+        join wms_warehouse t4
+        on t3.warehouse_id = t4.id
+        join wms_wares t5
+        on t2.wares_id = t5.id
+        <where>
+            <if test="id != null">t1.id=#{id}</if>
+            <if test="warehouseId != null">and t3.warehouse_id = #{warehouseId}</if>
+            <if test="skuId != null">and t3.sku_id=#{skuId}</if>
+            <if test="skuCode != null">and t2.sku_code=#{skuCode}</if>
+            <if test="skuName != null">and t2.sku_name like '%${skuName}%'</if>
+            <if test="stockType != null">and t1.stock_type=#{stockType}</if>
+            <if test="bizType != null">and t1.biz_type=#{bizType}</if>
+            <if test="originalCode != null">and t1.original_code=#{originalCode}</if>
+            <if test="createTimeBegin != null">and t1.create_time<![CDATA[>=]]>#{createTimeBegin}</if>
+            <if test="createTimeEnd != null">and t1.create_time<![CDATA[<=]]>#{createTimeEnd}</if>
+        </where>
+    </select>
+
+    <!-- 更新库存同步状态 -->
+    <update id="updateStockSyncStatusBySkuIds" parameterType="map">
+        update wms_stock
+        <set>
+            sync_status = #{status}
+        </set>
+        where id in
+        <foreach item="item" index="index" collection="stockIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <!-- and warehouse_id=#{warehouseId} -->
+    </update>
+
+    <insert id="insertStockDelta" parameterType="stockDelta">
 		insert into wms_stock_delta
 		(
 			id, 
@@ -375,20 +386,24 @@
 			#{goodsSid, jdbcType=VARCHAR}
 		)
 	</insert>
-	
-	<select id="queryStockDelta" resultType="stockDelta">
-	    <![CDATA[select id, sku_code as skuCode, warehouse_id as warehouseId, quantity, stock_type as stockType, biz_type as bizType, create_time as createTime, original_code as originalCode, goods_sid as goodsSid
-	    from wms_stock_delta where rownum<=100]]>
+
+    <select id="queryStockDelta" resultType="stockDelta">
+	    <![CDATA[
+
+        select id, sku_code as skuCode, warehouse_id as warehouseId, quantity, stock_type as stockType, biz_type as bizType, create_time as createTime, original_code as originalCode, goods_sid as goodsSid
+	    from wms_stock_delta where rownum<=100
+
+        ]]>
 	</select>
-	
-	<delete id="deleteStockDelta" parameterType="map">
-	    delete from wms_stock_delta where id in
-    	<foreach item="item" index="index" collection="deltaList" open="(" separator="," close=")">
- 	 		#{item.id}
- 	 	</foreach>
-	</delete>
-	<!-- 每日库存信息临时数据插入 不含本期库存 -->
-	<insert id="addQty"  parameterType="map">
+
+    <delete id="deleteStockDelta" parameterType="map">
+        delete from wms_stock_delta where id in
+        <foreach item="item" index="index" collection="deltaList" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </delete>
+    <!-- 每日库存信息临时数据插入 不含本期库存 -->
+    <insert id="addQty" parameterType="map">
 		insert into wms_stock_dailystocktemp
 			(id,
 			stock_id,
@@ -426,8 +441,8 @@
                            where o.stock_id = k.stock_id)
                    		 ) tt
 	</insert>
-	<!-- 每日库存信息临时数据插入  本期库存 -->
-	<insert id="addOutQty"  parameterType="map">
+    <!-- 每日库存信息临时数据插入  本期库存 -->
+    <insert id="addOutQty" parameterType="map">
 		insert into wms_stock_dailystocktemp
 			(id,
 			stock_id,
@@ -445,9 +460,9 @@
                         group by t2.stock_id
                    		 ) tt
 	</insert>
-	
-	<!-- 每日库存信息从临时数据表拼装插入正式表   -->
-	<insert id="addDailyStock"  parameterType="map">
+
+    <!-- 每日库存信息从临时数据表拼装插入正式表   -->
+    <insert id="addDailyStock" parameterType="map">
 		insert into wms_stock_dailystock
 			(id,
 			sku_code,
@@ -492,64 +507,64 @@
                             group by tt.sku_code
                    		 ) tt2
 	</insert>
-	<!-- 删除每日库存信息过渡数据 -->
-  <delete id="deleteDailyStockTemp">
+    <!-- 删除每日库存信息过渡数据 -->
+    <delete id="deleteDailyStockTemp">
  	 delete from wms_stock_dailystocktemp
   </delete>
-  <select id="queryDailyStockTotalCount" parameterType="map"  resultType="int">
-		select count(1) from wms_stock_dailystock t1 
-		<where>
-			<if test="startDate!=null">
-			 	<![CDATA[
+    <select id="queryDailyStockTotalCount" parameterType="map" resultType="int">
+        select count(1) from wms_stock_dailystock t1
+        <where>
+            <if test="startDate!=null">
+                <![CDATA[
 			 		t1.report_date>=#{startDate}
-			 	]]> 
-			</if>
-			<if test="endDate!=null">
-			 	<![CDATA[
+			 	]]>
+            </if>
+            <if test="endDate!=null">
+                <![CDATA[
 			 	 	and t1.report_date<=#{endDate}
-			 	 ]]> 
-			</if>
-			<if test="skuCode!=null">
-				 and  t1.sku_code=#{skuCode}
-			</if>
-		</where>
-  </select>
-  <!-- 每日库存信息分页查询 -->
-  <select id="queryDailyStockByPage" parameterType="map"  resultType="DailyStock">
-		select id,reportDate,skuCode,startStockQty,outStockQty,occupyStockQty,endStockQty,createDate
-		    from (select tt.*,rownum as rowno from (select t1.id as id,
-			t1.report_date as reportDate,
-			t1.sku_code as skuCode,
-			t1.startstockqty as startStockQty,
-			t1.outstockqty as outStockQty,
-			t1.occupystockqty occupyStockQty,
-			t1.endstockqty as endStockQty,
-			t1.createdate as createDate 
-		from wms_stock_dailystock t1 
-		<where>
-			<if test="startDate!=null">
-			 	<![CDATA[
+			 	 ]]>
+            </if>
+            <if test="skuCode!=null">
+                and t1.sku_code=#{skuCode}
+            </if>
+        </where>
+    </select>
+    <!-- 每日库存信息分页查询 -->
+    <select id="queryDailyStockByPage" parameterType="map" resultType="DailyStock">
+        select id,reportDate,skuCode,startStockQty,outStockQty,occupyStockQty,endStockQty,createDate
+        from (select tt.*,rownum as rowno from (select t1.id as id,
+        t1.report_date as reportDate,
+        t1.sku_code as skuCode,
+        t1.startstockqty as startStockQty,
+        t1.outstockqty as outStockQty,
+        t1.occupystockqty occupyStockQty,
+        t1.endstockqty as endStockQty,
+        t1.createdate as createDate
+        from wms_stock_dailystock t1
+        <where>
+            <if test="startDate!=null">
+                <![CDATA[
 			 	t1.report_date>=#{startDate}
-			 	]]> 
-			</if>
-			<if test="endDate!=null"> 
-			 	<![CDATA[
+			 	]]>
+            </if>
+            <if test="endDate!=null">
+                <![CDATA[
 			 	   and t1.report_date<=#{endDate}
-			 	 ]]> 
-			</if>
-			<if test="skuCode!=null">
-				 and  t1.sku_code=#{skuCode}
-			</if>
-		</where>
-		order by t1.sku_code) tt 
-		<![CDATA[
+			 	 ]]>
+            </if>
+            <if test="skuCode!=null">
+                and t1.sku_code=#{skuCode}
+            </if>
+        </where>
+        order by t1.sku_code) tt
+        <![CDATA[
 		where rownum<=#{page.endRow})  
 				where  rowno>=#{page.startRow}  
 		]]>
-  </select>
-  
+    </select>
+
     <!-- 每日库存信息 -->
-  <select id="queryDailyStockList" parameterType="map"  resultType="DailyStock">
+    <select id="queryDailyStockList" parameterType="map" resultType="DailyStock">
 		select t1.id as id,
 			t1.report_date as reportDate,
 			t1.sku_code as skuCode,
@@ -560,4 +575,19 @@
 			t1.createdate as createDate 
 		from wms_stock_dailystock t1 
   </select>
- </mapper>
+
+    <update id="updateBatchBySkuCode" parameterType="java.util.List">
+        begin
+        <foreach collection="list" item="item" index="index" separator=";">
+            update WMS_STOCK
+            <set>
+                total_quantity = #{item.salesQuantity} + #{item.occupyQuantity},
+                sales_quantity = #{item.salesQuantity},
+            </set>
+            where sku_id IN (
+              select id from wms_sku t where t.sku_code = #{item.sku.skuCode}
+            )
+        </foreach>
+        ;end;
+    </update>
+</mapper>

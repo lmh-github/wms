@@ -130,4 +130,9 @@ public interface StockDao {
 	 */
 	List<DailyStock> queryDailyStockList();
 
+    /**
+     * 根据sku code批量更新
+     * @param stocks
+     */
+    void updateBatchBySkuCode(List<Stock> stocks);
 }
