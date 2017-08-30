@@ -80,7 +80,7 @@
 				var $this = $(this).removeClass("combox");
 				var name = $this.attr("name");
 				var value= $this.val();
-				var label = $("option[value=" + value + "]",$this).text();
+				var label = $("option[value='" + value + "']",$this).text();
 				var ref = $this.attr("ref");
 				var refUrl = $this.attr("refUrl") || "";
 
