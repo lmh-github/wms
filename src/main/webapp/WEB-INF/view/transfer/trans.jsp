@@ -70,6 +70,7 @@
                     } catch (e) {
                         showMsg("");
                         $("#goodsPanel${rand}").html(data);
+                        checkFilsh();
                     }
                 });
             }
