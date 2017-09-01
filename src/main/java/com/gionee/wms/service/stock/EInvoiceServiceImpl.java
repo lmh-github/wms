@@ -1,7 +1,6 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.*;
-import com.gionee.wms.common.Base64;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.dao.SalesOrderDao;
 import com.gionee.wms.dto.*;
@@ -53,7 +52,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Component
 public class EInvoiceServiceImpl implements EInvoiceService {
 
-    /** 开票接口成功状态码 */
+    /**
+     * 开票接口成功状态码
+     */
     private static final String SUCCESS_CODE = "0000";
     private static final Pattern KPRQ_PATTERN = Pattern.compile("\\d{14}");
     private static final SimpleDateFormat KPRQ_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -83,7 +84,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
     private EwmGenerateService ewmGenerateService;
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServiceCtrlMessage<KpContentResp> makeEInvoice(String orderCode) {
         InvoiceInfo invoiceInfo1 = invoiceInfoSerivce.get(orderCode);
@@ -158,6 +161,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 月末最后一天处理
+     *
      * @param orderCode 订单号
      * @param status    开票延迟|冲红延迟
      * @return
@@ -178,7 +182,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         return false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServiceCtrlMessage<XzContentResp> downEInvoice(String orderCode) {
         SalesOrder salesOrder = salesOrderDao.queryOrderByOrderCode(orderCode);
@@ -201,7 +207,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         return null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage invalidEIvoice(String orderCode, boolean forced) {
@@ -259,6 +267,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 创建开票请求
+     *
      * @param eInvoice EInvoiceBuildService
      * @param order    订单
      * @param goods    订单商品
@@ -303,6 +312,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 请求航信发票接口
+     *
      * @param requestKpInterface 请求报文
      * @return KpInterface
      * @throws Exception
@@ -336,6 +346,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 日期格式转换
+     *
      * @param dateText
      * @return
      */
@@ -354,7 +365,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage downloadInvoicePdfAnd2Img(String orderCode) {
@@ -379,6 +392,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 异步下载PDF文件并转换成IMG图片格式，保存到部署目录
+     *
      * @param orderCode 订单号
      * @param pdfUrl    PDF下载URL
      */

@@ -401,7 +401,7 @@ public class StockAction extends CrudActionSupport<Stock> {
                     WmsRealTimeInventoryBalanceQueryResponse.class,
                     requests
                 );
-                stockService.updateBatchByResponses(Optional.ofNullable(responses), skuMapping);
+                stockService.updateBatchByResponses(responses, skuMapping);
             }
         }
         return "refresh";
