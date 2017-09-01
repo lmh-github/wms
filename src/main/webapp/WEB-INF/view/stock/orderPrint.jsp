@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" %>
+﻿﻿<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -380,6 +380,51 @@ function doPrint(orderIdStr, type) {
         LODOP.ADD_PRINT_URL(0, 0, "100%", "100%", "${urlPre}/stock/salesOrder!previewPicking.action?ids=" + idstr);
         //LODOP.PREVIEW();
         LODOP.PRINT();
+    }
+
+    if (type == 'invoice') {
+        $.post("${ctx}/stock/salesOrder!getPrintInvoiceData.action", {ids: idstr}, function (data) {
+            if (data.message) {
+                return alertMsg.error(data.message);
+            }
+            var successOrder = [], successBatch = {};
+            $.each(data, function () {
+                try {
+                    var m_ObjSoapKp = document.getElementById("m_ObjSoapKp");
+                    m_ObjSoapKp.SoapAdd = "http://127.0.0.1/wsdl/";
+                    m_ObjSoapKp.LoginTaxNo = "<%=com.gionee.wms.common.WmsConstants.INVOICE_SELLER_NO%>";
+                    m_ObjSoapKp.LoginPass = "<%=com.gionee.wms.common.WmsConstants.INVOICE_SELLER_PASSWORD%>";
+                    m_ObjSoapKp.DJID = this.ID;
+                    $.extend(m_ObjSoapKp, this);
+                    m_ObjSoapKp.MakeInvoice();
+
+                    if (m_ObjSoapKp.RetCode == '5011') { // 发票打印成功
+                        successOrder.push(this.orderId);
+                        if (this.batchCode != null && this.batchId != null) {
+                            successBatch[this.batchCode] = this.batchId;
+                        }
+                    }
+                } catch (e) {
+                    alertMsg.error(e.message);
+                }
+            });
+
+            var postData = {};
+            $.each(successOrder, function (i, v) {
+                postData['orderIds[' + i + ']'] = v;
+            });
+            $.each(successBatch, function (k, v) {
+                postData["batchMap['" + k + "']"] = v;
+            });
+            if ($.isEmptyObject(postData)) {
+                return;
+            }
+            $.post("${ctx}/stock/salesOrder!successInvoice.action", postData, function (data) {
+                if (data.statusCode == 200) {
+                    alertMsg.correct(data.message);
+                }
+            }, "json");
+        }, "json");
     }
 }
 </script>
