@@ -1,6 +1,7 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.*;
+import com.gionee.wms.common.Base64;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.dao.SalesOrderDao;
 import com.gionee.wms.dto.*;
