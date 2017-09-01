@@ -41,10 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller("StockAction")
 @Scope("prototype")
@@ -404,7 +401,7 @@ public class StockAction extends CrudActionSupport<Stock> {
                     WmsRealTimeInventoryBalanceQueryResponse.class,
                     requests
                 );
-                stockService.updateBatchByResponses(responses, skuMapping);
+                stockService.updateBatchByResponses(Optional.ofNullable(responses), skuMapping);
             }
         }
         return "refresh";
