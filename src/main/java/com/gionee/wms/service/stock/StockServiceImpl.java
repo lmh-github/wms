@@ -281,6 +281,16 @@ public class StockServiceImpl implements StockService {
         }
     }
 
+    @Override
+    public Integer getQuantity(Map<String, Object> skuCode) {
+        return stockDao.queryQuantity(skuCode);
+    }
+
+    @Override
+    public void updateBatch(List<Stock> list) {
+        stockDao.updateBatchById(list);
+    }
+
     private void doConvert(StockRequest stockRequest, Stock stock) {
         // 临时保存各库存数量
         Integer salesQuantity = stock.getSalesQuantity();
@@ -748,6 +758,9 @@ public class StockServiceImpl implements StockService {
                 if (response != null && response.getResult() && !CollectionUtils.isEmpty(response.getList())) {
                     for (WmsRealTimeInventoryBalanceQueryResponseItem responseItem : response.getList()) {
                         Stock stock = new Stock();
+                        Warehouse warehouse = new Warehouse();
+                        warehouse.setWarehouseCode(responseItem.getWarehouse());
+                        stock.setWarehouse(warehouse);
                         Sku sku = new Sku();
                         sku.setSkuCode(skuMapping.get(responseItem.getSku_no()));
 

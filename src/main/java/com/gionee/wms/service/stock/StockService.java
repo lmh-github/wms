@@ -160,4 +160,17 @@ public interface StockService {
      * @param skuMapping 响应商品映射
      */
     void updateBatchByResponses(List<WmsRealTimeInventoryBalanceQueryResponse> responses, Map<String, String> skuMapping);
+
+    /**
+     * 查询东莞库存
+     * @param skuCode
+     * @return
+     */
+    Integer getQuantity(Map<String, Object> skuCode);
+
+    /**
+     * 批量更新
+     * @param list
+     */
+    void updateBatch(List<Stock> list);
 }

@@ -41,7 +41,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller("StockAction")
 @Scope("prototype")
@@ -367,6 +370,36 @@ public class StockAction extends CrudActionSupport<Stock> {
         // }
         return stock;
     }
+
+    public String reset() {
+        Map<String, Object> criteria = Maps.newHashMap();
+        criteria.put("warehouseId", 1643);
+        List<Stock> list = stockService.getStockList(criteria);
+        for (Stock stock : list) {
+            String skuCode = stock.getSku().getSkuCode();
+            criteria = Maps.newHashMap();
+            criteria.put("skuCode", skuCode);
+            criteria.put("stockType", "4");
+
+            Integer totalQuantity = stockService.getQuantity(criteria);
+            criteria = Maps.newHashMap();
+            criteria.put("skuCode", skuCode);
+            criteria.put("stockType", "1");
+            Integer salesQuantity = stockService.getQuantity(criteria);
+
+            if (totalQuantity == null) {
+                totalQuantity = 0;
+            }
+            if (salesQuantity == null) {
+                salesQuantity = 0;
+            }
+            stock.setTotalQuantity(totalQuantity);
+            stock.setSalesQuantity(salesQuantity);
+        }
+        stockService.updateBatch(list);
+        return "refresh";
+    }
+
 
     // 刷新所有顺丰仓库存
     public String refresh() {

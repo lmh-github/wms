@@ -576,6 +576,24 @@
 		from wms_stock_dailystock t1 
   </select>
 
+    <select id="queryQuantity" parameterType="map" resultType="java.lang.Integer">
+        SELECT A.change_closing_stock
+          FROM (select t1.closing_stock as change_closing_stock
+                  from wms_stock_change t1
+                  join wms_stock t3 on t1.stock_id = t3.id
+                  join wms_sku t2 on t3.sku_id = t2.id
+                  join wms_warehouse t4 on t3.warehouse_id = t4.id
+                  join wms_wares t5 on t2.wares_id = t5.id
+                 WHERE t3.warehouse_id = 1643
+                   and t2.sku_code = #{skuCode}
+                   and t1.stock_type = #{stockType}
+                 order by t1.create_time desc, t1.id desc) A
+         WHERE rownum = 1
+
+
+    </select>
+
+
     <update id="updateBatchBySkuCode" parameterType="java.util.List">
         begin
         <foreach collection="list" item="item" index="index" separator=";">
@@ -584,9 +602,25 @@
                 total_quantity = #{item.salesQuantity} + #{item.occupyQuantity},
                 sales_quantity = #{item.salesQuantity},
             </set>
-            where sku_id IN (
-              select id from wms_sku t where t.sku_code = #{item.sku.skuCode}
+            where warehouse_id IN (
+               select id from wms_warehouse t where t.warehouse_code = #{item.warehouse.warehouseCode}
             )
+            AND sku_id IN (
+               select id from wms_sku t where t.sku_code = #{item.sku.skuCode}
+            )
+        </foreach>
+        ;end;
+    </update>
+
+    <update id="updateBatchById" parameterType="java.util.List">
+        begin
+        <foreach collection="list" item="item" index="index" separator=";">
+            update WMS_STOCK
+            <set>
+                total_quantity = #{item.totalQuantity},
+                sales_quantity = #{item.salesQuantity},
+            </set>
+            where id = #{item.id}
         </foreach>
         ;end;
     </update>
