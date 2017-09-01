@@ -15,7 +15,6 @@ import com.gionee.wms.web.client.OrderCenterClient;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sf.integration.warehouse.response.WmsRealTimeInventoryBalanceQueryResponse;
-import com.sf.integration.warehouse.response.WmsRealTimeInventoryBalanceQueryResponseItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -741,25 +740,26 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    public void updateBatchByResponses(List<WmsRealTimeInventoryBalanceQueryResponse> responses, Map<String, String> skuMapping) {
-        if (!CollectionUtils.isEmpty(responses)) {
+    public void updateBatchByResponses(Optional<List<WmsRealTimeInventoryBalanceQueryResponse>> responses, Map<String, String> skuMapping) {
+        if (responses.isPresent()) {
             List<Stock> stocks = Lists.newArrayList();
-            for (WmsRealTimeInventoryBalanceQueryResponse response : responses) {
-                if (response != null && response.getResult() && !CollectionUtils.isEmpty(response.getList())) {
-                    for (WmsRealTimeInventoryBalanceQueryResponseItem responseItem : response.getList()) {
+            responses.get().forEach(response -> {
+                if (response != null && response.getResult()) {
+                    response.getList().forEach(responseItem -> {
                         Stock stock = new Stock();
                         Sku sku = new Sku();
                         sku.setSkuCode(skuMapping.get(responseItem.getSku_no()));
-
                         stock.setSku(sku);
-                        stock.setTotalQuantity(responseItem.getTotal_stock().intValue());
-                        stock.setSalesQuantity(responseItem.getAvailable_stock().intValue());
-                        stock.setOccupyQuantity(responseItem.getOn_hand_stock().intValue());
-                        stock.setUnsalesQuantity(responseItem.getIn_transit_stock().intValue());
-                        stocks.add(stock);
-                    }
+                        if (responseItem.getTotal_stock() != null) {
+                            stock.setTotalQuantity(responseItem.getTotal_stock().intValue());
+                            stock.setSalesQuantity(responseItem.getAvailable_stock().intValue());
+                            stock.setOccupyQuantity(responseItem.getOn_hand_stock().intValue());
+                            stock.setUnsalesQuantity(responseItem.getIn_transit_stock().intValue());
+                            stocks.add(stock);
+                        }
+                    });
                 }
-            }
+            });
             if (!CollectionUtils.isEmpty(stocks)) {
                 stockDao.updateBatchBySkuCode(stocks);
             }

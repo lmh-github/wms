@@ -12,6 +12,7 @@ import com.sf.integration.warehouse.response.WmsRealTimeInventoryBalanceQueryRes
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface StockService {
 
@@ -159,5 +160,5 @@ public interface StockService {
      * @param responses 顺丰响应参数集合
      * @param skuMapping 响应商品映射
      */
-    void updateBatchByResponses(List<WmsRealTimeInventoryBalanceQueryResponse> responses, Map<String, String> skuMapping);
+    void updateBatchByResponses(Optional<List<WmsRealTimeInventoryBalanceQueryResponse>> responses, Map<String, String> skuMapping);
 }
