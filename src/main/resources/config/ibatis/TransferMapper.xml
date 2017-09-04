@@ -463,7 +463,7 @@
 	<update id="updateTransfer" parameterType="Transfer">
 		update wms_transfer
 		<set>
-            <if test="flowType!=null">warehouse_id=#{warehouseId, jdbcType=VARCHAR},</if>
+            <if test="warehouseId!=null">warehouse_id=#{warehouseId, jdbcType=VARCHAR},</if>
             <if test="transferTo!=null">transfer_to=#{transferTo, jdbcType=VARCHAR},</if>
             <if test="remark!=null">remark=#{remark, jdbcType=VARCHAR},</if>
             <if test="consignee!=null">consignee=#{consignee, jdbcType=VARCHAR},</if>
