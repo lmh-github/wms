@@ -69,7 +69,12 @@
 				<dd>
 					<select  name="order.shippingId">
 						<c:forEach items="${shippingList }" var="shipping">
-							<option value="${shipping.id }" ${(shipping.id==order.shippingId)?"selected='true'":""}>${shipping.shippingName }</option>
+                            <c:if test="${order == null}">
+							    <option value="${shipping.id }" ${(shipping.shippingName=="东莞直发")?"selected='true'":""}>${shipping.shippingName }</option>
+                            </c:if>
+                            <c:if test="${order != null}">
+                                <option value="${shipping.id }" ${(shipping.id==order.shippingId)?"selected='true'":""}>${shipping.shippingName }</option>
+                            </c:if>
 						</c:forEach>
 					</select>
 				</dd>
