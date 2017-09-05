@@ -765,15 +765,16 @@ public class StockServiceImpl implements StockService {
                         sku.setSkuCode(skuMapping.get(responseItem.getSku_no()));
 
                         stock.setSku(sku);
-                        if (responseItem.getTotal_stock() != null &&
-                            responseItem.getAvailable_stock() != null &&
-                            responseItem.getIn_transit_stock() != null) {
-                            stock.setTotalQuantity(responseItem.getTotal_stock().intValue());
-                            stock.setSalesQuantity(responseItem.getAvailable_stock().intValue());
-                            stock.setOccupyQuantity(responseItem.getOn_hand_stock().intValue());
-                            stock.setUnsalesQuantity(responseItem.getIn_transit_stock().intValue());
-                            stocks.add(stock);
-                        }
+                        int total = responseItem.getTotal_stock() == null ? 0 : responseItem.getTotal_stock().intValue();
+                        int sales = responseItem.getAvailable_stock() == null ? 0 : responseItem.getAvailable_stock().intValue();
+                        int occupy = responseItem.getOn_hand_stock() == null ? 0 : responseItem.getOn_hand_stock().intValue();
+                        int unSales = responseItem.getIn_transit_stock() == null ? 0 : responseItem.getIn_transit_stock().intValue();
+
+                        stock.setTotalQuantity(total);
+                        stock.setSalesQuantity(sales);
+                        stock.setOccupyQuantity(occupy);
+                        stock.setUnsalesQuantity(unSales);
+                        stocks.add(stock);
                     }
                 }
             }
