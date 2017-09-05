@@ -20,8 +20,15 @@
 			<dt>调货单:</dt>
 			<dd><input name="transferId" type="text" class="textInput digits required" value="${transferId }" readonly="readonly"/></dd>
 		</dl>
+		<dl id="scanIndiv2">
+			<dt>扫描类型：</dt>
+			<dd>
+                <input type="radio" name="isImei" checked value="0"/> imei
+                <input type="radio" name="isImei" value="1" /> 箱号
+            </dd>
+		</dl>
 		<dl id="scanIndiv">
-			<dt>扫描个体编码：</dt>
+			<dt>编码：</dt>
 			<dd><input id="indivCode2" name="indivCode" type="text" class="textInput" onKeydown="doKeydown(event, this)"/><span id="scanCode" style="color: red; font-size: 12pt; float: left;"></span></dd>
 		</dl>
 		<dl id="scanShipping" style="display: none;">

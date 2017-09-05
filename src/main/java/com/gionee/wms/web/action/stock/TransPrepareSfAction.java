@@ -11,7 +11,7 @@ import com.gionee.wms.service.ServiceException;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.service.wares.IndivService;
-import com.gionee.wms.web.action.CrudActionSupport;
+import com.gionee.wms.web.action.stock.base.TransPrepareBaseAction;
 import com.google.common.collect.Maps;
 import com.opensymphony.xwork2.ActionContext;
 import org.apache.commons.lang3.Validate;
@@ -28,9 +28,9 @@ import java.util.Map;
 
 @Controller("TransPrepareSfAction")
 @Scope("prototype")
-public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
+public class TransPrepareSfAction extends TransPrepareBaseAction {
     private static final long serialVersionUID = 2728587467025993326L;
-    private static final int PART_CODE_MAXLENGTH = 10; // 配件编码最大长度
+    private static final int PART_CODE_MAXLENGTH = 5; // 配件编码最大长度
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
@@ -53,6 +53,7 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
     private String tplateNumber;
     private String driver;
     private String joiner;
+
 
     public String execute() throws Exception {
         return SUCCESS;
@@ -90,7 +91,7 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
             ajaxObject(result);
             return null;
         }
-        if (indivCode.length() <= PART_CODE_MAXLENGTH) {// 扫描sku编码
+        if (indivCode.length() < PART_CODE_MAXLENGTH) {// 扫描sku编码
             result = this.dealSku(transfer, indivCode);
         } else {
             Indiv indiv = indivService.getIndivByCode(indivCode);
@@ -111,24 +112,7 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
         List<Map> resultList = new ArrayList<Map>();// 回传到页面的数据包括sku和对应的imei编码
         Map<String, Object> params = Maps.newHashMap();
         int prepareRst = 0;
-        if (null != goodsList) {
-            for (TransferGoods goods : goodsList) {
-                if (indivCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_FALSE == goods.getIndivEnabled()) {
-                    Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
-                    if (preparedNum > goods.getQuantity()) {
-                        prepareRst = 1; // 已超出
-                        break;
-                    }
-                    goods.setPreparedNum(preparedNum);
-                    params.clear();
-                    params.put("goodsId", goods.getId());
-                    params.put("preparedNum", preparedNum);
-                    transferService.updateTransferGoods(params);
-                    prepareRst = 2; // 成功
-                    break;
-                }
-            }
-        }
+        prepareRst = getPrepareRst(params, prepareRst, goodsList, transferService, indivCode);
         if (0 == prepareRst) {
             result.setOk(false);
             result.setMessage("未找到sku");
@@ -221,43 +205,10 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
         int prepareRst = 0;
         Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
         result.setOk(true);
-        if (WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode() != indiv.getStockStatus()) {
-            result.setOk(false);
-            result.setMessage("商品不在库中");
-        } else if (!(warehouse.getId().equals(indiv.getWarehouseId()))) {
-            result.setOk(false);
-            result.setMessage("该商品不属于该仓库");
-        } else {
-            if (null != transfer.getTransType() && WmsConstants.TRANS_TYPE_DEFECTIVE == transfer.getTransType().intValue()) {
-                // 次品单
-                if (WmsConstants.IndivWaresStatus.NON_DEFECTIVE.getCode() == indiv.getWaresStatus()) {
-                    result.setOk(false);
-                    result.setMessage("次品调拨的物品必须为次品");
-                }
-            } else {
-                // 良品单
-                if (WmsConstants.IndivWaresStatus.DEFECTIVE.getCode() == indiv.getWaresStatus()) {
-                    result.setOk(false);
-                    result.setMessage("良品调拨的物品必须为良品");
-                }
-            }
-        }
+        validateIndivTransAndSetResult(result, transfer, indiv, warehouse);
         if (result.getOk()) {
             String skuCode = indiv.getSkuCode();
-            if (null != goodsList) {
-                for (TransferGoods goods : goodsList) {
-                    if (skuCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_TRUE == goods.getIndivEnabled()) {
-                        Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
-                        if (preparedNum > goods.getQuantity()) {
-                            prepareRst = 1; // 超出
-                            break;
-                        }
-                        transferService.addIndiv(transfer.getTransferId(), transfer.getTransferId() + "", indiv.getId());
-                        prepareRst = 2; // 成功
-                        break;
-                    }
-                }
-            }
+            prepareRst = getPrepareRst(prepareRst, transfer, indiv, skuCode, goodsList, transferService);
             if (0 == prepareRst) {
                 result.setOk(false);
                 result.setMessage("未找到sku");
@@ -296,20 +247,7 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
             //if(type.equals("0")){
             //	result.setMessage("调拨单不属于分仓管理下的单号");
             //}else{
-            if (null != transfer) {
-                if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
-                    result.setMessage("未发货的单才能进行配货");
-                } else {
-                    Transfer tr = new Transfer();
-                    tr.setTransferId(transfer.getTransferId());
-                    tr.setStatus(WmsConstants.TransferStatus.DELIVERYING.getCode());
-                    transferService.updateTransferSf(tr);
-                    result.setOk(true);
-                    result.setResult(transfer);
-                }
-            } else {
-                result.setMessage("调拨单" + transferId + "不存在");
-            }
+            validateIndivTransAndSetResult(result, transferId, transfer, transferService);
             //}
         } catch (ServiceException e) {
             logger.error(e.getMessage(), e);
@@ -321,6 +259,7 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
 
     /**
      * 确认调拨
+     *
      * @return
      * @throws Exception
      */
@@ -540,5 +479,4 @@ public class TransPrepareSfAction extends CrudActionSupport<Transfer> {
     public void setJoiner(String joiner) {
         this.joiner = joiner;
     }
-
 }

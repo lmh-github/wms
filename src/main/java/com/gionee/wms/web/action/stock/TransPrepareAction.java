@@ -10,8 +10,9 @@ import com.gionee.wms.service.ServiceException;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.service.wares.IndivService;
-import com.gionee.wms.web.action.CrudActionSupport;
+import com.gionee.wms.web.action.stock.base.TransPrepareBaseAction;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 @Controller("TransPrepareAction")
 @Scope("prototype")
-public class TransPrepareAction extends CrudActionSupport<Transfer> {
+public class TransPrepareAction extends TransPrepareBaseAction {
     private static final long serialVersionUID = 2728587467025993326L;
     private static final int PART_CODE_MAXLENGTH = 5;    // 配件编码最大长度
 
@@ -43,6 +44,7 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
     private Integer preparedNum;
     private Transfer transfer;
     private Boolean finished;
+    private Integer isImei;
 
     public String execute() throws Exception {
         return SUCCESS;
@@ -73,105 +75,82 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
         int prepareRst = 0;
         // 获取配货订单仓库信息
         Transfer transfer = transferService.getTransferById(transferId);
-        if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
-            // 不为未发货或者配货中
-            result.setOk(false);
-            result.setMessage("调拨单状态异常，请检查");
-            ajaxObject(result);
+        if (checkTransferStatus(result, transfer)) {
             return null;
         }
-        if (indivCode.length() <= PART_CODE_MAXLENGTH) {
-            // sku编码
-            if (null != goodsList) {
-                for (TransferGoods goods : goodsList) {
-                    if (indivCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_FALSE == goods.getIndivEnabled()) {
-                        Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
-                        if (preparedNum > goods.getQuantity()) {
-                            prepareRst = 1; // 已超出
-                            break;
-                        }
-                        goods.setPreparedNum(preparedNum);
-                        params.clear();
-                        params.put("goodsId", goods.getId());
-                        params.put("preparedNum", preparedNum);
-                        transferService.updateTransferGoods(params);
-                        prepareRst = 2; // 成功
-                        break;
-                    }
-                }
-            }
-            if (0 == prepareRst) {
-                result.setOk(false);
-                result.setMessage("未找到sku");
-            } else if (1 == prepareRst) {
-                result.setOk(false);
-                result.setMessage("已达到数量");
-            } else if (2 == prepareRst) {
-                result.setOk(true);
-                result.setResult(indivCode);
-                result.setMessage("成功");
-            }
-        } else {
-            // 个体编码
-            Indiv indiv = indivService.getIndivByCode(indivCode);
-            Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
-
-            result.setOk(true);
-            if (null == indiv) {
-                result.setOk(false);
-                result.setMessage("未找到商品个体");
-            } else if (WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode() != indiv.getStockStatus()) {
-                result.setOk(false);
-                result.setMessage("商品不在库中");
-            } else if (!(warehouse.getId().equals(indiv.getWarehouseId()))) {
-                result.setOk(false);
-                result.setMessage("该商品不属于该仓库");
+        if ((isImei != null && isImei == 0) || isImei == null) {
+            if (indivCode.length() <= PART_CODE_MAXLENGTH) {
+                // 扫描sku编码
+                prepareSku(result, params, prepareRst);
             } else {
-                if (null != transfer.getTransType() && WmsConstants.TRANS_TYPE_DEFECTIVE == transfer.getTransType().intValue()) {
-                    // 次品单
-                    if (WmsConstants.IndivWaresStatus.NON_DEFECTIVE.getCode() == indiv.getWaresStatus()) {
-                        result.setOk(false);
-                        result.setMessage("次品调拨的物品必须为次品");
-                    }
-                } else {
-                    // 良品单
-                    if (WmsConstants.IndivWaresStatus.DEFECTIVE.getCode() == indiv.getWaresStatus()) {
-                        result.setOk(false);
-                        result.setMessage("良品调拨的物品必须为良品");
-                    }
-                }
+                // 扫描个体编码
+                prepareIndiv(result, prepareRst, transfer);
             }
-            if (result.getOk()) {
-                String skuCode = indiv.getSkuCode();
-                if (null != goodsList) {
-                    for (TransferGoods goods : goodsList) {
-                        if (skuCode.equals(goods.getSkuCode()) && WmsConstants.ENABLED_TRUE == goods.getIndivEnabled()) {
-                            Integer preparedNum = null == goods.getPreparedNum() ? 1 : goods.getPreparedNum() + 1;
-                            if (preparedNum > goods.getQuantity()) {
-                                prepareRst = 1; // 超出
-                                break;
+        } else if (isImei == 1) {
+            //扫描箱号
+            prepareCase(result, transfer);
+        }
+
+        ajaxObject(result);
+        return null;
+    }
+
+    private void prepareIndiv(CommonAjaxResult result, int prepareRst, Transfer transfer) {
+        Indiv indiv = indivService.getIndivByCode(indivCode);
+        Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
+
+        result.setOk(true);
+        validateIndivTransAndSetResult(result, transfer, indiv, warehouse);
+        if (result.getOk()) {
+            String skuCode = indiv.getSkuCode();
+            prepareRst = getPrepareRst(prepareRst, transfer, indiv, skuCode, goodsList, transferService);
+            switchPrepareAndSetResult(result, prepareRst, skuCode);
+        }
+    }
+
+    private void prepareSku(CommonAjaxResult result, Map<String, Object> params, int prepareRst) {
+        prepareRst = getPrepareRst(params, prepareRst, goodsList, transferService, indivCode);
+        switchPrepareAndSetResult(result, prepareRst, indivCode);
+    }
+
+    private void prepareCase(CommonAjaxResult result, Transfer transfer) {
+        result.setOk(false);
+        String message = "未找到箱号对应个体!";
+        List<Indiv> indivs = indivService.getIndivListByCaseCode(indivCode);
+        if (!CollectionUtils.isEmpty(indivs) && !CollectionUtils.isEmpty(goodsList)) {
+            for (TransferGoods transferGoods : goodsList) {
+                if (transferGoods.getSkuCode().equals(indivs.get(0).getSkuCode())
+                    && WmsConstants.ENABLED_TRUE == transferGoods.getIndivEnabled()) {
+                    // 申请数量必须大于等于包装箱中个体数量
+                    Integer quantity = transferGoods.getQuantity();
+
+                    if (quantity >= indivs.size()) {
+                        // 待配货数量必须为null或0
+                        // 待配货数量大于等于包装箱中个体数量
+                        Integer preparedNum = transferGoods.getPreparedNum();
+
+                        if ((preparedNum == null || preparedNum == 0) || (quantity - preparedNum >= indivs.size())) {
+                            result.setOk(true);
+                            Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
+
+                            for (Indiv indiv : indivs) {
+                                validateIndivTransAndSetResult(result, transfer, indiv, warehouse);
+                                if (!result.getOk()) {
+                                    return;
+                                }
                             }
-                            transferService.addIndiv(transfer.getTransferId(), transfer.getTransferId() + "", indiv.getId());
-                            prepareRst = 2; // 成功
-                            break;
+                            transferService.addIndivs(transfer.getTransferId(), transfer.getTransferId().toString(), indivs);
+                            message = "成功!";
+                        } else {
+                            message = "待配货数量必须大于等于包装箱中个体数量!";
                         }
+                    } else {
+                        message = "申请数量必须大于等于包装箱中个体数量!";
                     }
-                }
-                if (0 == prepareRst) {
-                    result.setOk(false);
-                    result.setMessage("未找到sku");
-                } else if (1 == prepareRst) {
-                    result.setOk(false);
-                    result.setMessage("已达到数量");
-                } else if (2 == prepareRst) {
-                    result.setOk(true);
-                    result.setResult(skuCode);
-                    result.setMessage("成功");
                 }
             }
         }
-        ajaxObject(result);
-        return null;
+        result.setMessage(message);
     }
 
     public String readyPrepare() throws Exception {
@@ -189,21 +168,7 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
                 ajaxObject(result);
                 return null;
             }
-
-            if (null != transfer) {
-                if (!(WmsConstants.TransferStatus.UN_DELIVERYD.getCode() == transfer.getStatus() || WmsConstants.TransferStatus.DELIVERYING.getCode() == transfer.getStatus())) {
-                    result.setMessage("未发货的单才能进行配货");
-                } else {
-                    Transfer tr = new Transfer();
-                    tr.setTransferId(transfer.getTransferId());
-                    tr.setStatus(WmsConstants.TransferStatus.DELIVERYING.getCode());
-                    transferService.updateTransferSf(tr);
-                    result.setOk(true);
-                    result.setResult(transfer);
-                }
-            } else {
-                result.setMessage("调拨单" + transferId + "不存在");
-            }
+            validateIndivTransAndSetResult(result, transferId, transfer, transferService);
 
         } catch (ServiceException e) {
             logger.error(e.getMessage(), e);
@@ -213,8 +178,10 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
         return null;
     }
 
+
     /**
      * 确认调拨
+     *
      * @return
      * @throws Exception
      */
@@ -398,4 +365,11 @@ public class TransPrepareAction extends CrudActionSupport<Transfer> {
         this.finished = finished;
     }
 
+    public Integer getIsImei() {
+        return isImei;
+    }
+
+    public void setIsImei(Integer isImei) {
+        this.isImei = isImei;
+    }
 }

@@ -394,4 +394,5 @@ public class TransferController {
         List<Indiv> indivList = transferService.getIndivList(transferId);
         modelMap.put("indivList", indivList);
     }
+
 }
