@@ -210,6 +210,7 @@
           <result name="toInput">/WEB-INF/view/morder/mOrderInput.jsp</result>
           <result name="toFinish">/WEB-INF/view/morder/mOrderFinish.jsp</result>
           <result name="toView">/WEB-INF/view/morder/mOrderView.jsp</result>
+          <result name="extension">/WEB-INF/view/morder/mOrderExtension.jsp</result>
         </action>
    		 <!--ÊÖ¹¤ÍË»»»õ-->
         <action name="orderBack" class="OrderBackAction">

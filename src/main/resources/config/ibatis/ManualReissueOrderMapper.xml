@@ -3,7 +3,7 @@
 <mapper namespace="com.gionee.wms.dao.ManualReissueOrderDao">
 
   <sql id="columns">
-    ID, PLATFORM, ORDER_CODE, NEW_ORDER_CODE, INVOICE, BILL_TYPE, REMARK, EXTENSION, STATUS, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY
+    ID, PLATFORM, ORDER_CODE, NEW_ORDER_CODE, INVOICE, BILL_TYPE, REMARK, EXTENSION, STATUS, CREATE_TIME, CREATE_BY, UPDATE_TIME, UPDATE_BY, ORDER_JSON
   </sql>
   
   <resultMap type="map" id="resultMap">
@@ -29,6 +29,7 @@
     <result property="skuCode" column="SKU_CODE" />
     <result property="skuName" column="SKU_Name" />
     <result property="qty" column="QTY" />
+    <result property="orderJson" column="ORDER_JSON" />
   </resultMap>
   
   <resultMap type="com.gionee.wms.entity.ManualReissueOrder" id="result">
@@ -65,7 +66,8 @@
       SYSDATE,
       #{createBy, jdbcType=VARCHAR},
       #{updateTime, jdbcType=TIMESTAMP},
-      #{updateBy, jdbcType=VARCHAR}
+      #{updateBy, jdbcType=VARCHAR},
+      #{orderJson , jdbcType=VARCHAR}
     )
   </insert>
   
@@ -95,6 +97,7 @@
       <if test="extension != null">extension = #{extension, jdbcType=VARCHAR},</if>
       <if test="status != null">status = #{status, jdbcType=NUMERIC},</if>
       <if test="updateBy != null">UPDATE_BY = #{updateBy, jdbcType=VARCHAR},</if>
+      <if test="orderJson != null">ORDER_JSON = #{orderJson, jdbcType=VARCHAR},</if>
       UPDATE_TIME = sysdate
     </set>
     where id = #{id}
@@ -143,6 +146,9 @@
       <if test="mobile != null">
         and T2.MOBILE = #{mobile}
       </if>
+      <if test="sku != null">
+        and T3.SKU_CODE = #{sku}
+      </if>
     </where>
   </sql>
   
@@ -164,7 +170,8 @@
     	T2.ORDER_AMOUNT,
     	T2.PAYMENT_NAME,
     	T2.CONSIGNEE,
-    	T2.MOBILE
+    	T2.MOBILE,
+    	T1.ORDER_JSON
     FROM
     	WMS_MANUAL_REISSUE_ORDER T1
     LEFT JOIN WMS_SALES_ORDER T2 ON T1.ORDER_CODE = T2.ORDER_CODE
@@ -195,6 +202,9 @@
           FROM
           	WMS_MANUAL_REISSUE_ORDER T1
           LEFT JOIN WMS_SALES_ORDER T2 ON T1.ORDER_CODE = T2.ORDER_CODE
+          <if test="sku != null">
+              LEFT JOIN WMS_MANUAL_REISSUE_ORDER_GOODS T3 ON T1.ID = T3.MANUAL_REISSUE_ORDER_ID
+          </if>
           <include refid="query-where" />
           order by id desc
 	   ) A WHERE rownum &lt;= #{page.endRow}
@@ -207,6 +217,9 @@
     FROM
     	WMS_MANUAL_REISSUE_ORDER T1
     LEFT JOIN WMS_SALES_ORDER T2 ON T1.ORDER_CODE = T2.ORDER_CODE
+    <if test="sku != null">
+        LEFT JOIN WMS_MANUAL_REISSUE_ORDER_GOODS T3 ON T1.ID = T3.MANUAL_REISSUE_ORDER_ID
+    </if>
     <include refid="query-where" />
   </select>
   

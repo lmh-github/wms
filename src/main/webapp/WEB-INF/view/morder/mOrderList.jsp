@@ -26,11 +26,11 @@
         </li>
         <li>
             <label>状态：</label>
-            <s:select name="order.status" list="#{'1':'已处理', '0':'未处理'}" listKey="key" listValue="value" value="order.status" headerKey="" headerValue="" theme="simple"></s:select>
+            <s:select name="order.status" list="#{'1':'已处理', '0':'未处理','2':'已取消'}" listKey="key" listValue="value" value="order.status" headerKey="" headerValue="" theme="simple"></s:select>
         </li>
         <li>
             <label>建单类型：</label>
-            <s:select name="order.billType" list="#{'赠品漏发':'赠品漏发', '三包期限内质量问题补发':'三包期限内质量问题补发', '系统BUG':'系统BUG'}" listKey="key" listValue="value" value="order.billType" headerKey="" headerValue="" theme="simple"></s:select>
+            <s:select name="order.billType" list="#{'赠品漏发':'赠品漏发', '三包期限内质量问题补发':'三包期限内质量问题补发', '系统BUG':'系统BUG','好评晒单':'好评晒单','京东赠品补发':'京东赠品补发','订单促销':'订单促销','售后客述安抚':'售后客述安抚'}" listKey="key" listValue="value" value="order.billType" headerKey="" headerValue="" theme="simple"></s:select>
         </li>
         <li>
             <label>订单号：</label>
@@ -41,8 +41,15 @@
             <input type="text" name="mobile" value="${mobile}" />
         </li>
         <li>
-            <label>是否重开发票：</label>
-            <s:select name="order.invoice" list="#{'1':'是', '0':'否'}" listKey="key" listValue="value" value="order.invoice" headerKey="" headerValue="" theme="simple"></s:select>
+            <label>需求平台：</label>
+            <s:select name="order.platform"
+                      list="@com.gionee.wms.common.WmsConstants$OrderSource@values()"
+                      listKey="code" listValue="name" headerKey="" headerValue=""/>
+        </li>
+        <li>
+            <label>sku：</label>
+            <input type="text" name="sku" value="${sku}" />
+
         </li>
       </ul>
       <div class="subBar">
@@ -75,17 +82,14 @@
         <th>订单号</th>
         <th>客户信息</th>
         <th>需建单物品</th>
-        <th>补发单号</th>
-        <th>是否要重开发票</th>
         <th>建单类型</th>
-        <th>建单原因</th>
-        <th>扩展备注</th>
+        <th width="250">建单原因</th>
         <th>处理状态</th>
         <th>操作</th>
       </tr>
     </thead>
     <tbody>
-      <s:set name="statusMap" value='#{"0":"未处理", "1":"已处理"}' />
+      <s:set name="statusMap" value='#{"0":"未处理", "1":"已处理" ,"2" : "已取消"}' />
       <s:iterator value="dataList" status="status" var="b">
         <tr target="sid_order" rel="${id}" align="center">
           <td><fmt:formatDate value="${createTime}" pattern="yyyy-MM-dd HH:mm:ss" /><input type="hidden" name="id" value="${id}" /></td>
@@ -101,13 +105,14 @@
               </s:iterator>
             </s:if>
           </td>
-          <td>${newOrderCode}</td>
-          <td>${invoice == 0 ? "否" : "是"}</td>
           <td>${billType}</td>
           <td>${remark}</td>
-          <td>${extension}</td>
           <td><s:property value="#statusMap[(status + '')]" /><input type="hidden" name="status" value="${status}" /></td>
-          <td><s:if test="status != 1"><a href="javascript:;" onclick="delFun${rand}(${id})">删除</a></s:if></td>
+          <td>
+               <s:if test="status == 0">
+                   <a id="extension_a${rand}" class="edit" href="${ctx}/stock/morder!toExtension.action?id=${id}" target="dialog" mask="true" width="400" height="180" rel="dlg_morderExtension">取消</a>
+              </s:if>
+          </td>
         </tr>
       </s:iterator>
     </tbody>
@@ -127,7 +132,7 @@
 function finish${rand}() {
 	var tb = $("#tb${rand}");
 	var selected = tb.find("tr.selected");
-	
+
 	var status = selected.find(":hidden[name='status']").val();
 	if (status == "1") {
 		//alertMsg.correct('操作成功！');

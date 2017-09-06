@@ -7,25 +7,8 @@
  */
 package com.gionee.wms.web.action.stock;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletOutputStream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.struts2.ServletActionContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
-
 import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.JsonUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.OrderSource;
 import com.gionee.wms.dto.Page;
@@ -38,9 +21,28 @@ import com.gionee.wms.service.stock.SalesOrderService;
 import com.gionee.wms.web.action.AjaxActionSupport;
 import com.google.common.collect.Maps;
 import com.opensymphony.xwork2.ActionContext;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.struts2.ServletActionContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import javax.servlet.ServletOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Clob;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 
  * @author PengBin 00001550<br>
  * @date 2016年10月8日 下午6:29:46
  */
@@ -48,349 +50,409 @@ import com.opensymphony.xwork2.ActionContext;
 @Scope("prototype")
 public class ManualReissueOrderAction extends AjaxActionSupport {
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -2114733892099789013L;
+    /**
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -2114733892099789013L;
 
-	@Autowired
-	private ManualReissueOrderService manualReissueOrderService;
+    @Autowired
+    private ManualReissueOrderService manualReissueOrderService;
 
-	@Autowired
-	private SalesOrderService salesOrderService;
+    @Autowired
+    private SalesOrderService salesOrderService;
 
-	private Page page = new Page();
+    private Page page = new Page();
 
-	private ManualReissueOrder order = new ManualReissueOrder();
+    private ManualReissueOrder order = new ManualReissueOrder();
 
-	private Date createTimeBegin;
+    private Date createTimeBegin;
 
-	private Date createTimeEnd;
+    private Date createTimeEnd;
 
-	private String consignee;
+    private String consignee;
 
-	private String mobile;
+    private String mobile;
 
-	private String orderCode;
+    private String orderCode;
 
-	@Override
-	public String execute() throws Exception {
-		Map<String, Object> criteria = Maps.newHashMap();
-		criteria.put("platform", order.getPlatform());
-		criteria.put("orderCode", StringUtils.trimToNull(order.getOrderCode()));
-		criteria.put("invoice", order.getInvoice());
-		criteria.put("billType", StringUtils.trimToNull(order.getBillType()));
-		criteria.put("mobile", StringUtils.trimToNull(mobile));
-		criteria.put("status", order.getStatus());
-		// criteria.put("paymentName", "");
-		criteria.put("createTimeBegin", createTimeBegin);
-		criteria.put("createTimeEnd", createTimeEnd);
+    private String sku;
 
-		if (!"1".equals(request.getParameter("exports"))) {
+    @Override
+    public String execute() throws Exception {
+        Map<String, Object> criteria = Maps.newHashMap();
+        criteria.put("platform", order.getPlatform());
+        criteria.put("orderCode", StringUtils.trimToNull(order.getOrderCode()));
+        criteria.put("invoice", order.getInvoice());
+        criteria.put("billType", StringUtils.trimToNull(order.getBillType()));
+        criteria.put("mobile", StringUtils.trimToNull(mobile));
+        criteria.put("status", order.getStatus());
+        // criteria.put("paymentName", "");
+        criteria.put("createTimeBegin", createTimeBegin);
+        criteria.put("createTimeEnd", createTimeEnd);
+        criteria.put("sku", StringUtils.trimToNull(sku));
 
-			int totalRow = manualReissueOrderService.queryCount(criteria);
-			page.setTotalRow(totalRow);
-			page.calculate();
-			criteria.put("page", page);
+        if (!"1".equals(request.getParameter("exports"))) {
 
-			if (totalRow == 0) {
-				ActionContext.getContext().put("dataList", new ArrayList<Map<String, Object>>(0));
-			} else {
-				List<Map<String, Object>> listData = manualReissueOrderService.query(criteria, page);
-				for (Map<String, Object> map : listData) {
-					List<ManualReissueOrderGoods> goods = manualReissueOrderService.queryGoods(Long.valueOf(map.get("id").toString()));
-					map.put("goods", goods);
-				}
-				ActionContext.getContext().put("dataList", listData);
-			}
-		} else {
-			export(criteria);
-			return null;
-		}
-		return SUCCESS;
-	}
+            int totalRow = manualReissueOrderService.queryCount(criteria);
+            page.setTotalRow(totalRow);
+            page.calculate();
+            criteria.put("page", page);
 
-	public void export(Map<String, Object> criteria) {
-		try {
-			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(ActionUtils.getProjectPath() + "/export/morder_template.xls")));
-			HSSFSheet sheet = workbook.getSheetAt(0);
+            if (totalRow == 0) {
+                ActionContext.getContext().put("dataList", new ArrayList<Map<String, Object>>(0));
+            } else {
+                List<Map<String, Object>> listData = manualReissueOrderService.query(criteria, page);
+                for (Map<String, Object> map : listData) {
+                    List<ManualReissueOrderGoods> goods = manualReissueOrderService.queryGoods(Long.valueOf(map.get("id").toString()));
+                    map.put("goods", goods);
+                }
+                ActionContext.getContext().put("dataList", listData);
+            }
+        } else {
+            export(criteria);
+            return null;
+        }
+        return SUCCESS;
+    }
 
-			List<Map<String, Object>> listData = manualReissueOrderService.queryForExport(criteria);
+    public void export(Map<String, Object> criteria) {
+        try {
+            HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(ActionUtils.getProjectPath() + "/export/morder_template.xls")));
+            HSSFSheet sheet = workbook.getSheetAt(0);
 
-			Map<Object, String> statusMap = Maps.newHashMap();
-			statusMap.put(0L, "未处理");
-			statusMap.put(1L, "已处理");
+            List<Map<String, Object>> listData = manualReissueOrderService.queryForExport(criteria);
 
-			Map<Object, String> orderSourceMap = Maps.newHashMap();
-			for (OrderSource o : WmsConstants.OrderSource.values()) {
-				orderSourceMap.put(o.getCode(), o.getName());
-			}
+            Map<Object, String> statusMap = Maps.newHashMap();
+            statusMap.put(0L, "未处理");
+            statusMap.put(1L, "已处理");
 
-			for (int i = 0, j = 0; i < listData.size(); i++, j = 0) {
-				Map<String, Object> map = listData.get(i);
+            Map<Object, String> orderSourceMap = Maps.newHashMap();
+            for (OrderSource o : WmsConstants.OrderSource.values()) {
+                orderSourceMap.put(o.getCode(), o.getName());
+            }
 
-				HSSFRow newRow = sheet.createRow(i + 1);
-				newRow.createCell(j++).setCellValue((Date) map.get("createTime"));
-				newRow.createCell(j++).setCellValue(orderSourceMap.get(getStringValue(map.get("platform")))); // 订单来源
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("orderCode"))); // 订单号
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("orderAmount"))); // 订单金额
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("skuCode")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("skuName")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("qty")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("paymentName")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("consignee")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("mobile")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("newOrderCode")));
-				newRow.createCell(j++).setCellValue("1".equals(getStringValue(map.get("invoice"))) ? "是" : "否");
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("billType")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("remark")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("extension")));
-				newRow.createCell(j++).setCellValue(statusMap.get(map.get("status")));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("createBy")));
-				newRow.createCell(j++).setCellValue((Date) map.get("createTime"));
-				newRow.createCell(j++).setCellValue(getStringValue(map.get("updateBy")));
+            for (int i = 0, j = 0; i < listData.size(); i++, j = 0) {
+                Map<String, Object> map = listData.get(i);
 
-				Date updateTime = map.get("updateTime") == null ? null : (Date) map.get("updateTime");
-				if (updateTime == null) {
-					newRow.createCell(j++).setCellValue("");
-				} else {
-					newRow.createCell(j++).setCellValue(updateTime);
-				}
-			}
+                HSSFRow newRow = sheet.createRow(i + 1);
+                newRow.createCell(j++).setCellValue((Date) map.get("createTime"));
+                newRow.createCell(j++).setCellValue(orderSourceMap.get(getStringValue(map.get("platform")))); // 订单来源
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("orderCode"))); // 订单号
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("orderAmount"))); // 订单金额
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("skuCode")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("skuName")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("qty")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("paymentName")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("consignee")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("mobile")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("newOrderCode")));
+                newRow.createCell(j++).setCellValue("1".equals(getStringValue(map.get("invoice"))) ? "是" : "否");
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("billType")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("remark")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("extension")));
+                newRow.createCell(j++).setCellValue(statusMap.get(map.get("status")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("createBy")));
+                newRow.createCell(j++).setCellValue((Date) map.get("createTime"));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("updateBy")));
 
-			// 清空输出流
-			response.reset();
-			// 设置响应头和下载保存的文件名
-			response.setHeader("content-disposition", "attachment;filename=morder_" + System.currentTimeMillis() + ".xls");
-			// 定义输出类型
-			response.setContentType("APPLICATION/msexcel");
-			ServletOutputStream outputStream = response.getOutputStream();
-			workbook.write(outputStream);
+                Date updateTime = map.get("updateTime") == null ? null : (Date) map.get("updateTime");
+                if (updateTime == null) {
+                    newRow.createCell(j++).setCellValue("");
+                } else {
+                    newRow.createCell(j++).setCellValue(updateTime);
+                }
+            }
 
-			outputStream.flush();
-			try {
-				outputStream.close();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
+            // 清空输出流
+            response.reset();
+            // 设置响应头和下载保存的文件名
+            response.setHeader("content-disposition", "attachment;filename=morder_" + System.currentTimeMillis() + ".xls");
+            // 定义输出类型
+            response.setContentType("APPLICATION/msexcel");
+            ServletOutputStream outputStream = response.getOutputStream();
+            workbook.write(outputStream);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            outputStream.flush();
+            try {
+                outputStream.close();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
 
-	private String getStringValue(Object obj) {
-		return obj == null ? "" : obj.toString();
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	public String prepareInput() {
-		return "toInput";
-	}
+    private String getStringValue(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
 
-	/**
-	 * 查找订单
-	 */
-	public void lookupSalesOrder() {
-		try {
-			SalesOrder salesOrder = salesOrderService.getSalesOrderByCode(orderCode);
-			if (salesOrder == null) {
-				ajaxError("订单号：" + orderCode + "，不存在！");
-				return;
-			}
+    public String prepareInput() {
+        return "toInput";
+    }
 
-			List<SalesOrderGoods> goodsList = salesOrderService.getOrderGoodsList(salesOrder.getId());
-			if (goodsList != null) {
-				for (SalesOrderGoods salesOrderGoods : goodsList) {
-					salesOrderGoods.setOrder(null);
-				}
-			}
+    /**
+     * 查找订单
+     */
+    public void lookupSalesOrder() {
+        try {
+            SalesOrder salesOrder = salesOrderService.getSalesOrderByCode(orderCode);
+            if (salesOrder == null) {
+                ajaxError("订单号：" + orderCode + "，不存在！");
+                return;
+            }
 
-			Map<String, Object> root = Maps.newHashMap();
-			root.put("salesOrder", salesOrder);
-			root.put("goodsList", goodsList);
-			ajaxObject(root);
-		} catch (Exception e) {
-			e.printStackTrace();
-			ajaxError("程序出现异常！");
-		}
-	}
+            List<SalesOrderGoods> goodsList = salesOrderService.getOrderGoodsList(salesOrder.getId());
+            if (goodsList != null) {
+                for (SalesOrderGoods salesOrderGoods : goodsList) {
+                    salesOrderGoods.setOrder(null);
+                }
+            }
 
-	public void add() {
-		try {
-			if (order.getGoods() == null || order.getGoods().size() == 0) {
-				ajaxError("请添加商品！");
-				return;
-			}
+            Map<String, Object> root = Maps.newHashMap();
+            root.put("salesOrder", salesOrder);
+            root.put("goodsList", goodsList);
+            ajaxObject(root);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ajaxError("程序出现异常！");
+        }
+    }
 
-			order.setCreateBy(ActionUtils.getLoginName()); // 设置创建人
-			manualReissueOrderService.handleAdd(order, order.getGoods());
-			ajaxSuccess("创建成功！");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void add() {
+        try {
+            if (order.getGoods() == null || order.getGoods().size() == 0) {
+                ajaxError("请添加商品！");
+                return;
+            }
+            if (order.getSalesOrder() == null) {
+                ajaxError("请输入订单信息");
+                return;
+            }
+            order.setOrderCode(order.getSalesOrder().getOrderCode());
+            order.setOrderJson(order.getSalesOrder());
+            order.setCreateBy(ActionUtils.getLoginName()); // 设置创建人
+            manualReissueOrderService.handleAdd(order, order.getGoods());
+            ajaxSuccess("创建成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	public String toFinish() {
-		String strId = ServletActionContext.getRequest().getParameter("id");
-		Map<String, Object> map = manualReissueOrderService.get(Long.valueOf(strId));
-		ActionContext.getContext().getContextMap().putAll(map);
-		return "toFinish";
-	}
+    public String toFinish() {
+        String strId = ServletActionContext.getRequest().getParameter("id");
+        Map<String, Object> map = manualReissueOrderService.get(Long.valueOf(strId));
+        ActionContext.getContext().getContextMap().putAll(map);
+        return "toFinish";
+    }
 
-	public void finish() {
-		try {
-			if (order.getId() == null) {
-				ajaxError("没有要操作的单据！");
-				return;
-			}
+    public String toExtension() {
+        ActionContext.getContext().getContextMap().put("id", ServletActionContext.getRequest().getParameter("id"));
+        return "extension";
+    }
 
-			if (StringUtils.isBlank(order.getNewOrderCode())) {
-				ajaxError("没有填写补发订单号！");
-				return;
-			}
+    public void extension() {
+        if (order.getId() == null) {
+            ajaxError("没有要操作的单据！");
+            return;
+        }
 
-			ManualReissueOrder toUpOrder = new ManualReissueOrder();
-			toUpOrder.setId(order.getId());
-			toUpOrder.setStatus(1);
-			toUpOrder.setNewOrderCode(order.getNewOrderCode());
-			toUpOrder.setUpdateBy(ActionUtils.getLoginName());
+        if (StringUtils.isBlank(order.getExtension())) {
+            ajaxError("没有填写取消原因！");
+            return;
+        }
+        ManualReissueOrder toUpOrder = new ManualReissueOrder();
+        toUpOrder.setUpdateBy(ActionUtils.getLoginName());
+        toUpOrder.setId(order.getId());
+        toUpOrder.setStatus(2);
+        toUpOrder.setExtension(order.getExtension());
+        manualReissueOrderService.handleUpdate(toUpOrder);
+        ajaxSuccess("操作成功！");
+    }
 
-			manualReissueOrderService.handleUpdate(toUpOrder);
+    public void finish() {
+        try {
+            if (order.getId() == null) {
+                ajaxError("没有要操作的单据！");
+                return;
+            }
 
-			ajaxSuccess("操作成功！");
+            if (StringUtils.isBlank(order.getNewOrderCode())) {
+                ajaxError("没有填写补发订单号！");
+                return;
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			ajaxError("操作异常！");
-		}
-	}
+            ManualReissueOrder toUpOrder = new ManualReissueOrder();
+            toUpOrder.setId(order.getId());
+            toUpOrder.setStatus(1);
+            toUpOrder.setNewOrderCode(order.getNewOrderCode());
+            toUpOrder.setUpdateBy(ActionUtils.getLoginName());
 
-	public void delete() {
-		try {
-			String strId = ServletActionContext.getRequest().getParameter("id");
-			if (StringUtils.isBlank(strId)) {
-				ajaxError("没有要操作的单据！");
-				return;
-			}
+            manualReissueOrderService.handleUpdate(toUpOrder);
 
-			Long id = Long.valueOf(strId);
-			manualReissueOrderService.handleDelete(id);
+            ajaxSuccess("操作成功！");
 
-			ajaxSuccess("操作成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ajaxError("操作异常！");
+        }
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			ajaxError("操作异常！");
-		}
-	}
+    public void delete() {
+        try {
+            String strId = ServletActionContext.getRequest().getParameter("id");
+            if (StringUtils.isBlank(strId)) {
+                ajaxError("没有要操作的单据！");
+                return;
+            }
 
-	public String toView() {
-		Map<String, Object> map = manualReissueOrderService.get(Long.valueOf(order.getId()));
-		List<ManualReissueOrderGoods> goods = manualReissueOrderService.queryGoods(order.getId());
-		String orderCode = map.get("orderCode").toString();
-		SalesOrder salesOrder = salesOrderService.getSalesOrderByCode(orderCode);
+            Long id = Long.valueOf(strId);
+            manualReissueOrderService.handleDelete(id);
 
-		ActionContext.getContext().getContextMap().putAll(map);
-		ActionContext.getContext().put("salesOrder", salesOrder);
-		ActionContext.getContext().put("goods", goods);
+            ajaxSuccess("操作成功！");
 
-		return "toView";
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            ajaxError("操作异常！");
+        }
+    }
 
-	/**
-	 * @return the page
-	 */
-	public Page getPage() {
-		return page;
-	}
+    public String toView() {
+        JsonUtils jsonUtils = new JsonUtils();
+        Map<String, Object> map = manualReissueOrderService.get(Long.valueOf(order.getId()));
+        List<ManualReissueOrderGoods> goods = manualReissueOrderService.queryGoods(order.getId());
+        try {
+            String orderJson = clobToString((Clob) map.get("orderJson"));
+            SalesOrder salesOrder = jsonUtils.fromJson(orderJson, SalesOrder.class);
 
-	/**
-	 * @param page the page
-	 */
-	public void setPage(Page page) {
-		this.page = page;
-	}
+            ActionContext.getContext().getContextMap().putAll(map);
+            ActionContext.getContext().put("salesOrder", salesOrder);
+            ActionContext.getContext().put("goods", goods);
 
-	/**
-	 * @return the order
-	 */
-	public ManualReissueOrder getOrder() {
-		return order;
-	}
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return "toView";
+    }
 
-	/**
-	 * @param order the order
-	 */
-	public void setOrder(ManualReissueOrder order) {
-		this.order = order;
-	}
+    private String clobToString(Clob clob) throws SQLException, IOException {
+        String reString;
+        java.io.Reader is = clob.getCharacterStream();
+        BufferedReader br = new BufferedReader(is);
+        String s = br.readLine();
+        StringBuilder sb = new StringBuilder();
+        while (s != null) {
+            sb.append(s);
+            s = br.readLine();
+        }
+        reString = sb.toString();
+        return reString;
+    }
 
-	/**
-	 * @return the createTimeBegin
-	 */
-	public Date getCreateTimeBegin() {
-		return createTimeBegin;
-	}
+    /**
+     * @return the page
+     */
+    public Page getPage() {
+        return page;
+    }
 
-	/**
-	 * @param createTimeBegin the createTimeBegin
-	 */
-	public void setCreateTimeBegin(Date createTimeBegin) {
-		this.createTimeBegin = createTimeBegin;
-	}
+    /**
+     * @param page the page
+     */
+    public void setPage(Page page) {
+        this.page = page;
+    }
 
-	/**
-	 * @return the createTimeEnd
-	 */
-	public Date getCreateTimeEnd() {
-		return createTimeEnd;
-	}
+    /**
+     * @return the order
+     */
+    public ManualReissueOrder getOrder() {
+        return order;
+    }
 
-	/**
-	 * @param createTimeEnd the createTimeEnd
-	 */
-	public void setCreateTimeEnd(Date createTimeEnd) {
-		this.createTimeEnd = createTimeEnd;
-	}
+    /**
+     * @param order the order
+     */
+    public void setOrder(ManualReissueOrder order) {
+        this.order = order;
+    }
 
-	/**
-	 * @return the consignee
-	 */
-	public String getConsignee() {
-		return consignee;
-	}
+    /**
+     * @return the createTimeBegin
+     */
+    public Date getCreateTimeBegin() {
+        return createTimeBegin;
+    }
 
-	/**
-	 * @param consignee the consignee
-	 */
-	public void setConsignee(String consignee) {
-		this.consignee = consignee;
-	}
+    /**
+     * @param createTimeBegin the createTimeBegin
+     */
+    public void setCreateTimeBegin(Date createTimeBegin) {
+        this.createTimeBegin = createTimeBegin;
+    }
 
-	/**
-	 * @return the mobile
-	 */
-	public String getMobile() {
-		return mobile;
-	}
+    /**
+     * @return the createTimeEnd
+     */
+    public Date getCreateTimeEnd() {
+        return createTimeEnd;
+    }
 
-	/**
-	 * @param mobile the mobile
-	 */
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
+    /**
+     * @param createTimeEnd the createTimeEnd
+     */
+    public void setCreateTimeEnd(Date createTimeEnd) {
+        this.createTimeEnd = createTimeEnd;
+    }
 
-	/**
-	 * @return the orderCode
-	 */
-	public String getOrderCode() {
-		return orderCode;
-	}
+    /**
+     * @return the consignee
+     */
+    public String getConsignee() {
+        return consignee;
+    }
 
-	/**
-	 * @param orderCode the orderCode
-	 */
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
+    /**
+     * @param consignee the consignee
+     */
+    public void setConsignee(String consignee) {
+        this.consignee = consignee;
+    }
 
+    /**
+     * @return the mobile
+     */
+    public String getMobile() {
+        return mobile;
+    }
+
+    /**
+     * @param mobile the mobile
+     */
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    /**
+     * @return the orderCode
+     */
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    /**
+     * @param orderCode the orderCode
+     */
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
 }

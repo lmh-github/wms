@@ -7,238 +7,261 @@
  */
 package com.gionee.wms.entity;
 
+import com.gionee.wms.common.JsonUtils;
+
 import java.util.Date;
 import java.util.List;
 
 /**
  * 手工补发订单
+ *
  * @author PengBin 00001550<br>
  * @date 2016年10月8日 上午10:32:37
  */
 public class ManualReissueOrder {
 
-	private Long id;
+    private Long id;
 
-	private Integer platform;
+    private Integer platform;
 
-	private String orderCode;
+    private String orderCode;
 
-	private String newOrderCode;
+    private String newOrderCode;
 
-	private Integer invoice;
+    private Integer invoice;
 
-	private String billType;
+    private String billType;
 
-	private String remark;
+    private String remark;
 
-	private String extension;
+    private String extension;
 
-	private Integer status;
+    private Integer status;
 
-	private Date createTime;
+    private Date createTime;
 
-	private String createBy;
+    private String createBy;
 
-	private Date updateTime;
+    private Date updateTime;
 
-	private String updateBy;
+    private String updateBy;
 
-	private List<ManualReissueOrderGoods> goods;
+    private List<ManualReissueOrderGoods> goods;
 
-	/**
-	 * @return the id
-	 */
-	public Long getId() {
-		return id;
-	}
+    private String orderJson;
 
-	/**
-	 * @param id the id
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private SalesOrder salesOrder;
 
-	/**
-	 * @return the platform
-	 */
-	public Integer getPlatform() {
-		return platform;
-	}
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
 
-	/**
-	 * @param platform the platform
-	 */
-	public void setPlatform(Integer platform) {
-		this.platform = platform;
-	}
+    /**
+     * @param id the id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	/**
-	 * @return the orderCode
-	 */
-	public String getOrderCode() {
-		return orderCode;
-	}
+    /**
+     * @return the platform
+     */
+    public Integer getPlatform() {
+        return platform;
+    }
 
-	/**
-	 * @param orderCode the orderCode
-	 */
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
+    /**
+     * @param platform the platform
+     */
+    public void setPlatform(Integer platform) {
+        this.platform = platform;
+    }
 
-	/**
-	 * @return the newOrderCode
-	 */
-	public String getNewOrderCode() {
-		return newOrderCode;
-	}
+    /**
+     * @return the orderCode
+     */
+    public String getOrderCode() {
+        return orderCode;
+    }
 
-	/**
-	 * @param newOrderCode the newOrderCode
-	 */
-	public void setNewOrderCode(String newOrderCode) {
-		this.newOrderCode = newOrderCode;
-	}
+    /**
+     * @param orderCode the orderCode
+     */
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
 
-	/**
-	 * @return the invoice
-	 */
-	public Integer getInvoice() {
-		return invoice;
-	}
+    /**
+     * @return the newOrderCode
+     */
+    public String getNewOrderCode() {
+        return newOrderCode;
+    }
 
-	/**
-	 * @param invoice the invoice
-	 */
-	public void setInvoice(Integer invoice) {
-		this.invoice = invoice;
-	}
+    /**
+     * @param newOrderCode the newOrderCode
+     */
+    public void setNewOrderCode(String newOrderCode) {
+        this.newOrderCode = newOrderCode;
+    }
 
-	/**
-	 * @return the billType
-	 */
-	public String getBillType() {
-		return billType;
-	}
+    /**
+     * @return the invoice
+     */
+    public Integer getInvoice() {
+        return invoice;
+    }
 
-	/**
-	 * @param billType the billType
-	 */
-	public void setBillType(String billType) {
-		this.billType = billType;
-	}
+    /**
+     * @param invoice the invoice
+     */
+    public void setInvoice(Integer invoice) {
+        this.invoice = invoice;
+    }
 
-	/**
-	 * @return the remark
-	 */
-	public String getRemark() {
-		return remark;
-	}
+    /**
+     * @return the billType
+     */
+    public String getBillType() {
+        return billType;
+    }
 
-	/**
-	 * @param remark the remark
-	 */
-	public void setRemark(String remark) {
-		this.remark = remark;
-	}
+    /**
+     * @param billType the billType
+     */
+    public void setBillType(String billType) {
+        this.billType = billType;
+    }
 
-	/**
-	 * @return the extension
-	 */
-	public String getExtension() {
-		return extension;
-	}
+    /**
+     * @return the remark
+     */
+    public String getRemark() {
+        return remark;
+    }
 
-	/**
-	 * @param extension the extension
-	 */
-	public void setExtension(String extension) {
-		this.extension = extension;
-	}
+    /**
+     * @param remark the remark
+     */
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
-	/**
-	 * @return the status
-	 */
-	public Integer getStatus() {
-		return status;
-	}
+    /**
+     * @return the extension
+     */
+    public String getExtension() {
+        return extension;
+    }
 
-	/**
-	 * @param status the status
-	 */
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+    /**
+     * @param extension the extension
+     */
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
 
-	/**
-	 * @return the createTime
-	 */
-	public Date getCreateTime() {
-		return createTime;
-	}
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
 
-	/**
-	 * @param createTime the createTime
-	 */
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    /**
+     * @param status the status
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
-	/**
-	 * @return the createBy
-	 */
-	public String getCreateBy() {
-		return createBy;
-	}
+    /**
+     * @return the createTime
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	/**
-	 * @param createBy the createBy
-	 */
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}
+    /**
+     * @param createTime the createTime
+     */
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	/**
-	 * @return the updateTime
-	 */
-	public Date getUpdateTime() {
-		return updateTime;
-	}
+    /**
+     * @return the createBy
+     */
+    public String getCreateBy() {
+        return createBy;
+    }
 
-	/**
-	 * @param updateTime the updateTime
-	 */
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
+    /**
+     * @param createBy the createBy
+     */
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
 
-	/**
-	 * @return the updateBy
-	 */
-	public String getUpdateBy() {
-		return updateBy;
-	}
+    /**
+     * @return the updateTime
+     */
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-	/**
-	 * @param updateBy the updateBy
-	 */
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
-	}
+    /**
+     * @param updateTime the updateTime
+     */
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-	/**
-	 * @return the goods
-	 */
-	public List<ManualReissueOrderGoods> getGoods() {
-		return goods;
-	}
+    /**
+     * @return the updateBy
+     */
+    public String getUpdateBy() {
+        return updateBy;
+    }
 
-	/**
-	 * @param goods the goods
-	 */
-	public void setGoods(List<ManualReissueOrderGoods> goods) {
-		this.goods = goods;
-	}
+    /**
+     * @param updateBy the updateBy
+     */
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
 
+    /**
+     * @return the goods
+     */
+    public List<ManualReissueOrderGoods> getGoods() {
+        return goods;
+    }
+
+    /**
+     * @param goods the goods
+     */
+    public void setGoods(List<ManualReissueOrderGoods> goods) {
+        this.goods = goods;
+    }
+
+    public String getOrderJson() {
+        return orderJson;
+    }
+
+    public void setOrderJson(SalesOrder salesOrder) {
+        JsonUtils jsonUtils = new JsonUtils();
+        this.orderJson = jsonUtils.toJson(salesOrder);
+    }
+
+    public SalesOrder getSalesOrder() {
+        return salesOrder;
+    }
+
+    public void setSalesOrder(SalesOrder salesOrder) {
+        this.salesOrder = salesOrder;
+    }
 }

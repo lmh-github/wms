@@ -6,7 +6,9 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <c:set var="rand"><%= java.lang.Math.round(java.lang.Math.random() * 100000) %></c:set>
 
-<style type="text/css">#goodsTbody${rand} input[type=text]{width:90%;}</style>
+<style type="text/css">
+    #goodsTbody${rand} input[type=text]{width:90%;}
+</style>
 <div class="pageContent">
   <form method="post" action="${ctx}/stock/morder!add.action?callbackType=closeCurrent&navTabId=tab_morder" class="pageForm required-validate" onsubmit="" id="form${rand}">
     <div class="pageFormContent" layoutH="56">
@@ -34,13 +36,13 @@
         <p>
           <label>修改时间：</label> <input type="text" readonly="readonly" value="<fmt:formatDate value="${updateTime}" pattern="yyyy-MM-dd HH:mm:ss" />" />
         </p>
-        <dl class="nowrap">
+        <dl class="nowrap" style="width: 350px;">
           <dt>建单原因：</dt>
-          <dd><s:textarea name="remark" readonly="true" cols="90" rows="2" cssStyle="height:45px;" /></dd>
+          <dd style="width: 200px;margin-left:34px;"><s:textarea name="remark" readonly="true" cols="90" rows="2" cssStyle="height:45px;" /></dd>
         </dl>
-        <dl class="nowrap">
-          <dt>扩展备注：</dt>
-          <dd><s:textarea name="extension" readonly="true" cols="90" rows="2" cssStyle="height:45px;" /></dd>
+        <dl class="nowrap extension" style="width: 350px;position: absolute;float: left;right:271px;top:156px;">
+          <dt>取消原因：</dt>
+          <dd style="width: 200px;margin-left:34px;"><s:textarea name="extension" readonly="true" cols="90" rows="2" cssStyle="height:45px;" /></dd>
         </dl>
       </fieldset>
       <fieldset>
