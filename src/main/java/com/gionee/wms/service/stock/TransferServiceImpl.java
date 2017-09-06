@@ -953,9 +953,13 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                     transferGoodsList.addAll(goods);
                 }
             }
-            transferDao.insertBatch(transferList);
+                transferDao.insertBatch(transferList);
             if (!CollectionUtils.isEmpty(transferGoodsList)) {
-                transferDao.insertBatchGoods(transferGoodsList);
+                try {
+                    transferDao.insertBatchGoods(transferGoodsList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

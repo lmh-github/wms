@@ -644,7 +644,7 @@
 	</select>
 
     <insert id="insertBatch" parameterType="java.util.List">
-        insert into wms_transfer(id,TRANSFER_TO,create_time,CONSIGNEE, contact,order_amount, flow_type)
+        insert into wms_transfer(id,TRANSFER_TO,create_time,CONSIGNEE, contact,order_amount, flow_type,warehouse_id,REMARK)
         select A.* from
         (
             <foreach collection="list" item="item" index="index" separator="UNION ALL">
@@ -655,7 +655,9 @@
                 #{item.consignee, jdbcType=VARCHAR},
                 #{item.contact, jdbcType=VARCHAR},
                 #{item.orderAmount},
-                #{item.flowType, jdbcType=VARCHAR}
+                #{item.flowType, jdbcType=VARCHAR},
+                #{item.warehouseId},
+                #{item.remark}
                 from dual
             </foreach>
         )A

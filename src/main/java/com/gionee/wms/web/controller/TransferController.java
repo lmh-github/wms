@@ -121,6 +121,7 @@ public class TransferController {
         mapping.put("2", "consignee");
         mapping.put("3", "transferTo");
         mapping.put("4", "contact");
+        mapping.put("10", "remark");
         mapping.put("5", "array,goodsList,skuCode");
         mapping.put("9", "array,goodsList,unitPrice");
         mapping.put("8", "array,goodsList,quantity");
