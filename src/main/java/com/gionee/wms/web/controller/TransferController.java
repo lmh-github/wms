@@ -213,10 +213,6 @@ public class TransferController {
                 transferService.addTransfer(transfer);
                 return DwzMessage.success("添加成功！", queryMap);
             } else {
-                // 状态校验
-                if (!"已审核".equals(transferService.getTransferById(transfer.getTransferId()).getFlowType())) {
-                    return DwzMessage.error("财务审核后方可正常流转！", queryMap);
-                }
                 transferService.updateTransfer(transfer);
                 return DwzMessage.success("修改成功！", queryMap);
             }
