@@ -78,6 +78,10 @@
             </li>
             <li class="line">line</li>
             <li>
+                <a class="add" href="${ctx}/export/transfer_import_template.xlsx" target="_blank" ><span>下载导入模板</span></a>
+            </li>
+            <li class="line">line</li>
+            <li>
                 <a class="icon" href="${ctx}/trans/toUp.do" target="dialog" width="500" height="300"><span>导入excel</span></a>
             </li>
         </ul>
