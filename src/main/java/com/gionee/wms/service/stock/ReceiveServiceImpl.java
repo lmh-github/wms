@@ -181,6 +181,7 @@ public class ReceiveServiceImpl extends CommonServiceImpl implements ReceiveServ
 								indiv.setInTime(new Date());
 								indiv.setCaseCode(flow.getCaseCode());// 箱号
 								indiv.setRemark("预收单中的该串号在个体表中已经存在，现将其数据库中的库存状态更新为入库中");
+								indiv.setCaseCode(flow.getCaseCode());
 								indivDao.updateIndiv1(indiv);
 							}
 							// 如果不是重复入库，则需要插入个体数据

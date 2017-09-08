@@ -148,10 +148,10 @@
 	<!-- 添加采购商品清单 -->
 	<insert id="addGoodsList" parameterType="list">
 	 	insert into wms_pur_prerecv_goods
- 		   (id,prerecv_id,sku_id,sku_code,sku_name,quantity,measure_unit,product_batchno,indiv_enabled)
+ 		   (id,prerecv_id,sku_id,sku_code,sku_name,quantity,measure_unit,product_batchno,indiv_enabled,case_code)
 		select WMS_SEQ_COMMON.nextval,A.* from(
 		<foreach item="item" collection="list" index="index" separator="UNION ALL">
-		   select #{item.purPreRecv.id},#{item.skuId},#{item.skuCode},#{item.skuName},#{item.quantity},#{item.measureUnit},#{item.productBatchNo, jdbcType=VARCHAR},#{item.indivEnabled} from dual
+		   select #{item.purPreRecv.id},#{item.skuId},#{item.skuCode},#{item.skuName},#{item.quantity},#{item.measureUnit},#{item.productBatchNo, jdbcType=VARCHAR},#{item.indivEnabled},#{item.caseCode} from dual
 		</foreach>
 		  )A
 	</insert>

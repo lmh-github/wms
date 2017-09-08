@@ -534,7 +534,8 @@
   			   t1.flow_code        as flowCode,
   			   t1.flow_goods_id    as flowGoodsId,
   			   t1.wares_status     as waresStatus,
-  			   t1.enabled          as enabled
+  			   t1.enabled          as enabled,
+  			   t1.CASE_CODE        as caseCode
   	</sql>
   	
 	<!-- 获取商品个体流水列表. -->
@@ -598,7 +599,7 @@
 	
   	<!-- 批量添加个体流转信息  sql语句形成ID-->
 	<insert id="addIndivFlows" parameterType="list">
- 		insert into wms_indiv_flow(id, indiv_code, sku_id,sku_code,sku_name,warehouse_id,warehouse_name,flow_type,flow_id,flow_code,flow_goods_id,flow_time,wares_status,measure_unit,product_batchno,enabled,remark，case_code)
+ 		insert into wms_indiv_flow(id, indiv_code, sku_id,sku_code,sku_name,warehouse_id,warehouse_name,flow_type,flow_id,flow_code,flow_goods_id,flow_time,wares_status,measure_unit,product_batchno,enabled,remark,case_code)
 		select WMS_SEQ_COMMON.nextval,A.* from(
 		<foreach item="item" collection="list" index="index" separator="UNION ALL">
 		   select #{item.indivCode, jdbcType=VARCHAR},

@@ -19,6 +19,7 @@ public class PurPreRecvGoods {
 	private Integer indivEnabled; // 是否需绑定个体
 	private List<String> indivCodeList;
 	private PurPreRecv purPreRecv;
+    private String caseCode;
 
 	public Long getId() {
 		return id;
@@ -111,4 +112,11 @@ public class PurPreRecvGoods {
 		this.purPreRecv = purPreRecv;
 	}
 
+    public String getCaseCode() {
+        return caseCode;
+    }
+
+    public void setCaseCode(String caseCode) {
+        this.caseCode = caseCode;
+    }
 }
