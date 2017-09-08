@@ -4,9 +4,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="s" uri="/struts-tags"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
-
-<div class="pageContent">
-	<table class="list" width="100%" layoutH="0">
+<div class="pageContent" style="height: 100%;">
+	<table class="list" width="100%">
 		<thead>
 			<tr align="center">
 				<th>商品编码</th>
