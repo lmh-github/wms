@@ -145,6 +145,7 @@ public class ManualReissueOrderAction extends AjaxActionSupport {
                 newRow.createCell(j++).setCellValue(getStringValue(map.get("paymentName")));
                 newRow.createCell(j++).setCellValue(getStringValue(map.get("consignee")));
                 newRow.createCell(j++).setCellValue(getStringValue(map.get("mobile")));
+                newRow.createCell(j++).setCellValue(getStringValue(map.get("province")) + getStringValue(map.get("city")) + getStringValue(map.get("district")) + getStringValue(map.get("address")));
                 newRow.createCell(j++).setCellValue(getStringValue(map.get("newOrderCode")));
                 newRow.createCell(j++).setCellValue("1".equals(getStringValue(map.get("invoice"))) ? "是" : "否");
                 newRow.createCell(j++).setCellValue(getStringValue(map.get("billType")));
@@ -202,7 +203,8 @@ public class ManualReissueOrderAction extends AjaxActionSupport {
                 ajaxError("订单号：" + orderCode + "，不存在！");
                 return;
             }
-
+            // 省市区加详细地址
+            salesOrder.setProvince(salesOrder.getProvince() + salesOrder.getCity() + salesOrder.getDistrict() + salesOrder.getAddress());
             List<SalesOrderGoods> goodsList = salesOrderService.getOrderGoodsList(salesOrder.getId());
             if (goodsList != null) {
                 for (SalesOrderGoods salesOrderGoods : goodsList) {

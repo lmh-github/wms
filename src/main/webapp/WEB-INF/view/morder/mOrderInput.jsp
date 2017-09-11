@@ -99,20 +99,20 @@
                                                class="textInput">
                 </p>
                 <p>
-                    <label>收货地址：</label> <input type="text" name="order.salesOrder.province" data-bind="province"
-                                                class="textInput">
-                </p>
-                <p>
-                    <label>商品总金额：</label> <input type="text" name="order.salesOrder.goodsAmount" data-bind="goodsAmount"
-                                                 class="textInput">
-                </p>
-                <p>
                     <label>订单总金额：</label> <input type="text" name="order.salesOrder.orderAmount" data-bind="orderAmount"
                                                  class="textInput">
                 </p>
                 <p>
                     <label>应付金额：</label> <input type="text" name="order.salesOrder.payableAmount"
                                                 data-bind="payableAmount" class="textInput">
+                </p>
+                <p style="padding-bottom: 20px;">
+                    <label>收货地址：</label> <textarea name="order.salesOrder.province" data-bind="province"
+                                                   class="textarea" style="height: 30px;"></textarea>
+                </p>
+                <p>
+                    <label>商品总金额：</label> <input type="text" name="order.salesOrder.goodsAmount" data-bind="goodsAmount"
+                                                 class="textInput">
                 </p>
             </fieldset>
             <div class="divider"></div>

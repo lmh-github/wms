@@ -25,7 +25,11 @@
     <result property="paymentName" column="PAYMENT_NAME" />
     <result property="consignee" column="CONSIGNEE" />
     <result property="mobile" column="MOBILE" />
-    
+    <result property="province" column="PROVINCE" />
+    <result property="city" column="CITY" />
+    <result property="district" column="DISTRICT" />
+    <result property="address" column="ADDRESS" />
+
     <result property="skuCode" column="SKU_CODE" />
     <result property="skuName" column="SKU_Name" />
     <result property="qty" column="QTY" />
@@ -242,6 +246,10 @@
     	T2.PAYMENT_NAME,
     	T2.CONSIGNEE,
     	T2.MOBILE,
+    	T2.PROVINCE,
+    	T2.CITY,
+    	T2.DISTRICT,
+    	T2.ADDRESS,
     	T3.SKU_CODE,
     	T3.SKU_NAME,
     	T3.QTY

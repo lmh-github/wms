@@ -77,18 +77,19 @@
         <p>
           <label>手机号：</label> <s:textfield value="%{#salesOrder.mobile}" readonly="true" />
         </p>
-        <p>
-          <label>收货地址：</label> <s:textfield value="%{#salesOrder.province}" readonly="true" />
+         <p>
+             <label>订单总金额：</label> <s:textfield value="%{#salesOrder.orderAmount}" readonly="true" />
+         </p>
+         <p>
+             <label>应付金额：</label> <s:textfield value="%{#salesOrder.payableAmount}" readonly="true" />
+         </p>
+        <p style="padding-bottom: 20px;">
+          <label>收货地址：</label> <s:textarea value="%{#salesOrder.province}" readonly="true" style="height: 30px;"/>
         </p>
         <p>
           <label>商品总金额：</label> <s:textfield value="%{#salesOrder.goodsAmount}" readonly="true" />
         </p>
-        <p>
-          <label>订单总金额：</label> <s:textfield value="%{#salesOrder.orderAmount}" readonly="true" />
-        </p>
-        <p>
-          <label>应付金额：</label> <s:textfield value="%{#salesOrder.payableAmount}" readonly="true" />
-        </p>
+
       </fieldset>
       <div class="divider"></div>
       <table class="list nowrap" width="100%" style="table-layout: fixed;">
