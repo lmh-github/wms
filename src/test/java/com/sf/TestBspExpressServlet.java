@@ -19,6 +19,8 @@ public class TestBspExpressServlet {
         //定义参数 end
         URL url = new URL(uri);
         String xml = Util.loadFile(xmlFile);
+        //xml = xml.replaceAll("(\r|\n)", "");
+        System.out.println(xml);
         String verifyCode = Util.md5EncryptAndBase64(xml + checkWord);
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

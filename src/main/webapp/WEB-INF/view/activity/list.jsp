@@ -77,7 +77,7 @@
             </li>
         </ul>
     </div>
-    <table class="list" style="width: 100%;" layoutH="115">
+    <table class="list" style="width: 100%;white-space: nowrap;" layoutH="115">
         <thead>
         <tr align="center">
             <th>发起人</th>
@@ -93,11 +93,11 @@
         <tbody>
         <s:iterator value="#request.list" var="b">
             <tr target="sid_activity" rel="${id}">
-                <td align="center"><s:property value="sponsor"/></td>
-                <td align="center"><s:property value="platform"/></td>
+                <td align="center" style="white-space: nowrap;"><s:property value="sponsor"/></td>
+                <td align="center" style="white-space: nowrap;"><s:property value="platform"/></td>
                 <td align="center"><fmt:formatDate value="${startTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
                 <td align="center"><fmt:formatDate value="${endTime}" pattern="yyyy-MM-dd'<br/>'HH:mm:ss"/></td>
-                <td align="center"><s:property value="area"/></td>
+                <td align="center" style="white-space: normal"><s:property value="area"/></td>
                 <td align="center">
                     <s:if test="status == '未开始'">
                         <span style="background:green;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
@@ -105,22 +105,28 @@
                     <s:elseif test="status == '活动中'">
                         <span style="background:#6A6AFF;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
                     </s:elseif>
+                    <s:elseif test="status == null">
+
+                    </s:elseif>
                     <s:else>
                         <span style="background:#F79646;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
                     </s:else>
                 </td>
-                <td align="center">
+                <td align="center" style="white-space: nowrap;">
                     <s:if test="giving == '未发放'">
                         <span style="background:green;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="giving"/></span>
                     </s:if>
                     <s:elseif test="giving == '已发放'">
                         <span style="background:#6A6AFF;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="giving"/></span>
                     </s:elseif>
+                    <s:elseif test="giving == null">
+
+                    </s:elseif>
                     <s:else>
                         <span style="background:#F79646;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="giving"/></span>
                     </s:else>
                 </td>
-                <td align="center">
+                <td align="center" style="white-space: nowrap;">
                     <a href="${cfx}/activity/to.do?to=show&id={sid_activity}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="690"> 查看</a>
                     <s:if test="#currentUser == #sponsor">
                         <a href="${cfx}/activity/to.do?to=add&id={sid_activity}"  target="dialog" rel="dlg_orderInput" mask="true" width="815" height="690">|修改</a>

@@ -154,13 +154,13 @@ public class DockSfServiceImpl implements DockSfService {
         }
 
         int newOrderStatus = STATUS_MAP.get(status_code);
+        salesOrderNodeInfoService.updateFromDockSf(salesOrderMap.getOrder_code(), newOrderStatus, header.getStatus_time(), header.getWarehouse(), header.getCarrier(), header.getWaybill_no());
         if (STATUS_SEQUECE.indexOf(newOrderStatus) < STATUS_SEQUECE.indexOf(salesOrder.getOrderStatus())) {
             newOrderStatus = salesOrder.getOrderStatus();
         }
 
         // 修改订单状态和运单号
         salesOrderDao.updateOrder(LinkMapUtils.<String, Object>newHashMap().put("orderStatus", newOrderStatus).put("orderCode", salesOrderMap.getOrder_code()).put("shippingNo", trimToNull(header.getWaybill_no())).put("orderId", salesOrder.getId()).getMap());
-        salesOrderNodeInfoService.updateFromDockSf(salesOrderMap.getOrder_code(), newOrderStatus, header.getStatus_time(), header.getWarehouse(), header.getCarrier(), header.getWaybill_no());
         addOpLog(newOrderStatus, salesOrder.getId()); // 记录操作日志
         // 订单被取消
         if (WmsConstants.OrderStatus.CANCELED.getCode() == newOrderStatus) {
