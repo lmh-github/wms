@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="fm${rand}" enctype="multipart/form-data" action="${ctx}/trans/upload.json?callbackType=closeCurrent&navTabId=tab_trans_list" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
+<form id="fm${rand}" enctype="multipart/form-data" action="${ctx}/trans/upload.json?callbackType=closeCurrent&navTabId=${rel}" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
     <div class="pageContent">
         <div class="pageFormContent" layoutH="97">
             <fieldset>

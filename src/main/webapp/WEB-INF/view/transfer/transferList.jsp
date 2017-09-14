@@ -82,7 +82,7 @@
             </li>
             <li class="line">line</li>
             <li>
-                <a class="icon" href="${ctx}/trans/toUp.do" target="dialog" width="500" height="300"><span>导入excel</span></a>
+                <a class="icon" href="${ctx}/trans/toUp.do?rel=tab_trans_list" target="dialog" width="500" height="300"><span>导入excel</span></a>
             </li>
         </ul>
     </div>

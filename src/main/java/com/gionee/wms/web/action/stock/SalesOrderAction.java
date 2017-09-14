@@ -189,7 +189,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         criteria.put("paymentTimeEnd", paymentTimeEnd);
         criteria.put("shippingTimeBegin", shippingTimeBegin);
         criteria.put("shippingTimeEnd", shippingTimeEnd);
-        criteria.put("province", province);
+        criteria.put("province", StringUtils.trimToNull(province));
 
         if (condition != null) {
             if (StringUtils.isNotBlank(skuCode)) {

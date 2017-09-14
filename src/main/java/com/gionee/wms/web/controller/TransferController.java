@@ -111,6 +111,7 @@ public class TransferController {
     @RequestMapping("/toUp.do")
     public String toUpload(Integer type, HttpServletRequest request) {
         request.setAttribute("type", type);
+        request.setAttribute("rel", request.getParameter("rel"));
         return "transfer/file_transfer";
     }
 
