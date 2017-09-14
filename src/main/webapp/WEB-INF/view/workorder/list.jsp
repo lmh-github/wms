@@ -130,7 +130,7 @@
             </li>
         </ul>
     </div>
-    <table class="list" style="width: 100%;" layoutH="115">
+    <table class="list" style="width: 100%;white-space: nowrap;" layoutH="115">
         <thead>
         <tr align="center">
             <th>发起人</th>
@@ -149,8 +149,8 @@
         <tbody>
         <s:iterator value="#request.list" var="b">
             <tr target="sid_workorder" rel="${id}">
-                <td align="center"><s:property value="sponsor"/></td>
-                <td align="center">
+                <td align="center" style="white-space: nowrap;"><s:property value="sponsor"/></td>
+                <td align="center" style="white-space: nowrap;">
                     <s:if test="lv == '紧急'">
                         <span style="background:red;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="lv"/></span>
                     </s:if>
@@ -158,10 +158,10 @@
                         <span style="background:#92CDDC;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="lv"/></span>
                     </s:else>
                 </td>
-                <td align="center"><s:property value="platform"/></td>
-                <td align="center"><s:property value="orderCode"/></td>
-                <td align="center"><s:property value="description"/></td>
-                <td align="center">
+                <td align="center" style="white-space: nowrap;"><s:property value="platform"/></td>
+                <td align="center" style="white-space: nowrap;"><s:property value="orderCode"/></td>
+                <td align="center" style="white-space: normal"><s:property value="description"/></td>
+                <td align="center" style="white-space: nowrap;">
                     <s:if test="status == '已完成'">
                         <span style="background:green;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
                     </s:if>
@@ -175,7 +175,7 @@
                         <span style="background:#F79646;color:white;padding:3px;font-family:'宋体';border-radius:2px;"><s:property value="status"/></span>
                     </s:else>
                 </td>
-                <td align="center"><s:property value="resultMsg"/></td>
+                <td align="center" style="white-space: normal"><s:property value="resultMsg"/></td>
 
                 <td align="center">
                     <c:if test="${lastTime != null}">
@@ -183,10 +183,10 @@
                         <fmt:formatNumber value="${interval/1000/60/60}" pattern="#0.00h"/>
                     </c:if>
                 </td>
-                <td align="center"><s:property value="worker"/></td>
-                <td align="center"><s:property value="uper"/></td>
+                <td align="center" style="white-space: nowrap;"><s:property value="worker"/></td>
+                <td align="center" style="white-space: nowrap;"><s:property value="uper"/></td>
 
-                <td align="center">
+                <td align="center" style="white-space: nowrap;">
                     <s:if test="#attr.status != '待处理'">
                     <a class="add" href="${ctx}/workorder/to.do?to=look&id={sid_workorder}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>查看</span></a>
                     </s:if>
