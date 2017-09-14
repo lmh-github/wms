@@ -5,10 +5,8 @@ import com.gionee.wms.common.DateConvert;
 import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.*;
-import com.gionee.wms.common.excel.excelimport.util.StringUtil;
 import com.gionee.wms.dao.*;
 import com.gionee.wms.dto.Page;
-import com.gionee.wms.dto.QueryMap;
 import com.gionee.wms.dto.StockRequest;
 import com.gionee.wms.entity.*;
 import com.gionee.wms.facade.result.WmsResult;
@@ -898,6 +896,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     public List<Transfer> convert(List<Transfer> transfers, Integer type) throws Exception {
         List<Transfer> transferList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(transfers)) {
+            Map<String, Long> warehouseMap = getWarehouseMap(warehouseService.getWarehouseList(null));
             for (int i = 0; i < transfers.size(); i++) {
                 Transfer transfer = transfers.get(i);
                 transfer.setFlowType("待审核");
@@ -907,11 +906,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
                 if (null != type && type == 1) {
                     // 转换分仓收货仓
-                    String transferTo = warehouseDao.getWarehouseIdByName(transfer.getTransferTo());
-                    if (StringUtils.isEmpty(transferTo)) {
+                    Long transferTo = warehouseMap.get(transfer.getTransferTo().replaceAll("\\s",""));
+                    if (transferTo == null) {
                         throw new Exception("导入失败,找不到对应收货仓:" + transfer.getTransferTo());
                     }
-                    transfer.setTransferTo(transferTo);
+                    transfer.setTransferTo( transferTo.toString());
                 }
                 if (sku == null) {
                     throw new Exception("导入失败,sku code:" + transferGoods.getSkuCode() + "找不到对应商品!");
@@ -942,6 +941,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             }
         }
         return transferList;
+    }
+
+    private Map<String, Long> getWarehouseMap(List<Warehouse> warehouseList) {
+        Map<String, Long> map = new HashMap<>();
+        for (Warehouse warehouse : warehouseList) {
+            map.put(warehouse.getWarehouseName().replaceAll("\\s", ""), warehouse.getId());
+        }
+        return map;
     }
 
     private void setGoodsTransferIdAndTotalAndId(Transfer transfer, BigDecimal total) {

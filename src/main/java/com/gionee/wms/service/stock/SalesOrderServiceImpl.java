@@ -27,6 +27,7 @@ import com.gionee.wms.web.client.SyncVipOrderClient;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.routdata.zzfw.webservice.service.OrderCodeUtils;
 import com.sf.integration.warehouse.request.*;
 import com.sf.integration.warehouse.response.*;
 import org.apache.commons.codec.binary.Base64;
@@ -58,6 +59,7 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service("orderService")
@@ -1746,6 +1748,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
             List<SalesOrder> salesOrders = new ArrayList<>();
             List<SalesOrderGoods> salesOrderGoods = new ArrayList<>();
+            String prefix = new SimpleDateFormat("yyyyMMdd").format(new Date());
 
             // 转换同一个订单多个sku的数据
             for (int i = 0; i < list.size(); i++) {
@@ -1758,6 +1761,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 list.get(i).setHandledBy(ActionUtils.getLoginName());
                 list.get(i).setHandledTime(new Date());
                 list.get(i).setOrderStatus(OrderStatus.FILTERED.getCode());
+                list.get(i).setOrderCode(prefix + OrderCodeUtils.generateRadix());
 
                 if (salesOrders.size() == 0) {
                     salesOrders.add(list.get(i));

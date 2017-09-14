@@ -1282,7 +1282,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         mapping.put("6", "mobile");
         mapping.put("11", "invoiceEnabled");
         mapping.put("12", "remark");
-        mapping.put("13", "orderCode");
         mapping.put("7", "array,goodsList,skuCode");
         mapping.put("8", "array,goodsList,skuName");
         mapping.put("9", "array,goodsList,unitPrice");
