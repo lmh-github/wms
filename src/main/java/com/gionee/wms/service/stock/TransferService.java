@@ -128,9 +128,10 @@ public interface TransferService {
     /**
      * 转换EXCEL List
      * @param transfers
+     * @param type
      * @return
      */
-    List<Transfer> convert(List<Transfer> transfers) throws Exception;
+    List<Transfer> convert(List<Transfer> transfers, Integer type) throws Exception;
 
     /**
      * 批量增加调拨单

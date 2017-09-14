@@ -4,6 +4,7 @@ import com.gionee.wms.common.*;
 import com.gionee.wms.common.WmsConstants.OrderPushStatusEnum;
 import com.gionee.wms.common.WmsConstants.OrderSource;
 import com.gionee.wms.common.WmsConstants.OrderStatus;
+import com.gionee.wms.common.excel.ExcelUtil;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dao.WaresDao;
@@ -128,6 +129,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     private String printerPre;// 网络打印机前缀
     private Date shippingTimeBegin;
     private Date shippingTimeEnd;
+    private String province;
 
     private String templateName;
     private String exports;
@@ -143,6 +145,9 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     private String queryFrom;// menu:点击菜单查询；button:点击按钮查询
 
     private Map<String, Object> bspSourceMap;// 面单打印数据源
+    private File file; //上传文件
+    private String fileFileName; // 文件名称
+    private Integer type;
 
     /**
      * 订单推送到顺丰状态
@@ -184,6 +189,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         criteria.put("paymentTimeEnd", paymentTimeEnd);
         criteria.put("shippingTimeBegin", shippingTimeBegin);
         criteria.put("shippingTimeEnd", shippingTimeEnd);
+        criteria.put("province", province);
 
         if (condition != null) {
             if (StringUtils.isNotBlank(skuCode)) {
@@ -574,8 +580,21 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
             if (null == order) {
                 throw new Exception("订单不存在");
             }
+
             goodsList = salesOrderService.getOrderGoodsList(id);
-            salesOrderLogList = salesOrderLogService.selectSalesOrderLogsByOrderId(id);
+            // 换货订单数据处理
+            if (type != null && type == 1) {
+                order.setId(null);
+                order.setOrderCode(null);
+                order.setType("换货订单");
+                order.setOrderStatus(OrderStatus.FILTERED.getCode());
+                for (SalesOrderGoods salesOrderGoods : goodsList) {
+                    salesOrderGoods.setId(null);
+                    salesOrderGoods.setOrder(order);
+                }
+            } else {
+                salesOrderLogList = salesOrderLogService.selectSalesOrderLogsByOrderId(id);
+            }
         }
         return INPUT;
     }
@@ -1243,6 +1262,48 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         return null;
     }
 
+    public String toUp() {
+        System.out.println(1);
+        return "up";
+    }
+
+    public String upload() throws IOException {
+        if (file == null || StringUtils.isEmpty(fileFileName)) {
+            ajaxError("上传失败！");
+            return null;
+        }
+        LinkedHashMap<String, String> mapping = new LinkedHashMap<>();
+        mapping.put("0", "orderSource");
+        mapping.put("1", "consignee");
+        mapping.put("2", "province");
+        mapping.put("3", "city");
+        mapping.put("4", "district");
+        mapping.put("5", "address");
+        mapping.put("6", "mobile");
+        mapping.put("11", "invoiceEnabled");
+        mapping.put("12", "remark");
+        mapping.put("13", "orderCode");
+        mapping.put("7", "array,goodsList,skuCode");
+        mapping.put("8", "array,goodsList,skuName");
+        mapping.put("9", "array,goodsList,unitPrice");
+        mapping.put("10", "array,goodsList,quantity");
+        File destFile = new File(ServletActionContext.getServletContext().getRealPath("/upload/" + fileFileName));
+        FileUtils.copyFile(file, destFile);
+
+        String jsonStr = ExcelUtil.read(mapping, new FileInputStream(destFile), fileFileName, 1, 0, 0);
+        jsonStr = jsonStr.replaceAll(":\"是\",", ":\"1\",").replaceAll(":\"否\",", ":\"0\",");
+        JsonUtils jsonUtils = new JsonUtils();
+        List<SalesOrder> list = jsonUtils.jsonToList(jsonStr, SalesOrder.class);
+        try {
+            salesOrderService.addInsertBatch(list);
+            ajaxSuccess("上传成功!");
+        } catch (Exception e) {
+            ajaxError(e.getMessage());
+        }
+
+        return null;
+    }
+
     /**
      * 查看串号
      *
@@ -1773,5 +1834,35 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         this.errorMsg = errorMsg;
     }
 
+    public File getFile() {
+        return file;
+    }
 
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public String getFileFileName() {
+        return fileFileName;
+    }
+
+    public void setFileFileName(String fileFileName) {
+        this.fileFileName = fileFileName;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
 }

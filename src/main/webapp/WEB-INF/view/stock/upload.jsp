@@ -6,17 +6,14 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="fm${rand}" enctype="multipart/form-data" action="${ctx}/trans/upload.json?callbackType=closeCurrent&navTabId=tab_trans_list" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
+<form id="fm${rand}" enctype="multipart/form-data" action="${ctx}/stock/salesOrder!upload.action?callbackType=closeCurrent&navTabId=tab_salesOrder" method="post" class="pageForm required-validate" onsubmit="return iframeCallback(this, dialogAjaxDone);">
     <div class="pageContent">
         <div class="pageFormContent" layoutH="97">
             <fieldset>
                 <legend>文件信息</legend>
                 <dl>
                     <dt>文件信息：</dt>
-                    <dd>
-                        <input type="hidden" name="type" value="${type}" />
-                        <input type="file" name="multipartFile"/>
-                    </dd>
+                    <dd><input type="file" name="file"/></dd>
                 </dl>
             </fieldset>
         </div>

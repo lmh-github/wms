@@ -106,6 +106,10 @@
                   <option value="0" <s:property value="orderPushStatus == 0 ? 'selected' : ''"/>>否</option>
                 </select>
 			</li>
+			<li>
+				<label>地区：</label>
+                <input type="text" name="province" value="${province}" />
+            </li>
 		</ul>
 		<div class="subBar">
 			<ul>
@@ -131,7 +135,9 @@
 			<li><a class="edit" href="${ctx}/stock/salesOrder!copy.action?id={sid_order}" target="ajaxTodo" title="<span style='color:#e91e63;font-size:15px;'>请确定原订单已经取消，如果货已发出需通知物流截件，继续操作请点击&nbsp;确定！</span>" mask="true"><span>一键复制</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/salesOrder.action?exports=1" target="dwzExport" targettype="navTab"><span>导出excel</span></a></li>
-		</ul>
+            <li class="line">line</li>
+            <li><a class="icon" href="${ctx}/stock/salesOrder!toUp.action" target="dialog" rel="dlg_orderInput" mask="true" width="500" height="300"><span>导入excel</span></a></li>
+        </ul>
 	</div>
 	<table class="list" width="100%" layoutH="170">
 		<thead>
@@ -141,6 +147,7 @@
 				<th>支付时间</th>
 				<th>收货信息</th>
 				<th>订单总金额</th>
+				<th>订单类型</th>
 				<th>支付类型</th>
 				<th>物流公司</th>
 				<th>物流单号</th>
@@ -159,6 +166,7 @@
 				<td><fmt:formatDate value="${paymentTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 				<td>${consignee } ${mobile }<br>${fullAddress }</td>
 				<td>${orderAmount }</td>
+				<td>${type }</td>
 				<td>
 					<s:if test="paymentType==@com.gionee.wms.common.WmsConstants$PaymentType@ONLINE.code"><s:property value="@com.gionee.wms.common.WmsConstants$PaymentType@ONLINE.name"/></s:if>
 					<s:elseif test="PaymentType==@com.gionee.wms.common.WmsConstants$PaymentType@COD.code"><s:property value="@com.gionee.wms.common.WmsConstants$PaymentType@COD.name"/></s:elseif>
@@ -217,6 +225,9 @@
                     </s:if>
                     <s:if test="orderStatus != -1 && (orderPushStatus != null && orderPushStatus == @com.gionee.wms.common.WmsConstants$OrderPushStatusEnum@PUSHED.code)">
                       |&nbsp;<a target="ajaxTodo" title="该功能用于直接修改订单状态为已签收，切勿随意使用，确定要签收：${orderCode }的订单吗?" href="${ctx }/stock/salesOrder!qinaShou.action?orderCode=${orderCode }"><span>改签收</span></a>
+                    </s:if>
+                    <s:if test="orderStatus != -1 && orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@RECEIVED.code">
+                      |&nbsp;<a  href="${ctx}/stock/salesOrder!input.action?id=${id}&type=1" target="dialog" rel="dlg_orderInput" mask="true" width="1024" height="768" warn="请选择销售订单"><span>换货</span></a>
                     </s:if>
 				</td>
 			</tr>

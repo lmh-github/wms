@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -107,28 +109,43 @@ public class TransferController {
     }
 
     @RequestMapping("/toUp.do")
-    public String toUpload() {
+    public String toUpload(Integer type, HttpServletRequest request) {
+        request.setAttribute("type", type);
         return "transfer/file_transfer";
     }
 
     @RequestMapping("/upload.json")
     @ResponseBody
-    public Object importExcel(MultipartFile multipartFile, QueryMap queryMap) {
+    public Object importExcel(MultipartFile multipartFile, Integer type, QueryMap queryMap) throws IOException {
         if (multipartFile == null) {
             return DwzMessage.error("上传出现异常！", null);
         }
         LinkedHashMap<String, String> mapping = new LinkedHashMap<>();
-        mapping.put("2", "consignee");
-        mapping.put("3", "transferTo");
-        mapping.put("4", "contact");
-        mapping.put("10", "remark");
-        mapping.put("5", "array,goodsList,skuCode");
-        mapping.put("9", "array,goodsList,unitPrice");
-        mapping.put("8", "array,goodsList,quantity");
-        String jsonStr = ExcelUtil.read(mapping, multipartFile, 2, 2, 0);
+        String jsonStr;
+        if (null != type && type == 1) {
+            mapping.put("1", "transferTo");
+            mapping.put("2", "consignee");
+            mapping.put("3", "contact");
+            mapping.put("8", "remark");
+            mapping.put("4", "array,goodsList,skuCode");
+            mapping.put("6", "array,goodsList,quantity");
+            mapping.put("7", "array,goodsList,unitPrice");
+            jsonStr = ExcelUtil.read(mapping, multipartFile.getInputStream(), multipartFile.getOriginalFilename(), 1, 0, 0);
+
+        } else {
+            mapping.put("2", "consignee");
+            mapping.put("3", "transferTo");
+            mapping.put("4", "contact");
+            mapping.put("10", "remark");
+            mapping.put("5", "array,goodsList,skuCode");
+            mapping.put("9", "array,goodsList,unitPrice");
+            mapping.put("8", "array,goodsList,quantity");
+            jsonStr = ExcelUtil.read(mapping, multipartFile.getInputStream(), multipartFile.getOriginalFilename(), 2, 2, 0);
+
+        }
         JsonUtils jsonUtils = new JsonUtils();
         try {
-            List<Transfer> transferList = transferService.convert(jsonUtils.jsonToList(jsonStr, Transfer.class));
+            List<Transfer> transferList = transferService.convert(jsonUtils.jsonToList(jsonStr, Transfer.class), type);
             transferService.addBatch(transferList);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

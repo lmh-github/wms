@@ -65,6 +65,7 @@ public class SalesOrderVo {
 	private Long rownum;// 记录序列
 	private String weight;
 	private Date opTime;// 签收时间
+    private String type;// 类型类型  普通订单 换货订单 退货订单
 
 	private List<SalesOrderGoods> goodsList;
 
@@ -471,4 +472,11 @@ public class SalesOrderVo {
 		this.opTime = opTime;
 	}
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

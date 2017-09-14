@@ -4,6 +4,7 @@ import com.gionee.wms.common.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class SalesOrder {
     private Long id;
@@ -70,6 +71,8 @@ public class SalesOrder {
     private String invoiceMobile; // 发票接收手机号
     private String invoiceEmail; // 发票接收邮箱
     private String buyerTaxNo; // 纳税人识别号
+    private String type;// 类型类型  普通订单 换货订单 退货订单
+    private List<SalesOrderGoods> goodsList;
 
     /**
      * 取完整地址
@@ -558,5 +561,21 @@ public class SalesOrder {
 
     public void setBuyerTaxNo(String buyerTaxNo) {
         this.buyerTaxNo = buyerTaxNo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<SalesOrderGoods> getGoodsList() {
+        return goodsList;
+    }
+
+    public void setGoodsList(List<SalesOrderGoods> goodsList) {
+        this.goodsList = goodsList;
     }
 }

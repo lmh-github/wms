@@ -13,9 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -28,26 +28,26 @@ public class ExcelUtil {
     // split: ,
     // listValue start with array
     public static String read(LinkedHashMap<String, String> mapping,
-                              MultipartFile multipartFile, int startRow, int startCell, int sheetNum) {
+                              InputStream inputStream, String fileName, int startRow, int startCell, int sheetNum) {
         String jsonStr = "";
         JsonUtils jsonUtils = new JsonUtils();
-        if (multipartFile.getOriginalFilename().contains(".xlsx")) {
-            jsonStr = jsonUtils.toJson(readExcelByXlsx(multipartFile, startRow, startCell, sheetNum, mapping));
-        } else if (multipartFile.getOriginalFilename().contains(".xls")) {
-            jsonStr = jsonUtils.toJson(readExcelByXls(multipartFile, startRow, startCell, sheetNum, mapping));
+        if (fileName.contains(".xlsx")) {
+            jsonStr = jsonUtils.toJson(readExcelByXlsx(inputStream, startRow, startCell, sheetNum, mapping));
+        } else if (fileName.contains(".xls")) {
+            jsonStr = jsonUtils.toJson(readExcelByXls(inputStream, startRow, startCell, sheetNum, mapping));
         }
         return jsonStr;
     }
 
     // 获取07以下版本数据源
     private static List<Map<String, Object>> readExcelByXls(
-        MultipartFile multipartFile, int startRow, int startCell, int sheetNum,
+        InputStream inputStream, int startRow, int startCell, int sheetNum,
         LinkedHashMap<String, String> mapping) {
 
         List<Map<String, Object>> hssfList = new ArrayList<>();
 
         try {
-            HSSFWorkbook hssfWorkbook = new HSSFWorkbook(multipartFile.getInputStream());
+            HSSFWorkbook hssfWorkbook = new HSSFWorkbook(inputStream);
             HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(sheetNum);
 
             for (int i = startRow; i < hssfSheet.getLastRowNum() + 1; i++) {
@@ -75,13 +75,13 @@ public class ExcelUtil {
 
     // 获取07版本数据源
     private static List<Map<String, Object>> readExcelByXlsx(
-        MultipartFile multipartFile, int startRow, int startCell, int sheetNum,
+        InputStream inputStream, int startRow, int startCell, int sheetNum,
         LinkedHashMap<String, String> mapping) {
 
         List<Map<String, Object>> xssfList = new ArrayList<>();
 
         try {
-            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(multipartFile.getInputStream());
+            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
             XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(sheetNum);
 
             for (int i = startRow; i < xssfSheet.getLastRowNum() + 1; i++) {

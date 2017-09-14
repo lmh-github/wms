@@ -83,6 +83,16 @@
 				<dt>配送单号：</dt>
 				<dd><input name="order.shippingNo" type="text"  value="${order.shippingNo }"></dd>
 			</dl>
+			<dl>
+				<dt>订单类型：</dt>
+				<dd>
+                    <select  name="order.type" id="i_order_type">
+                        <option value=">${order.type }</option>
+                        <option value="普通订单" ${(order.type =="普通订单") ? "selected='true'":""}>普通订单</option>
+                        <option value="换货订单"  ${(order.type =="换货订单") ? "selected='true'":""}>换货订单</option>
+                    </select>
+                </dd>
+			</dl>
 		</fieldset>
 		<fieldset>
 			<legend>发票信息</legend>

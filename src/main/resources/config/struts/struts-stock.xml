@@ -100,6 +100,7 @@
 			<result name="list_for_dely">/WEB-INF/view/stock/orderListForDely.jsp</result>
 			<result name="show">/WEB-INF/view/stock/orderShow.jsp</result>
 			<result name="lookup">/WEB-INF/view/stock/orderLookup.jsp</result>
+			<result name="up">/WEB-INF/view/stock/upload.jsp</result>
 			<result name="preview_shopping_list" type="freemarker">/WEB-INF/ftl/shoppingList.ftl</result>
 			<result name="batch_preview_shopping_list" type="freemarker">/WEB-INF/ftl/batchShoppingList.ftl</result>
 			

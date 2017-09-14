@@ -32,4 +32,11 @@ public interface WarehouseDao {
      * @return
      */
     String getWarehouseNameByCode(String warehouseCode);
+
+    /**
+     * 根据仓库名称获取仓库id
+     * @param warehouseName
+     * @return
+     */
+    String getWarehouseIdByName(String warehouseName);
 }

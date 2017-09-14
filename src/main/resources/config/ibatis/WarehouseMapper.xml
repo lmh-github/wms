@@ -66,5 +66,12 @@
     <select id="getWarehouseNameByCode" parameterType="string" resultType="string">
         SELECT WAREHOUSE_NAME FROM WMS_WAREHOUSE WHERE WAREHOUSE_CODE = #{warehouseCode}
     </select>
+
+    <select id="getWarehouseIdByName" parameterType="string" resultType="string">
+        SELECT id FROM WMS_WAREHOUSE WHERE WAREHOUSE_NAME = #{warehouseName}
+    </select>
+
+
+
 	
  </mapper>

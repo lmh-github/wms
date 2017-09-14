@@ -49,6 +49,7 @@
 		<result column="order_source" property="orderSource" />
 		<result column="weight" property="weight" />
 		<result column="rownum" property="rownum" />
+		<result column="type" property="type" />
 		<!--goodsList属性是个集合类型 -->
 		<collection property="goodsList" ofType="SalesOrderGoods">
 			<id column="goods_id" property="id" />
@@ -124,7 +125,8 @@
 		t1.weight as weight,
         t1.ORDER_PUSH_STATUS as orderPushStatus,
         t1.order_push_time as orderPushTime,
-        t1.buyer_tax_no as buyerTaxNo
+        t1.buyer_tax_no as buyerTaxNo,
+        t1.type as type
 	</sql>
 
 	<sql id="sql_orderWhere">
@@ -139,6 +141,7 @@
 			<if test="orderUser != null and orderUser != ''">and t1.order_user=#{orderUser}</if>
 			<if test="consignee != null and consignee != ''">and t1.consignee=#{consignee}</if>
 			<if test="orderStatus != null">and t1.order_status=#{orderStatus}</if>
+			<if test="type != null">and t1.type=#{type}</if>
 			<if test="orderTimeBegin != null">and
 				t1.order_time<![CDATA[>=]]>#{orderTimeBegin}
 			</if>
@@ -187,6 +190,8 @@
 			<if test="orderUser != null and orderUser != ''">and t1.order_user=#{orderUser}</if>
 			<if test="consignee != null and consignee != ''">and t1.consignee=#{consignee}</if>
 			<if test="orderStatus != null">and t1.order_status=#{orderStatus}</if>
+			<if test="type != null">and t1.type=#{type}</if>
+			<if test="province != null">and t1.province LIKE concat(#{province},'%') </if>
 			<if test="orderTimeBegin != null">and
 				t1.order_time<![CDATA[>=]]>#{orderTimeBegin}
 			</if>
@@ -276,7 +281,8 @@
 		t1.stockout_code as stockoutCode,
 		t1.remark as remark,
 		t1.delivery_code as deliveryCode,
-		t1.order_source as orderSource
+		t1.order_source as orderSource,
+		t1.type as type
 	</sql>
 
 	<sql id="sql_goodsColumns">
@@ -422,7 +428,7 @@
 		insert into wms_sales_order
 		(id, order_code, order_source,
 		order_user,order_time,payment_type,payment_code,payment_name,pay_no,paid_amount,consignee,province,city,district,address,zipcode,tel,mobile,best_time,shipping_id,shipping_name,invoice_enabled,invoice_type,invoice_amount,invoice_title,buyer_tax_no,invoice_content,invoice_status,postscript,goods_amount,order_amount,payable_amount,join_time,order_notify_status,order_notify_count,order_status,delivery_code,remark,handled_by,handled_time,payment_time
-        ,ORDER_PUSH_STATUS)
+        ,ORDER_PUSH_STATUS,type)
 		select
 		#{id},
 		#{orderCode, jdbcType=VARCHAR},
@@ -466,11 +472,12 @@
 		#{handledTime, jdbcType=TIME},
 		#{paymentTime, jdbcType=TIME},
         <if test="orderPushStatus != null">
-        #{orderPushStatus, jdbcType=VARCHAR}
+        #{orderPushStatus, jdbcType=VARCHAR},
         </if>
         <if test="orderPushStatus == null">
-        0
+        0,
         </if>
+        #{type, jdbcType=VARCHAR}
         from dual
 		where not exists (select 1 from wms_sales_order where
 		order_code=#{orderCode})
@@ -513,7 +520,8 @@
 			remark=#{remark, jdbcType=VARCHAR},
 			handled_by=#{handledBy, jdbcType=VARCHAR},
 			handled_time=#{handledTime, jdbcType=TIME},
-			payment_time=#{paymentTime, jdbcType=TIME}
+			payment_time=#{paymentTime, jdbcType=TIME},
+            type = #{type,jdbcType=VARCHAR}
 		</set>
 		where order_code=#{orderCode}
 	</update>
@@ -530,6 +538,7 @@
 			<if test="remarkBacked!=null">remark_backed=#{remarkBacked, jdbcType=VARCHAR},</if>
             <if test="orderPushStatus != null">ORDER_PUSH_STATUS = #{orderPushStatus},</if>
             <if test="orderPushTime != null">ORDER_PUSH_TIME = #{orderPushTime}</if>
+            <if test="type != null">type = #{type}</if>
 		</set>
 		where order_code=#{orderCode}
 		<if test="orderStatusWhere!=null"> and order_status=#{orderStatusWhere}</if>
@@ -772,6 +781,24 @@
 		t2 on t2.delivery_id=t3.id and t1.sku_id=t2.sku_id where t1.order_id=#{orderId} 
 		</select> -->
 
+	<!-- 批量添加订单 -->
+	<insert id="batchAddOrder" parameterType="list">
+        insert into wms_sales_order
+        (id,order_code,shipping_id,shipping_name,order_time,handled_by,handled_time,order_status,
+        order_source,consignee,province,city,district,address,mobile,invoice_enabled,remark,type)
+        select WMS_SEQ_COMMON.nextval,A.* from
+		(
+		<foreach item="item" collection="list" index="index"
+			separator="UNION ALL">
+			select
+              #{item.orderCode},#{item.shippingId},#{item.shippingName},#{item.orderTime},#{item.handledBy},#{item.handledTime},
+              #{item.orderStatus},#{item.orderSource},#{item.consignee},#{item.province},#{item.city},#{item.district},#{item.address},
+              #{item.mobile},#{item.invoiceEnabled},#{item.remark},#{item.type}
+            from dual
+		</foreach>
+		)A
+	</insert>
+
 	<!-- 批量添加订单商品 -->
 	<insert id="batchAddOrderGoods" parameterType="list">
 		insert into wms_sales_order_goods(id, order_id,sku_id,
@@ -918,6 +945,7 @@
 		t1.invoice_amount,
 		t1.invoice_content,
 		t1.invoice_status,
+        t1.type,
 		rownum
 		from wms_sales_order_goods
 		t2
@@ -1021,6 +1049,7 @@
 			<if test="handledBy!=null">handled_by=#{handledBy},</if>
 			<if test="handledTime!=null">handled_time=#{handledTime, jdbcType=TIME},</if>
 			<if test="remark!=null">remark=#{remark}</if>
+			<if test="type!=null">type=#{type}</if>
 			<!--if test="orderNotifyStatus!=null">order_notify_status=#{orderNotifyStatus}</if -->
 		</set>
 		where id=#{id}

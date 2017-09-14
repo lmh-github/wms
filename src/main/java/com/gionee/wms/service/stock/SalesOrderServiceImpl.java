@@ -218,37 +218,14 @@ public class SalesOrderServiceImpl implements SalesOrderService {
             invoiceInfoSerivce.saveByOrder(order);
             // 记录订单节点信息
             salesOrderNodeInfoService.saveFromSalesOrder(order, orderGoodsList);
-
             // 保存操作日志
-            SalesOrderLog salesOrderLog = new SalesOrderLog();
-            try {
-                salesOrderLog.setOrderId(order.getId());
-                salesOrderLog.setOrderStatus(order.getOrderStatus().intValue());
-                salesOrderLog.setOpUser(ActionUtils.getLoginName() == null ? WmsConstants.DEFAULT_USERNAME_LOG : ActionUtils.getLoginName());
-                salesOrderLog.setOpTime(new Date());
-                salesOrderLog.setRemark("新增订单");
-                salesOrderLogDao.insertSalesOrderLog(salesOrderLog);
-            } catch (Exception e) {
-                logger.error("业务日志记录异常", e);
-            }
+            saveOperateLog(order);
+
 
             // 保存订单商品清单
             Map<String, Sku> skuMap = getSkuMap(orderGoodsList);
             if (skuMap != null && skuMap.size() > 0) {
-                for (SalesOrderGoods orderGoods : orderGoodsList) {
-                    orderGoods.setOrder(order);
-                    if (skuMap.containsKey(orderGoods.getSkuCode())) {
-                        Sku sku = skuMap.get(orderGoods.getSkuCode());
-                        orderGoods.setSkuId(sku.getId());
-                        orderGoods.setSkuCode(sku.getSkuCode());
-                        orderGoods.setSkuName(sku.getSkuName());
-                        orderGoods.setMeasureUnit(sku.getWares().getMeasureUnit());
-                        orderGoods.setIndivEnabled(sku.getWares().getIndivEnabled());
-                        if (null == orderGoods.getSubtotalPrice()) {
-                            orderGoods.setSubtotalPrice(new BigDecimal(orderGoods.getUnitPrice().floatValue() * orderGoods.getQuantity().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                        }
-                    }
-                }
+                convertSku(order, orderGoodsList, skuMap);
             }
             // 如果是来自唯品会订单，为了保证同步数据到数据库，需另行处理
             else if (WmsConstants.OrderSource.VIP_GIONEE.getCode().equals(orderGoodsList.get(0).getOrderSource())) {
@@ -265,6 +242,38 @@ public class SalesOrderServiceImpl implements SalesOrderService {
             orderDao.batchAddOrderGoods(orderGoodsList);
         } catch (DataAccessException e) {
             throw new ServiceException(WmsCodeEnum.SYSTEM_ERROR.getCode(), e);
+        }
+    }
+
+    private void saveOperateLog(SalesOrder order) {
+        // 保存操作日志
+        SalesOrderLog salesOrderLog = new SalesOrderLog();
+        try {
+            salesOrderLog.setOrderId(order.getId());
+            salesOrderLog.setOrderStatus(order.getOrderStatus().intValue());
+            salesOrderLog.setOpUser(ActionUtils.getLoginName() == null ? WmsConstants.DEFAULT_USERNAME_LOG : ActionUtils.getLoginName());
+            salesOrderLog.setOpTime(new Date());
+            salesOrderLog.setRemark("新增订单");
+            salesOrderLogDao.insertSalesOrderLog(salesOrderLog);
+        } catch (Exception e) {
+            logger.error("业务日志记录异常", e);
+        }
+    }
+
+    private void convertSku(SalesOrder order, List<SalesOrderGoods> orderGoodsList, Map<String, Sku> skuMap) {
+        for (SalesOrderGoods orderGoods : orderGoodsList) {
+            orderGoods.setOrder(order);
+            if (skuMap.containsKey(orderGoods.getSkuCode())) {
+                Sku sku = skuMap.get(orderGoods.getSkuCode());
+                orderGoods.setSkuId(sku.getId());
+                orderGoods.setSkuCode(sku.getSkuCode());
+                orderGoods.setSkuName(sku.getSkuName());
+                orderGoods.setMeasureUnit(sku.getWares().getMeasureUnit());
+                orderGoods.setIndivEnabled(sku.getWares().getIndivEnabled());
+                if (null == orderGoods.getSubtotalPrice()) {
+                    orderGoods.setSubtotalPrice(new BigDecimal(orderGoods.getUnitPrice().floatValue() * orderGoods.getQuantity().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                }
+            }
         }
     }
 
@@ -313,20 +322,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 // 保存商品清单，调整新的库存占用信息
                 Map<String, Sku> skuMap = getSkuMap(orderGoodsList);
                 order.setId(oldOrder.getId());
-                for (SalesOrderGoods orderGoods : orderGoodsList) {
-                    orderGoods.setOrder(order);
-                    if (skuMap.containsKey(orderGoods.getSkuCode())) {
-                        Sku sku = skuMap.get(orderGoods.getSkuCode());
-                        orderGoods.setSkuId(sku.getId());
-                        orderGoods.setSkuCode(sku.getSkuCode());
-                        orderGoods.setSkuName(sku.getSkuName());
-                        orderGoods.setMeasureUnit(sku.getWares().getMeasureUnit());
-                        orderGoods.setIndivEnabled(sku.getWares().getIndivEnabled());
-                        if (null == orderGoods.getSubtotalPrice()) {
-                            orderGoods.setSubtotalPrice(new BigDecimal(orderGoods.getUnitPrice().floatValue() * orderGoods.getQuantity().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP));
-                        }
-                    }
-                }
+                convertSku(order, orderGoodsList, skuMap);
                 orderDao.batchAddOrderGoods(orderGoodsList);
                 salesOrderNodeInfoService.updateFromSalesOrder(order, orderGoodsList); // 更新节点信息
             }
@@ -846,7 +842,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return Base64.encodeBase64String(lineListInfo.toString().getBytes());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handBatch(Map<String, Long> batchCodeMap) {
         // 若所有订单发票打印成功，则修改拣货批次状态为已处理，根据拣货批次号来获取判断
@@ -1015,7 +1013,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int updateSalesOrderPushStatus(SalesOrder order) {
         Map<String, Object> criteria = Maps.newHashMap();
@@ -1026,7 +1026,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return orderDao.updateOrder(criteria);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public ServiceCtrlMessage copy(Long id) {
@@ -1097,7 +1099,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return new ServiceCtrlMessage(true, "操作成功！");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ServiceCtrlMessage pushOrderToSF(SalesOrder order) {
         if (OrderStatus.FILTERED.getCode() != order.getOrderStatus()) {
@@ -1148,6 +1152,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
     /**
      * 检查订单在顺丰仓的实时库存，是否只是推送到顺丰
+     *
      * @param order order
      * @return true:可以推送
      */
@@ -1204,6 +1209,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
     /**
      * 检查订单在顺丰仓的非实时库存，是否只是推送到顺丰
+     *
      * @param order order
      * @return true:可以推送
      */
@@ -1249,6 +1255,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
     /**
      * 发往顺丰
+     *
      * @param order
      * @param orderGoodsList
      */
@@ -1733,4 +1740,58 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
     }
 
+    @Override
+    public void addInsertBatch(List<SalesOrder> list) throws Exception {
+        if (!CollectionUtils.isEmpty(list)) {
+
+            List<SalesOrder> salesOrders = new ArrayList<>();
+            List<SalesOrderGoods> salesOrderGoods = new ArrayList<>();
+
+            // 转换同一个订单多个sku的数据
+            for (int i = 0; i < list.size(); i++) {
+                list.get(i).setPaymentName("在线支付");
+                list.get(i).setOrderSource(WmsConstants.getOrderCodeByName(list.get(i).getOrderSource()));
+                list.get(i).setType("普通订单");
+                list.get(i).setShippingId(23559737L);
+                list.get(i).setShippingName("东莞直发");
+                list.get(i).setOrderTime(new Date());
+                list.get(i).setHandledBy(ActionUtils.getLoginName());
+                list.get(i).setHandledTime(new Date());
+                list.get(i).setOrderStatus(OrderStatus.FILTERED.getCode());
+
+                if (salesOrders.size() == 0) {
+                    salesOrders.add(list.get(i));
+                } else {
+                    if (list.get(i).getMobile().equals(list.get(i - 1).getMobile())) {
+                        list.get(i - 1).getGoodsList().addAll(list.get(i).getGoodsList());
+                    }
+                }
+            }
+            // 合并orderGoods
+
+            for (SalesOrder salesOrder : salesOrders) {
+                //计算费用信息
+                BigDecimal totalPrice = new BigDecimal(0);
+                for (SalesOrderGoods orderGoods : salesOrder.getGoodsList()) {
+                    totalPrice = totalPrice.add(BigDecimal.valueOf(orderGoods.getQuantity()).multiply(orderGoods.getUnitPrice()));
+                }
+                salesOrder.setGoodsAmount(totalPrice);
+                salesOrder.setOrderAmount(totalPrice);
+                salesOrder.setPayableAmount(totalPrice);
+
+                orderDao.addOrder(salesOrder);
+                Map<String, Sku> skuMap = getSkuMap(salesOrder.getGoodsList());
+                if (skuMap != null && skuMap.size() > 0) {
+                    convertSku(salesOrder, salesOrder.getGoodsList(), skuMap);
+                    salesOrderGoods.addAll(salesOrder.getGoodsList());
+                }
+                //保存操作日志
+                saveOperateLog(salesOrder);
+            }
+            if (CollectionUtils.isEmpty(salesOrderGoods)) {
+                throw new Exception("上传失败");
+            }
+            orderDao.batchAddOrderGoods(salesOrderGoods);
+        }
+    }
 }

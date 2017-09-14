@@ -5,11 +5,10 @@ import com.gionee.wms.common.DateConvert;
 import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.*;
-import com.gionee.wms.dao.IndivDao;
-import com.gionee.wms.dao.StatDao;
-import com.gionee.wms.dao.TransferDao;
-import com.gionee.wms.dao.WaresDao;
+import com.gionee.wms.common.excel.excelimport.util.StringUtil;
+import com.gionee.wms.dao.*;
 import com.gionee.wms.dto.Page;
+import com.gionee.wms.dto.QueryMap;
 import com.gionee.wms.dto.StockRequest;
 import com.gionee.wms.entity.*;
 import com.gionee.wms.facade.result.WmsResult;
@@ -55,6 +54,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     private TransferDao transferDao;
     @Autowired
     private IndivDao indivDao;
+    @Autowired
+    private WarehouseDao warehouseDao;
     @Autowired
     private StockService stockService;
     @Autowired
@@ -894,7 +895,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     }
 
     @Override
-    public List<Transfer> convert(List<Transfer> transfers) throws Exception {
+    public List<Transfer> convert(List<Transfer> transfers, Integer type) throws Exception {
         List<Transfer> transferList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(transfers)) {
             for (int i = 0; i < transfers.size(); i++) {
@@ -903,8 +904,17 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                 transfer.setWarehouseId(1643L);
                 TransferGoods transferGoods = transfer.getGoodsList().get(0);
                 Sku sku = waresDao.querySkuBySkuCode(transferGoods.getSkuCode());
+
+                if (null != type && type == 1) {
+                    // 转换分仓收货仓
+                    String transferTo = warehouseDao.getWarehouseIdByName(transfer.getTransferTo());
+                    if (StringUtils.isEmpty(transferTo)) {
+                        throw new Exception("导入失败,找不到对应收货仓:" + transfer.getTransferTo());
+                    }
+                    transfer.setTransferTo(transferTo);
+                }
                 if (sku == null) {
-                    throw new Exception("导入失败,第" + (i + 1) + "行sku code:" + transferGoods.getSkuCode() + "找不到对应商品!");
+                    throw new Exception("导入失败,sku code:" + transferGoods.getSkuCode() + "找不到对应商品!");
                 }
                 transferGoods.setSkuName(sku.getSkuName());
                 transferGoods.setSkuId(sku.getId());
@@ -953,7 +963,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                     transferGoodsList.addAll(goods);
                 }
             }
-                transferDao.insertBatch(transferList);
+            transferDao.insertBatch(transferList);
             if (!CollectionUtils.isEmpty(transferGoodsList)) {
                 try {
                     transferDao.insertBatchGoods(transferGoodsList);

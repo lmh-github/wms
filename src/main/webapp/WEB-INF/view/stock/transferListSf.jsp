@@ -73,7 +73,10 @@
 			<li><a class="add" href="javascript:;" onclick="addSfOrder();"><span>下达顺丰入库</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/transferSf.action?exports=1" target="dwzExport" targettype="navTab"><span>导出调拨单excel</span></a></li>
-		</ul>
+            <li>
+                <a class="icon" href="${ctx}/trans/toUp.do?type=1" target="dialog" width="500" height="300"><span>导入excel</span></a>
+            </li>
+        </ul>
 	</div>
 	<table id="tb${rand}" class="list" width="100%" layoutH="140">
 		<thead>

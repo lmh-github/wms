@@ -84,7 +84,12 @@ public interface SalesOrderDao {
 	 * 批量添加订单商品
 	 */
 	int batchAddOrderGoods(List<SalesOrderGoods> orderGoodsList);
-	
+
+	/**
+	 * 批量添加订单商品
+	 */
+	int batchAddOrder(List<SalesOrder> orderGoodsList);
+
 	/**
 	 * 更新销售订单信息
 	 */
