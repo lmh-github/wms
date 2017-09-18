@@ -149,6 +149,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     private String fileFileName; // 文件名称
     private Integer inputType;
     private String type; // 订单类型
+    private Integer urlType; // 订单类型 1:普通订单 2:换货订单
 
     /**
      * 订单推送到顺丰状态
@@ -1873,5 +1874,18 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     public void setProvince(String province) {
         this.province = province;
+    }
+
+    public Integer getUrlType() {
+        return urlType;
+    }
+
+    public void setUrlType(Integer urlType) {
+        this.urlType = urlType;
+        if(urlType == 1){
+            setType("普通订单");
+        }else if(urlType ==2){
+            setType("换货订单");
+        }
     }
 }

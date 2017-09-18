@@ -1746,6 +1746,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     public void addInsertBatch(List<SalesOrder> list) throws Exception {
         if (!CollectionUtils.isEmpty(list)) {
 
+            int index = 0;
             List<SalesOrder> salesOrders = new ArrayList<>();
             List<SalesOrderGoods> salesOrderGoods = new ArrayList<>();
             String prefix = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -1768,8 +1769,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                     salesOrders.add(list.get(i));
                 } else {
                     if (list.get(i).getMobile().equals(list.get(i - 1).getMobile())) {
-                        list.get(i - 1).getGoodsList().addAll(list.get(i).getGoodsList());
+                        list.get(index).getGoodsList().addAll(list.get(i).getGoodsList());
                     } else {
+                        index = i;
                         salesOrders.add(list.get(i));
                     }
                 }

@@ -108,7 +108,43 @@
 			</li>
 			<li>
 				<label>地区：</label>
-                <input type="text" name="province" value="${province}" />
+                <select name="province">
+                    <option value="" ${province == null ? "selected" : "" }>请选择</option>
+                    <option value="北京" <s:property value="type == '北京' ? 'selected' : ''"/>>北京</option>
+                    <option value="天津" <s:property value="type == '天津' ? 'selected' : ''"/>>天津</option>
+                    <option value="上海" <s:property value="type == '上海' ? 'selected' : ''"/>>上海</option>
+                    <option value="重庆" <s:property value="type == '重庆' ? 'selected' : ''"/>>重庆</option>
+                    <option value="河北省" <s:property value="type == '河北省' ? 'selected' : ''"/>>河北省</option>
+                    <option value="山西省" <s:property value="type == '山西省' ? 'selected' : ''"/>>山西省</option>
+                    <option value="辽宁省" <s:property value="type == '辽宁省' ? 'selected' : ''"/>>辽宁省</option>
+                    <option value="吉林省" <s:property value="type == '吉林省' ? 'selected' : ''"/>>吉林省</option>
+                    <option value="黑龙江省" <s:property value="type == '黑龙江省' ? 'selected' : ''"/>>黑龙江省</option>
+                    <option value="江苏省" <s:property value="type == '江苏省' ? 'selected' : ''"/>>江苏省</option>
+                    <option value="浙江省" <s:property value="type == '浙江省' ? 'selected' : ''"/>>浙江省</option>
+                    <option value="安徽省" <s:property value="type == '安徽省' ? 'selected' : ''"/>>安徽省</option>
+                    <option value="福建省" <s:property value="type == '福建省' ? 'selected' : ''"/>>福建省</option>
+                    <option value="江西省" <s:property value="type == '江西省' ? 'selected' : ''"/>>江西省</option>
+                    <option value="山东省" <s:property value="type == '山东省' ? 'selected' : ''"/>>山东省</option>
+                    <option value="河南省" <s:property value="type == '河南省' ? 'selected' : ''"/>>河南省</option>
+                    <option value="湖北省" <s:property value="type == '湖北省' ? 'selected' : ''"/>>湖北省</option>
+                    <option value="湖南省" <s:property value="type == '湖南省' ? 'selected' : ''"/>>湖南省</option>
+                    <option value="广东省" <s:property value="type == '广东省' ? 'selected' : ''"/>>广东省</option>
+                    <option value="海南省" <s:property value="type == '海南省' ? 'selected' : ''"/>>海南省</option>
+                    <option value="四川省" <s:property value="type == '四川省' ? 'selected' : ''"/>>四川省</option>
+                    <option value="贵州省" <s:property value="type == '贵州省' ? 'selected' : ''"/>>贵州省</option>
+                    <option value="云南省" <s:property value="type == '云南省' ? 'selected' : ''"/>>云南省</option>
+                    <option value="陕西省" <s:property value="type == '陕西省' ? 'selected' : ''"/>>陕西省</option>
+                    <option value="甘肃省" <s:property value="type == '甘肃省' ? 'selected' : ''"/>>甘肃省</option>
+                    <option value="青海省" <s:property value="type == '青海省' ? 'selected' : ''"/>>青海省</option>
+                    <option value="青海省" <s:property value="type == '青海省' ? 'selected' : ''"/>>青海省</option>
+                    <option value="内蒙古自治区" <s:property value="type == '内蒙古自治区' ? 'selected' : ''"/>>内蒙古自治区</option>
+                    <option value="广西壮族自治区" <s:property value="type == '广西壮族自治区' ? 'selected' : ''"/>>广西壮族自治区</option>
+                    <option value="西藏自治区" <s:property value="type == '西藏自治区' ? 'selected' : ''"/>>西藏自治区</option>
+                    <option value="宁夏回族自治区" <s:property value="type == '宁夏回族自治区' ? 'selected' : ''"/>>宁夏回族自治区</option>
+                    <option value="新疆维吾尔自治区" <s:property value="type == '新疆维吾尔自治区' ? 'selected' : ''"/>>新疆维吾尔自治区</option>
+                    <option value="香港特别行政区" <s:property value="type == '香港特别行政区' ? 'selected' : ''"/>>香港特别行政区</option>
+                    <option value="澳门特别行政区" <s:property value="type == '澳门特别行政区' ? 'selected' : ''"/>>澳门特别行政区</option>
+                </select>
             </li>
             <li>
                 <label>订单类型：</label>
