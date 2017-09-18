@@ -1757,6 +1757,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 list.get(i).setType("普通订单");
                 list.get(i).setShippingId(23559737L);
                 list.get(i).setShippingName("东莞直发");
+                list.get(i).setPaymentTime(new Date());
                 list.get(i).setOrderTime(new Date());
                 list.get(i).setHandledBy(ActionUtils.getLoginName());
                 list.get(i).setHandledTime(new Date());
@@ -1768,6 +1769,8 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 } else {
                     if (list.get(i).getMobile().equals(list.get(i - 1).getMobile())) {
                         list.get(i - 1).getGoodsList().addAll(list.get(i).getGoodsList());
+                    } else {
+                        salesOrders.add(list.get(i));
                     }
                 }
             }
