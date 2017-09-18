@@ -73,9 +73,9 @@
 			<li><a class="add" href="javascript:;" onclick="addSfOrder();"><span>下达顺丰入库</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="${ctx}/stock/transferSf.action?exports=1" target="dwzExport" targettype="navTab"><span>导出调拨单excel</span></a></li>
-            <li>
-                <a class="icon" href="${ctx}/trans/toUp.do?type=1&rel=tab_transferSf" target="dialog" width="500" height="300"><span>导入excel</span></a>
-            </li>
+            <li><a class="icon" href="${ctx}/trans/toUp.do?type=1&rel=tab_transferSf" target="dialog" width="500" height="300"><span>导入excel</span></a></li>
+            <li class="line">line</li>
+            <a class="add" href="${ctx}/export/transfer_sf_inport_template.xlsx" target="_blank" ><span>下载导入模板</span></a>
         </ul>
 	</div>
 	<table id="tb${rand}" class="list" width="100%" layoutH="140">

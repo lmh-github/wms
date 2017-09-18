@@ -146,6 +146,8 @@
 			<li><a class="icon" href="${ctx}/stock/salesOrder.action?exports=1" target="dwzExport" targettype="navTab"><span>导出excel</span></a></li>
             <li class="line">line</li>
             <li><a class="icon" href="${ctx}/stock/salesOrder!toUp.action" target="dialog" rel="dlg_orderInput" mask="true" width="500" height="300"><span>导入excel</span></a></li>
+            <li class="line">line</li>
+            <a class="add" href="${ctx}/export/sales_order_import_template.xlsx" target="_blank" ><span>下载导入模板</span></a>
         </ul>
 	</div>
 	<table class="list" width="100%" layoutH="170">
