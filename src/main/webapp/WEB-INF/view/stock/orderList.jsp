@@ -110,6 +110,15 @@
 				<label>地区：</label>
                 <input type="text" name="province" value="${province}" />
             </li>
+            <li>
+                <label>订单类型：</label>
+                <select name="type">
+                    <option value="" ${type == null ? "selected" : "" }>请选择</option>
+                    <option value="普通订单" <s:property value="type == '普通订单' ? 'selected' : ''"/>>普通订单</option>
+                    <option value="换货订单" <s:property value="type == '换货订单' ? 'selected' : ''"/>>换货订单</option>
+                    <option value="退货订单" <s:property value="type == '退货订单' ? 'selected' : ''"/>>退货订单</option>
+                </select>
+            </li>
 		</ul>
 		<div class="subBar">
 			<ul>
@@ -227,7 +236,7 @@
                       |&nbsp;<a target="ajaxTodo" title="该功能用于直接修改订单状态为已签收，切勿随意使用，确定要签收：${orderCode }的订单吗?" href="${ctx }/stock/salesOrder!qinaShou.action?orderCode=${orderCode }"><span>改签收</span></a>
                     </s:if>
                     <s:if test="orderStatus != -1 && orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@RECEIVED.code">
-                      |&nbsp;<a  href="${ctx}/stock/salesOrder!input.action?id=${id}&type=1" target="dialog" rel="dlg_orderInput" mask="true" width="1024" height="768" warn="请选择销售订单"><span>换货</span></a>
+                      |&nbsp;<a  href="${ctx}/stock/salesOrder!input.action?id=${id}&inputType=1" target="dialog" rel="dlg_orderInput" mask="true" width="1024" height="768" warn="请选择销售订单"><span>换货</span></a>
                     </s:if>
 				</td>
 			</tr>

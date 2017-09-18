@@ -147,7 +147,8 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
     private Map<String, Object> bspSourceMap;// 面单打印数据源
     private File file; //上传文件
     private String fileFileName; // 文件名称
-    private Integer type;
+    private Integer inputType;
+    private String type; // 订单类型
 
     /**
      * 订单推送到顺丰状态
@@ -190,6 +191,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         criteria.put("shippingTimeBegin", shippingTimeBegin);
         criteria.put("shippingTimeEnd", shippingTimeEnd);
         criteria.put("province", StringUtils.trimToNull(province));
+        criteria.put("type", StringUtils.trimToNull(type));
 
         if (condition != null) {
             if (StringUtils.isNotBlank(skuCode)) {
@@ -583,7 +585,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
             goodsList = salesOrderService.getOrderGoodsList(id);
             // 换货订单数据处理
-            if (type != null && type == 1) {
+            if (inputType != null && inputType == 1) {
                 order.setId(null);
                 order.setOrderCode(null);
                 order.setType("换货订单");
@@ -1849,11 +1851,19 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         this.fileFileName = fileFileName;
     }
 
-    public Integer getType() {
+    public Integer getInputType() {
+        return inputType;
+    }
+
+    public void setInputType(Integer inputType) {
+        this.inputType = inputType;
+    }
+
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 
