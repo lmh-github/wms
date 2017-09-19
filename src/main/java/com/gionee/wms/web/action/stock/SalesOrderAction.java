@@ -46,6 +46,7 @@ import org.xml.sax.InputSource;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -590,6 +591,17 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
                 order.setId(null);
                 order.setOrderCode(null);
                 order.setType("换货订单");
+                order.setShippingId(23559737L);
+                order.setShippingName("东莞直发");
+                order.setInvoiceStatus(0);
+                order.setInvoiceEnabled(0);
+                order.setInvoiceType(null);
+                order.setInvoiceTitle(null);
+                order.setInvoiceAmount(null);
+                order.setInvoiceContent(null);
+                order.setInvoiceStatus(null);
+                order.setGoodsAmount(BigDecimal.valueOf(0L));
+                order.setPayableAmount(BigDecimal.valueOf(0L));
                 order.setOrderStatus(OrderStatus.FILTERED.getCode());
                 for (SalesOrderGoods salesOrderGoods : goodsList) {
                     salesOrderGoods.setId(null);
