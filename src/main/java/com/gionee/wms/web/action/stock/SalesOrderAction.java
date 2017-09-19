@@ -591,6 +591,8 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
                 order.setId(null);
                 order.setOrderCode(null);
                 order.setType("换货订单");
+                order.setPaymentName("在线付款");
+                order.setPaymentType(1);
                 order.setShippingId(23559737L);
                 order.setShippingName("东莞直发");
                 order.setInvoiceStatus(0);
