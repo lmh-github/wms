@@ -77,6 +77,8 @@ public class ManualReissueOrderAction extends AjaxActionSupport {
 
     private String sku;
 
+    private String createBy;
+
     @Override
     public String execute() throws Exception {
         Map<String, Object> criteria = Maps.newHashMap();
@@ -90,6 +92,7 @@ public class ManualReissueOrderAction extends AjaxActionSupport {
         criteria.put("createTimeBegin", createTimeBegin);
         criteria.put("createTimeEnd", createTimeEnd);
         criteria.put("sku", StringUtils.trimToNull(sku));
+        criteria.put("createBy", StringUtils.trimToNull(createBy));
 
         if (!"1".equals(request.getParameter("exports"))) {
 
@@ -456,5 +459,9 @@ public class ManualReissueOrderAction extends AjaxActionSupport {
 
     public void setSku(String sku) {
         this.sku = sku;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
     }
 }

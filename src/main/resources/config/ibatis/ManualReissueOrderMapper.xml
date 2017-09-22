@@ -141,6 +141,9 @@
       <if test="status != null">
         and T1.STATUS = #{status}
       </if>
+      <if test="createBy != null">
+        and T1.CREATE_BY = #{createBy}
+      </if>
       <if test="paymentName != null">
         and T2.PAYMENT_NAME = #{paymentName}
       </if>

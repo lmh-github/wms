@@ -51,6 +51,11 @@
             <input type="text" name="sku" value="${sku}" />
 
         </li>
+        <li>
+            <label>创建人：</label>
+            <input type="text" name="createBy" value="${createBy}" />
+
+        </li>
       </ul>
       <div class="subBar">
         <ul>
