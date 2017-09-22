@@ -51,10 +51,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             return new ServiceCtrlMessage(false, "订单号为空！");
         }
         SalesOrder salesOrder = salesOrderDao.queryOrderByOrderCode(workOrder.getOrderCode());
-        if (salesOrder == null) {
-            return new ServiceCtrlMessage(false, "未找到订单号【" + workOrder.getOrderCode() + "】相关信息！");
+        if (salesOrder != null) {
+            workOrder.setPlatform(OrderSourceGionee.get(salesOrder.getOrderSource()).getName());
         }
-        workOrder.setPlatform(OrderSourceGionee.get(salesOrder.getOrderSource()).getName());
 
         if (isBlank(workOrder.getWorker())) {
             return new ServiceCtrlMessage(false, "处理人信息为空！");

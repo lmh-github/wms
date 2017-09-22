@@ -20,7 +20,7 @@
                 <dl>
                     <dt>订单来源：</dt>
                     <dd>
-                        <input name="platform" placeholder="后台自动匹配" readonly="readonly" />
+                        <s:select name="platform" value="%{#attr.platform}" list="@com.gionee.wms.common.WmsConstants$OrderSourceGionee@values()" listKey="name" listValue="name" headerValue="请选择" headerKey=""/>
                     </dd>
                 </dl>
                 <dl>
