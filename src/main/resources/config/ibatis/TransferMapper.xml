@@ -657,7 +657,7 @@
                 #{item.orderAmount},
                 #{item.flowType, jdbcType=VARCHAR},
                 #{item.warehouseId},
-                #{item.remark}
+                #{item.remark, jdbcType=VARCHAR}
                 from dual
             </foreach>
         )A
