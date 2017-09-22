@@ -133,6 +133,7 @@
     <table class="list" style="width: 100%;white-space: nowrap;" layoutH="115">
         <thead>
         <tr align="center">
+            <th>创建时间</th>
             <th>发起人</th>
             <th>紧急程度</th>
             <th>所属平台</th>
@@ -149,6 +150,7 @@
         <tbody>
         <s:iterator value="#request.list" var="b">
             <tr target="sid_workorder" rel="${id}">
+                <td align="center" style="white-space: nowrap;"><fmt:formatDate value="${createTime}" pattern="yyyy-MM-dd HH:mm" /> </td>
                 <td align="center" style="white-space: nowrap;"><s:property value="sponsor"/></td>
                 <td align="center" style="white-space: nowrap;">
                     <s:if test="lv == '紧急'">
