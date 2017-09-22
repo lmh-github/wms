@@ -19,7 +19,8 @@
         CREATE_TIME,
         ACCEPT_TIME,
         LAST_TIME,
-        REMARKS
+        REMARKS,
+        FILES_PATH
     </sql>
 
     <insert id="insert" parameterType="com.gionee.wms.entity.WorkOrder">
@@ -46,7 +47,8 @@
         #{createTime, jdbcType=TIMESTAMP},
         #{acceptTime, jdbcType=TIMESTAMP},
         #{lastTime, jdbcType=TIMESTAMP},
-        #{remarks, jdbcType=VARCHAR}
+        #{remarks, jdbcType=VARCHAR},
+        #{filesPath,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -112,6 +114,7 @@
         <result property="acceptTime" column="ACCEPT_TIME"/>
         <result property="lastTime" column="LAST_TIME"/>
         <result property="remarks" column="remarks"/>
+        <result property="filesPath" column="FILES_PATH"/>
         <association property="salesOrder" resultMap="com.gionee.wms.dao.SalesOrderDao.work_order_left_join_result" />
         <!--        <collection property="attachmentList" column="WORK_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment" select="atta-select"/>
               <collection property="attachmentList" column="BILL_CODE" javaType="list" ofType="com.gionee.wms.entity.Attachment">
@@ -184,6 +187,7 @@
         w.ACCEPT_TIME,
         w.LAST_TIME,
         W.REMARKS,
+        W.FILES_PATH,
         s.ID left_order_id,
         s.ORDER_USER left_order_user,
         s.CONSIGNEE left_consignee,

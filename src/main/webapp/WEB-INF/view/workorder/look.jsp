@@ -156,6 +156,7 @@
         <div class="formBar">
             <ul>
                 <li><div class="button"><div class="buttonContent"><button class="submit" id="work_order_save_remarks" type="button">保存备注</button></div></div></li>
+                <li><div class="button"><div class="buttonContent"><a class="add" href="${ctx}/workorder/downZip.json?id=${workOrder.id}"><span>文件下载</span></a></div></div></li>
                 <li><div class="button"><div class="buttonContent"><a class="add" href="${ctx}/workorder/to.do?to=up_workorder&id=${workOrder.id}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>升级处理</span></a></div></div></li>
                 <li><div class="button"><div class="buttonContent"><a class="add" href="${ctx}/workorder/to.do?to=finish_workorder&id=${workOrder.id}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>完成处理</span></a></div></div></li>
                 <li><div class="button"><div class="buttonContent"><a class="add" href="${ctx}/workorder/to.do?to=cancel_workorder&id=${workOrder.id}" target="dialog" rel="dlg_orderInput" mask="true" width="815" height="550"><span>作废处理</span></a></div></div></li>

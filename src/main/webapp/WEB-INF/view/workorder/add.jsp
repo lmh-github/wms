@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="inputForm" action="${ctx}/workorder/save.do?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="notify();return validateCallback(this, dialogAjaxDone)">
+<form id="inputForm" enctype="multipart/form-data" action="${ctx}/workorder/save.json?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="notify();return iframeCallback(this, dialogAjaxDone)">
     <input type="hidden" name="id" value="${id }"/>
     <input type="hidden" name="orderStatus" value="${status }"/>
     <div class="pageContent">
@@ -43,6 +43,25 @@
                 <dl class="nowrap">
                     <dt>问题明细：</dt>
                     <dd><textarea name="description" maxlength="512" class="textInput valid required" style="width: 526px;height: 70px;">${remark }</textarea></dd>
+                </dl>
+            </fieldset>
+            <fieldset>
+                <legend>附件上传</legend>
+                <dl>
+                    <dt>图片一：</dt>
+                    <dd><input name="files" type="file" /></dd>
+                </dl>
+                <dl>
+                    <dt>图片二：</dt>
+                    <dd><input name="files" type="file" /></dd>
+                </dl>
+                <dl>
+                    <dt>图片三：</dt>
+                    <dd><input name="files" type="file" /></dd>
+                </dl>
+                <dl>
+                    <dt>附件：</dt>
+                    <dd><input name="files" type="file" /></dd>
                 </dl>
             </fieldset>
         </div>

@@ -1,6 +1,7 @@
 package com.gionee.wms.web.controller;
 
 import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.FileUtil;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.Page;
@@ -12,6 +13,7 @@ import com.gionee.wms.service.stock.WorkOrderService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
 import com.gionee.wms.web.extend.DwzMessage;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,10 +126,22 @@ public class WorkOrderController {
      * @param workOrder
      * @return
      */
-    @RequestMapping("save.do")
+    @RequestMapping("save.json")
     @ResponseBody
-    public Object save(QueryMap queryMap, WorkOrder workOrder) {
+    public Object save(QueryMap queryMap, WorkOrder workOrder, @RequestParam("files") MultipartFile[] files) {
         try {
+            FileUtil.FileInfo[] filesInfo = FileUtil.upload(files);
+
+            StringBuilder filesPath = new StringBuilder();
+            for (FileUtil.FileInfo fileInfo : filesInfo) {
+                filesPath.append(fileInfo == null ? "" : fileInfo.toString());
+                filesPath.append("^_^");
+            }
+
+            if (filesPath.length() > 3) {
+                workOrder.setFilesPath(filesPath.substring(0, filesPath.length() - 3));
+            }
+
             UcUser ucUser = getCurrentUser();
             workOrder.setSponsor(ucUser.getUserName());
             ServiceCtrlMessage message = workOrderService.save(workOrder);
@@ -133,6 +150,44 @@ public class WorkOrderController {
             logger.error(e.getMessage(), e);
             return DwzMessage.error("程序异常：【 " + e.getMessage() + "】", queryMap);
         }
+    }
+
+    @RequestMapping("/downZip.json")
+    public ResponseEntity<?> downFiles(Long id, HttpServletRequest request) {
+        WorkOrder workOrder = workOrderService.get(id);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "text/html; charset=utf-8");
+
+        if (workOrder == null) {
+            return new ResponseEntity<>("下载出现异常！", httpHeaders, HttpStatus.OK);
+        }
+
+        if (StringUtils.isEmpty(workOrder.getFilesPath())) {
+            return new ResponseEntity<>("该记录未上传文件！", httpHeaders, HttpStatus.OK);
+        }
+
+        httpHeaders.clear();
+
+        String[] filesPathArray = workOrder.getFilesPath().split("\\^_\\^");
+        File[] files = new File[filesPathArray.length];
+        String[] downName = new String[filesPathArray.length];
+
+        for (int i = 0; i < filesPathArray.length; i++) {
+            if (!StringUtils.isEmpty(filesPathArray[i])) {
+                files[i] = new File(filesPathArray[i].split(",")[0]);
+                downName[i] = filesPathArray[i].split(",")[1];
+            }
+        }
+
+        String zipName = request.getSession().getServletContext().getRealPath("/") + id + ".zip";
+        File file = FileUtil.downZip(files, downName, new File(zipName));
+
+        FileSystemResource resource = new FileSystemResource(file);
+        httpHeaders.add("Content-Disposition", "attachment; filename=\"" +  id + ".zip" + "\"");
+        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        return new ResponseEntity(resource, httpHeaders, HttpStatus.OK);
     }
 
     private UcUser getCurrentUser() {

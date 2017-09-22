@@ -31,6 +31,7 @@ public class WorkOrder {
     private SalesOrderVo salesOrder;
     private List<Attachment> attachmentList;
     private String remarks;
+    private String filesPath;
 
     public Long getId() {
         return id;
@@ -187,5 +188,13 @@ public class WorkOrder {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getFilesPath() {
+        return filesPath;
+    }
+
+    public void setFilesPath(String filesPath) {
+        this.filesPath = filesPath;
     }
 }
