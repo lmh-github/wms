@@ -7,6 +7,7 @@ import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.ScriptSession;
 import org.directwebremoting.WebContextFactory;
 import org.directwebremoting.annotations.RemoteProxy;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import java.util.Collection;
  * Created by gionee on 2017/7/11.
  */
 @RemoteProxy(name = "MessageService")
+@Component
 public class MessageServiceImpl implements MessageService {
 
     @Override
@@ -30,7 +32,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void sendMessageAuto(final String messageAuto) {
+    public void sendMessageAuto(String messageAuto) {
+        sendMessageAuto(messageAuto, null);
+    }
+
+    @Override
+    public void sendMessageAuto(final String messageAuto, final String userId) {
+
         Runnable run = new Runnable() {
             private ScriptBuffer script = new ScriptBuffer();
 
@@ -42,12 +50,15 @@ public class MessageServiceImpl implements MessageService {
                     .getTargetSessions();
                 // 遍历每一个ScriptSession
                 for (ScriptSession scriptSession : sessions) {
-                    scriptSession.addScript(script);
+                    if (userId == null || scriptSession.getAttribute(userId) != null) {
+                        scriptSession.addScript(script);
+                    }
                 }
             }
         };
         // 执行推送
         Browser.withAllSessions(run);
+
     }
 
     @Override

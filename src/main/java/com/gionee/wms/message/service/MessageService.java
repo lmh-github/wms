@@ -21,6 +21,14 @@ public interface MessageService {
 
     /**
      * 接受前台发送的消息 并推送给其他客户端
+     * account 指定登录用户
+     *
+     * @param messageAuto
+     */
+    void sendMessageAuto(final String messageAuto , final String account);
+
+    /**
+     * 接受前台发送的消息 并推送给其他客户端
      *
      * @param messageAuto
      */

@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 
-<form id="inputForm" action="${ctx}/workorder/save.do?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+<form id="inputForm" action="${ctx}/workorder/save.do?callbackType=closeCurrent&navTabId=tab_workorder_list" method="post" class="pageForm required-validate" onsubmit="notify();return validateCallback(this, dialogAjaxDone)">
     <input type="hidden" name="id" value="${id }"/>
     <input type="hidden" name="orderStatus" value="${status }"/>
     <div class="pageContent">
@@ -27,6 +27,7 @@
                     <dt>处理人：</dt>
                     <dd>
                         <input id="worker${rand}" class="required" name="worker" bringBackName="uc.userName" type="text" readonly="readonly" autocomplete="off"/>
+                        <input id="workerId${rand}" type="hidden" class="required" name="workerId" bringBackName="uc.account" readonly="readonly" autocomplete="off"/>
                         <a class="btnLook" href="${ctx}/uc/list.do?switch=true" lookupGroup="uc" width="660" height="550">查找</a>
                     </dd>
                 </dl>
@@ -53,5 +54,17 @@
         </div>
     </div>
 </form>
-<script type="text/javascript">
+<script>
+
+    function notify() {
+
+        if(!$("input[name=id]").val()){
+
+            var account = $("#workerId${rand}").val();
+
+            messageService.sendMessageAuto("您有新的工单请在“工单管理“查看" , account);
+
+        }
+
+    }
 </script>
