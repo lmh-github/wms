@@ -634,7 +634,11 @@ public class WmsConstants {
         /**
          * 自媒体
          */
-        ZMT("24", "自媒体活动");
+        ZMT("24", "自媒体活动"),
+        /**
+         * 牧申贸易
+         */
+        MSMY("25","牧申贸易");
 
         private final String code;
         private final String name;
@@ -774,7 +778,11 @@ public class WmsConstants {
         /**
          * 自媒体
          */
-        ZMT("24", "自媒体活动");
+        ZMT("24", "自媒体活动"),
+        /**
+         * 牧申贸易
+         */
+        MSMY("25","牧申贸易");
 
         private final String code;
         private final String name;
