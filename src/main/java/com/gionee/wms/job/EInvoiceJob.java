@@ -2,7 +2,6 @@ package com.gionee.wms.job;
 
 import com.gionee.wms.service.stock.EInvoiceService;
 import com.gionee.wms.service.stock.InvoiceInfoService;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +11,6 @@ import org.springframework.core.task.TaskExecutor;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.gionee.wms.common.WmsConstants.EInvoiceStatus.*;
-import static com.gionee.wms.common.WmsConstants.OrderStatus.*;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 /**
@@ -35,9 +31,13 @@ public class EInvoiceJob {
 
     public void execute() {
         {
-            List<String> orderList = invoiceInfoService.queryForJob(newArrayList(RECEIVED.getCode()), newArrayList(WAIT_MAKE.toString(), KP_DELAYED.toString()));
+            invoiceInfoService.autoDoNothingInvoiceOrder(); // 定时扫描并且更改不需要开票的订单
+        }
+
+        {
+            List<String> orderList = invoiceInfoService.queryToMakeInvoiceOrder();
             if (isEmpty(orderList)) {
-                logger.info("没有需要延期开的发票！");
+                logger.info("定时开票：没有扫描到需要开票的订单！");
                 return;
             }
             logger.info(String.format("自动开具延期发票%d张，发票号：%s", orderList.size(), Arrays.toString(orderList.toArray())));
@@ -56,9 +56,9 @@ public class EInvoiceJob {
         }
 
         {
-            List<String> orderList = invoiceInfoService.queryForJob(Lists.newArrayList(CANCELED.getCode(), REFUSED.getCode(), BACKED.getCode()), Lists.newArrayList(SUCCESS.toString(), KP_DELAYED.toString(), WAIT_DOWNLOAD.toString(), CH_DELAYED.toString()));
+            List<String> orderList = invoiceInfoService.queryToCancelInvoiceOrder();
             if (isEmpty(orderList)) {
-                logger.info("没有需要延期冲红的发票！");
+                logger.info("定时冲红：没有扫描到需要冲红的订单！");
                 return;
             }
             logger.info(String.format("自动冲红延期发票%d张，发票号：%s", orderList.size(), Arrays.toString(orderList.toArray())));
@@ -75,5 +75,6 @@ public class EInvoiceJob {
                 });
             }
         }
+
     }
 }

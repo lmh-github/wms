@@ -395,7 +395,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 }
 
                 // 若订单状态为已配货、待出库，则应更改商品个体状态为在库
-                if (OrderStatus.PICKED.getCode() == order.getOrderStatus() || OrderStatus.SHIPPING.getCode() == order.getOrderStatus()) {
+                if (OrderStatus.PICKED.getCode() == order.getOrderStatus()
+                    || OrderStatus.SHIPPING.getCode() == order.getOrderStatus()
+                    || OrderStatus.PICKING.getCode() == order.getOrderStatus()) {
                     Map<String, Object> params = Maps.newHashMap();
                     params.put("outId", order.getId());
                     params.put("stockStatus", WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode());

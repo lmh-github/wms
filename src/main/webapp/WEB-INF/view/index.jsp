@@ -143,7 +143,7 @@ window['downLoadEvent'] = function (e) {
 </script>
 </head>
 
-<body scroll="no" onload=" messageService.push('${user.loginName}');dwr.engine.setActiveReverseAjax(true);dwr.engine.setNotifyServerOnPageUnload(true);;">
+<body scroll="no" >
 	<div id="layout">
 		<div id="header">
 			<div class="headerNav">

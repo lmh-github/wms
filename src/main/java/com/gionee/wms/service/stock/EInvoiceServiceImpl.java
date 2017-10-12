@@ -104,8 +104,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             return new ServiceCtrlMessage(false, "订单号不存在！");
         }
         if (salesOrder.getInvoiceAmount().doubleValue() == 0) {
-            return new ServiceCtrlMessage(false, "订单金额为0，不可以开发票！");
+            return new ServiceCtrlMessage(false, "订单发票金额为0，不可以开发票！");
         }
+
         if (doLastDayOfMonth(orderCode, EInvoiceStatus.KP_DELAYED)) {
             return new ServiceCtrlMessage<>(false, "月末最后一天自动延期发票打印！");
         }
@@ -161,7 +162,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 月末最后一天处理
-     *
      * @param orderCode 订单号
      * @param status    开票延迟|冲红延迟
      * @return
@@ -220,7 +220,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
         if (RED.toString().equals(invoiceInfo1.getStatus())) {
             return new ServiceCtrlMessage(false, "发票已经冲红！");
         }
-        if (!asList(SUCCESS.toString(), WAIT_DOWNLOAD.toString()).contains(invoiceInfo1.getStatus())) {
+        if (!asList(SUCCESS.toString(), WAIT_DOWNLOAD.toString(), CH_DELAYED.toString()).contains(invoiceInfo1.getStatus())) {
             return new ServiceCtrlMessage(false, "发票未开具，不能做冲红处理！", invoiceInfo1.getJsonData());
         }
         SalesOrder salesOrder = salesOrderDao.queryOrderByOrderCode(orderCode);
@@ -267,7 +267,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 创建开票请求
-     *
      * @param eInvoice EInvoiceBuildService
      * @param order    订单
      * @param goods    订单商品
@@ -312,7 +311,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 请求航信发票接口
-     *
      * @param requestKpInterface 请求报文
      * @return KpInterface
      * @throws Exception
@@ -346,7 +344,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 日期格式转换
-     *
      * @param dateText
      * @return
      */
@@ -392,7 +389,6 @@ public class EInvoiceServiceImpl implements EInvoiceService {
 
     /**
      * 异步下载PDF文件并转换成IMG图片格式，保存到部署目录
-     *
      * @param orderCode 订单号
      * @param pdfUrl    PDF下载URL
      */

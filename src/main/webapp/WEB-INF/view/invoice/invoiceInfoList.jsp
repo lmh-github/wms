@@ -87,6 +87,7 @@
         <thead>
         <tr align="center">
             <th>订单号</th>
+            <th>订单状态</th>
             <th>手机</th>
             <th>邮箱</th>
             <th>发票代码</th>
@@ -104,6 +105,7 @@
         <s:iterator value="#request.invoiceInfoList" status="status" var="b">
             <tr target="sid_order" rel="${orderCode }" align="center">
                 <td>${orderCode }</td>
+                <td><s:property value="@com.gionee.wms.common.WmsConstants$OrderStatus@values().{?#this.code==#b.orderStatus}[0].name"/></td>
                 <td>${mobile }</td>
                 <td>${email }</td>
                 <td>${fpDm}</td>

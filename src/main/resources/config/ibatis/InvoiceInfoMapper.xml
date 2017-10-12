@@ -131,17 +131,17 @@
 
     <sql id="query-where">
         <where>
-            <if test="orderCode != null">AND ORDER_CODE = #{orderCode}</if>
-            <if test="fpDm != null">AND FP_DM = #{fpDm}</if>
-            <if test="fpHm != null">AND FP_HM = #{fpHm}</if>
-            <if test="returnCode != null">AND RETURN_CODE = #{returnCode}</if>
-            <if test="status != null">AND STATUS = #{status}</if>
-            <if test="invoiceType != null">AND INVOICE_TYPE = #{invoiceType}</if>
-            <if test="opDateBegin != null">AND OP_DATE &gt;= #{opDateBegin}</if>
-            <if test="opDateEnd != null">AND OP_DATE &lt;= #{opDateEnd}</if>
-            <if test="mobile != null">AND MOBILE = #{mobile}</if>
-            <if test="kpLsh != null">AND KPLSH = #{kpLsh}</if>
-            <if test="chLsh != null">AND CHLSH = #{chLsh}</if>
+            <if test="orderCode != null">AND i.ORDER_CODE = #{orderCode}</if>
+            <if test="fpDm != null">AND i.FP_DM = #{fpDm}</if>
+            <if test="fpHm != null">AND i.FP_HM = #{fpHm}</if>
+            <if test="returnCode != null">AND i.RETURN_CODE = #{returnCode}</if>
+            <if test="status != null">AND i.STATUS = #{status}</if>
+            <if test="invoiceType != null">AND i.INVOICE_TYPE = #{invoiceType}</if>
+            <if test="opDateBegin != null">AND i.OP_DATE &gt;= #{opDateBegin}</if>
+            <if test="opDateEnd != null">AND i.OP_DATE &lt;= #{opDateEnd}</if>
+            <if test="mobile != null">AND i.MOBILE = #{mobile}</if>
+            <if test="kpLsh != null">AND i.KPLSH = #{kpLsh}</if>
+            <if test="chLsh != null">AND i.CHLSH = #{chLsh}</if>
         </where>
     </sql>
 
@@ -151,17 +151,20 @@
                 A.*,
                 ROWNUM r
             FROM (
-                SELECT *
-                FROM WMS_INVOICE
+                SELECT
+                  i.*,
+                  o.ORDER_STATUS orderStatus
+                FROM WMS_INVOICE i
+                INNER JOIN WMS_SALES_ORDER o ON i.ORDER_CODE = o.ORDER_CODE
                 <include refid="query-where"/>
-                ORDER BY OP_DATE DESC) A
+                ORDER BY i.OP_DATE DESC) A
             WHERE ROWNUM &lt;= #{page.endRow})
         WHERE r &gt;= #{page.startRow}
     </select>
 
     <select id="queryCount" parameterType="map" resultType="int">
         SELECT COUNT(1)
-        FROM WMS_INVOICE
+        FROM WMS_INVOICE i
         <include refid="query-where"/>
     </select>
 
@@ -236,6 +239,30 @@
         SELECT * FROM WMS_INVOICE
         WHERE ID = #{param} OR ORDER_CODE = #{param}
     </select>
+    
+    <select id="queryToMakeInvoiceOrder" resultType="string">
+        SELECT i.ORDER_CODE FROM WMS_INVOICE i INNER JOIN WMS_SALES_ORDER o ON i.ORDER_CODE = o.ORDER_CODE
+        WHERE i.STATUS IN ('WAIT_MAKE', 'KP_DELAYED') AND o.INVOICE_AMOUNT &gt; 20 AND o.ORDER_STATUS IN (1, 5) AND o.SHIPPING_NAME = '顺丰速运'
+    </select>
+
+    <select id="queryToCancelInvoiceOrder" resultType="string">
+        SELECT i.ORDER_CODE FROM WMS_INVOICE i INNER JOIN WMS_SALES_ORDER o ON i.ORDER_CODE = o.ORDER_CODE
+        WHERE i.STATUS IN ('SUCCESS', 'WAIT_DOWNLOAD', 'CH_DELAYED') AND o.ORDER_STATUS IN ('-1', '10', '4')
+    </select>
+    
+    <update id="autoDoNothingInvoiceOrder">
+        UPDATE WMS_INVOICE
+        SET STATUS = 'DO_NOTHING'
+        WHERE STATUS = 'WAIT_MAKE' AND exists(
+            SELECT 1
+            FROM WMS_SALES_ORDER
+            WHERE WMS_SALES_ORDER.ORDER_CODE = WMS_INVOICE.ORDER_CODE
+                  AND (
+                    WMS_SALES_ORDER.INVOICE_AMOUNT &lt;= 20 OR WMS_SALES_ORDER.ORDER_SOURCE NOT IN (1, 2)
+                    OR WMS_SALES_ORDER.ORDER_STATUS IN (4, 10) OR WMS_SALES_ORDER.SHIPPING_NAME = '东莞直发'
+                  )
+        )
+    </update>
 
     <select id="queryForJob" resultType="string">
         SELECT I.ORDER_CODE

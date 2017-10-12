@@ -1,12 +1,19 @@
 package com.gionee.wms.service.stock;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.MyCollectionUtils;
+import com.gionee.wms.common.WmsConstants;
+import com.gionee.wms.common.WmsConstants.*;
+import com.gionee.wms.dao.*;
+import com.gionee.wms.dto.Page;
+import com.gionee.wms.dto.ReceiveSummary;
+import com.gionee.wms.dto.StockRequest;
+import com.gionee.wms.entity.*;
+import com.gionee.wms.service.ServiceException;
+import com.gionee.wms.service.common.CommonServiceImpl;
+import com.gionee.wms.web.client.OrderCenterClient;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -16,43 +23,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.gionee.wms.common.ActionUtils;
-import com.gionee.wms.common.MyCollectionUtils;
-import com.gionee.wms.common.WmsConstants;
-import com.gionee.wms.common.WmsConstants.IndivFlowType;
-import com.gionee.wms.common.WmsConstants.IndivStockStatus;
-import com.gionee.wms.common.WmsConstants.IndivWaresStatus;
-import com.gionee.wms.common.WmsConstants.OrderStatus;
-import com.gionee.wms.common.WmsConstants.PurchaseOrderStatus;
-import com.gionee.wms.common.WmsConstants.ReceiveMode;
-import com.gionee.wms.common.WmsConstants.ReceiveStatus;
-import com.gionee.wms.common.WmsConstants.ReceiveType;
-import com.gionee.wms.common.WmsConstants.RemoteCallStatus;
-import com.gionee.wms.common.WmsConstants.StockBizType;
-import com.gionee.wms.common.WmsConstants.StockType;
-import com.gionee.wms.dao.DeliveryDao;
-import com.gionee.wms.dao.IndivDao;
-import com.gionee.wms.dao.PurPreRecvDao;
-import com.gionee.wms.dao.ReceiveDao;
-import com.gionee.wms.dao.SalesOrderDao;
-import com.gionee.wms.dao.SalesOrderLogDao;
-import com.gionee.wms.dto.Page;
-import com.gionee.wms.dto.ReceiveSummary;
-import com.gionee.wms.dto.StockRequest;
-import com.gionee.wms.entity.Indiv;
-import com.gionee.wms.entity.IndivFlow;
-import com.gionee.wms.entity.PurPreRecv;
-import com.gionee.wms.entity.PurPreRecvGoods;
-import com.gionee.wms.entity.Receive;
-import com.gionee.wms.entity.ReceiveGoods;
-import com.gionee.wms.entity.SalesOrder;
-import com.gionee.wms.entity.SalesOrderGoods;
-import com.gionee.wms.entity.SalesOrderLog;
-import com.gionee.wms.service.ServiceException;
-import com.gionee.wms.service.common.CommonServiceImpl;
-import com.gionee.wms.web.client.OrderCenterClient;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.*;
 
 @Service("receiveService")
 public class ReceiveServiceImpl extends CommonServiceImpl implements ReceiveService {
@@ -126,9 +97,19 @@ public class ReceiveServiceImpl extends CommonServiceImpl implements ReceiveServ
 			Map<String, Object> criteria = Maps.newHashMap();
 			criteria.put("flowType", IndivFlowType.PUR_PRE_RECV.getCode());
 			criteria.put("flowId", purPreRecv.getId());
-			List<IndivFlow> preRecvIndivFlowList = indivDao.queryIndivFlowList(criteria);
-			if (CollectionUtils.isNotEmpty(preRecvIndivFlowList)) {
-				// 检测预收商品个体合法性
+			List<IndivFlow> IndivFlowList = indivDao.queryIndivFlowList(criteria);
+            List<IndivFlow> preRecvIndivFlowList = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(IndivFlowList)) {
+                for (IndivFlow indivFlow : IndivFlowList) {
+                    if (StringUtils.isBlank(indivFlow.getIndivCode())) {
+                        continue;
+                    }
+                    preRecvIndivFlowList.add(indivFlow);
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(preRecvIndivFlowList)) {
+                // 检测预收商品个体合法性
 				List<String> indivCodesList = MyCollectionUtils.collectionElementPropertyToList(preRecvIndivFlowList, "indivCode");
 				// 过滤掉重复的串号
 				Set<String> indivCodes = new HashSet<String>(indivCodesList);

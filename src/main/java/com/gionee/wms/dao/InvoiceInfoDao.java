@@ -90,4 +90,22 @@ public interface InvoiceInfoDao {
      */
     List<String> queryForJob(@Param("orderStatus") List<?> orderStatus, @Param("invoiceStatus") List<?> invoiceStatus);
 
+    /**
+     * 查询需要开票的订单
+     * @return
+     */
+    List<String> queryToMakeInvoiceOrder();
+
+    /**
+     * 查询需要冲红的订单
+     * @return
+     */
+    List<String> queryToCancelInvoiceOrder();
+
+    /**
+     * 扫描并更改不需要开票的订单
+     * @return
+     */
+    int autoDoNothingInvoiceOrder();
+
 }

@@ -1,6 +1,7 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.common.WmsConstants.OrderSourceGionee;
 import com.gionee.wms.common.excel.excelimport.util.StringUtil;
@@ -69,15 +70,26 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
     @Override
     @Transactional
     public int saveByOrder(SalesOrder order) {
+        // 只有官网和天猫订单开票
+        if (!WmsConstants.OrderSource.OFFICIAL_GIONEE.getCode().equals(order.getOrderSource()) && !WmsConstants.OrderSource.TMALL_GIONEE.getCode().equals(order.getOrderSource())) {
+            return -1;
+        }
+
         InvoiceInfo invoiceInfo = new InvoiceInfo();
         invoiceInfo.setOrderCode(order.getOrderCode());
         invoiceInfo.setMobile(defaultString(order.getInvoiceMobile(), order.getMobile()));
         invoiceInfo.setEmail(order.getInvoiceEmail());
-        if (order.getOrderAmount() != null && order.getOrderAmount().doubleValue() <= 20D) {
+        invoiceInfo.setStatus(WAIT_MAKE.toString()); // 未开发票
+
+        if (order.getInvoiceAmount() != null && order.getInvoiceAmount().doubleValue() <= 20D) { // 根据订单发票金额判定是否需要开票
             invoiceInfo.setStatus(DO_NOTHING.toString()); // 无须开票
-        } else {
-            invoiceInfo.setStatus(WAIT_MAKE.toString()); // 未开发票
         }
+
+        // 不需要发票就不开电子发票
+        if (order.getInvoiceEnabled() == 0) {
+            invoiceInfo.setStatus(DO_NOTHING.toString()); // 无须开票
+        }
+
         invoiceInfo.setInvoiceType("E"); // 电子发票
         invoiceInfo.setOpDate(new Date());
         invoiceInfo.setOpUser(ActionUtils.getLoginName());
@@ -209,6 +221,24 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
     @Override
     public List<String> queryForJob(List<?> orderStatus, List<?> invoiceStatus) {
         return invoiceInfoDao.queryForJob(orderStatus, invoiceStatus);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> queryToMakeInvoiceOrder() {
+        return invoiceInfoDao.queryToMakeInvoiceOrder();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> queryToCancelInvoiceOrder() {
+        return invoiceInfoDao.queryToCancelInvoiceOrder();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int autoDoNothingInvoiceOrder() {
+        return invoiceInfoDao.autoDoNothingInvoiceOrder();
     }
 
     /** {@inheritDoc} */

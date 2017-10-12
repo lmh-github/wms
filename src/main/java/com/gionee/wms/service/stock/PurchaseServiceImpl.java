@@ -14,6 +14,7 @@ import com.gionee.wms.service.common.CommonServiceImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,9 @@ public class PurchaseServiceImpl extends CommonServiceImpl implements PurchaseSe
             for (PurPreRecvGoods goods : goodsList) {
                 if (CollectionUtils.isNotEmpty(goods.getIndivCodeList())) {
                     for (String indivCode : goods.getIndivCodeList()) {
+                        if(StringUtils.isBlank(indivCode)){
+                            continue;
+                        }
                         IndivFlow indivFlow = new IndivFlow();
 
                         indivFlow.setIndivCode(indivCode);

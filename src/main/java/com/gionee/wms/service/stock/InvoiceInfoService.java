@@ -101,6 +101,24 @@ public interface InvoiceInfoService {
     List<String> queryForJob(List<?> orderStatus, List<?> invoiceStatus);
 
     /**
+     * 查询需要开票的订单
+     * @return
+     */
+    List<String> queryToMakeInvoiceOrder();
+
+    /**
+     * 查询需要冲红的订单
+     * @return
+     */
+    List<String> queryToCancelInvoiceOrder();
+
+    /**
+     * 扫描并更改不需要开票的订单
+     * @return
+     */
+    int autoDoNothingInvoiceOrder();
+
+    /**
      * 导出查询
      * @param paramMap
      * @return

@@ -250,7 +250,9 @@
 						<a target="ajaxTodo" title="确定要取消${orderCode }的订单吗?" href="${ctx }/stock/salesOrder!cancelOrder.action?orderCode=${orderCode }"><span>取消</span></a>
 					</s:if> --%>
                     <s:if test="orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@FILTERED.code
-                    || orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@PRINTED.code">
+                    || orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@PRINTED.code
+                    || orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@PICKING.code
+                    || orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPING.code">
                       <a target="ajaxTodo" title="确定要取消${orderCode }的订单吗?" href="${ctx }/stock/salesOrder!cancelOrder.action?orderCode=${orderCode }"><span>取消</span></a>
                     </s:if>
 					<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@REFUSEING.code">

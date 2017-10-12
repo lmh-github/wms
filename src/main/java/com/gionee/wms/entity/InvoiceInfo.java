@@ -27,6 +27,7 @@ public class InvoiceInfo {
     private String ewmUrl;
     private String kpLsh;
     private String chLsh;
+    private Integer orderStatus;
 
     public String getId() {
         return id;
@@ -170,6 +171,14 @@ public class InvoiceInfo {
 
     public void setChLsh(String chLsh) {
         this.chLsh = chLsh;
+    }
+
+    public Integer getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     /** {@inheritDoc} */
