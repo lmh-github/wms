@@ -709,6 +709,8 @@
 			<if test="outTime!=null">out_time=#{outTime, jdbcType=TIMESTAMP},</if>
 			<if test="orderId!=null">order_id=#{orderId},</if>
 			<if test="orderCode!=null">order_code=#{orderCode},</if>
+            <if test="prepareId!=null">PREPARE_ID=#{prepareId},</if>
+            <if test="prepareCode1!=null">PREPARE_CODE='',</if>
 	        stock_status = #{stockStatus}
 	    </set>
 	</sql>
@@ -728,6 +730,13 @@
 	    update wms_indiv
 	    <include refid="indiv_set"/>
 	    where out_id=#{outId}
+	</update>
+
+	<!-- 按配货单号更新个体库存信息 -->
+	<update id="updateIndivStatusByPrePareCode" parameterType="map">
+	    update wms_indiv
+	    <include refid="indiv_set"/>
+	    where PREPARE_CODE=#{prepareCode}
 	</update>
 	<!-- 按个体更新indiv -->
 	<update id="updateIndivPrepare" parameterType="map">

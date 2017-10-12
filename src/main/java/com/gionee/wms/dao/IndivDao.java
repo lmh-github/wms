@@ -194,6 +194,11 @@ public interface IndivDao {
 	 * 批量更新相同(订)单号的个体状态
 	 */
 	int updateIndivStatusByOutId(Map<String, Object> criteria);
+
+    /**
+     * 根据配货单号和在库状态更改个体状态
+     */
+	int updateIndivStatusByPrePareCode(Map<String, Object> criteria);
 	
 	/**
 	 * 更新配货状态

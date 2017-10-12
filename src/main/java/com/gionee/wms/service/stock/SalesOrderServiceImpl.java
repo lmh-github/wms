@@ -394,19 +394,26 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                     logger.error("业务日志记录异常", e);
                 }
 
+                Map<String, Object> params = Maps.newHashMap();
+                // 重置如下参数
+                params.put("outId", "");
+                params.put("outCode","");
+                params.put("orderId","");
+                params.put("orderCode","");
+                params.put("prepareId","");
+                params.put("prepareCode1","");
+
+                // 条件参数
+                params.put("prepareCode", order.getOrderCode());
+                params.put("stockStatus", WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode());
+                // indivDao.updateIndivStatusByOutId(params);
+                indivDao.updateIndivStatusByPrePareCode(params);
+
                 // 若订单状态为已配货、待出库，则应更改商品个体状态为在库
-                if (OrderStatus.PICKED.getCode() == order.getOrderStatus()
-                    || OrderStatus.SHIPPING.getCode() == order.getOrderStatus()
-                    || OrderStatus.PICKING.getCode() == order.getOrderStatus()) {
-                    Map<String, Object> params = Maps.newHashMap();
-                    params.put("outId", order.getId());
-                    params.put("stockStatus", WmsConstants.IndivStockStatus.IN_WAREHOUSE.getCode());
-                    indivDao.updateIndivStatusByOutId(params);
+                if (OrderStatus.PICKED.getCode() == order.getOrderStatus() || OrderStatus.SHIPPING.getCode() == order.getOrderStatus()) {
                     // 释放销售订单占用库存(配货或者待出库的情况下)
                     Warehouse warehouse = warehouseService.getWarehouseByOrderSource(order.getOrderSource());
-                    if (warehouse == null) {
-                        throw new ServiceException("无仓库信息");
-                    }
+                    if (warehouse == null) throw new ServiceException("无仓库信息");
                     List<SalesOrderGoods> goodsList = getOrderGoodsListByOrderCode(orderCode);
                     for (SalesOrderGoods goods : goodsList) {
                         StockRequest stockRequest = new StockRequest(warehouse.getId(), goods.getSkuId(), StockType.STOCK_OCCUPY, StockType.STOCK_SALES, goods.getQuantity(), StockBizType.CONVERT_CANCEL_ORDER, goods.getOrder().getOrderCode());
@@ -1766,6 +1773,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 list.get(i).setHandledTime(new Date());
                 list.get(i).setOrderStatus(OrderStatus.FILTERED.getCode());
                 list.get(i).setOrderCode(prefix + OrderCodeUtils.generateRadix());
+                list.get(i).setDeliveryCode(list.get(i).getOrderCode() + "01"); // 添加初始化一个发货流水号
 
                 if (salesOrders.size() == 0) {
                     salesOrders.add(list.get(i));
