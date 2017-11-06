@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.OrderOutlierLogDao">
+
+
+    <resultMap id="query-result" type="com.gionee.wms.entity.OrderOutlierLog">
+        <id property="id" column="ID"/>
+        <result property="orderCode" column="ORDER_CODE"/>
+        <result property="skuCode" column="SKU_CODE"/>
+        <result property="handledTime" column="HANDLED_TIME"/>
+        <result property="handledBy" column="HANDLED_BY"/>
+        <result property="minUnitPrice" column="MIN_UNIT_PRICE"/>
+        <result property="unitPrice" column="UNIT_PRICE"/>
+        <result property="outlierId" column="OUTLIER_ID"/>
+        <result property="orderSource" column="ORDER_SOURCE"/>
+        <association property="orderOutlier" resultMap="com.gionee.wms.dao.OrderOutlierDao.query-result"/>
+    </resultMap>
+
+    <sql id="columns">
+        ID,
+        ORDER_CODE,
+        SKU_CODE,
+        HANDLED_TIME,
+        HANDLED_BY,
+        MIN_UNIT_PRICE,
+        UNIT_PRICE,
+        OUTLIER_ID,
+        ORDER_SOURCE
+    </sql>
+
+    <sql id="query-where">
+        <if test="orderCode != null">AND W.ORDER_CODE = #{orderCode, jdbcType=VARCHAR}</if>
+        <if test="skuCode != null">AND W.SKU_CODE = #{skuCode, jdbcType=VARCHAR}</if>
+        <if test="handledTime != null">AND W.HANDLED_TIME &gt;= #{handledTime}</if>
+        <if test="beginHandledTime != null">AND W.HANDLED_TIME &gt;= #{beginHandledTime}</if>
+        <if test="endHandledTime != null">AND W.HANDLED_TIME &lt;= #{endHandledTime}</if>
+        <if test="handledBy != null">AND W.HANDLED_BY = #{handledBy, jdbcType=VARCHAR}</if>
+        <if test="minUnitPrice != null">AND W.MIN_UNIT_PRICE = #{minUnitPrice, jdbcType=DECIMAL}</if>
+        <if test="unitPrice != null">AND W.UNIT_PRICE = #{unitPrice, jdbcType=DECIMAL}</if>
+        <if test="outlierId != null">AND W.OUTLIER_ID = #{outlierId, jdbcType=VARCHAR}</if>
+        <if test="orderSource != null">AND W.ORDER_SOURCE = #{orderSource, jdbcType=VARCHAR}</if>
+    </sql>
+
+    <select id="query" parameterType="map" resultMap="query-result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                            W.ID,
+                            W.ORDER_CODE,
+                            W.SKU_CODE,
+                            W.HANDLED_TIME,
+                            W.HANDLED_BY,
+                            W.MIN_UNIT_PRICE,
+                            W.UNIT_PRICE,
+                            W.OUTLIER_ID,
+                            W.ORDER_SOURCE,
+                            O.NAME
+                      FROM WMS_ORDER_OUTLIER_LOG W
+                      LEFT JOIN WMS_ORDER_OUTLIER O ON O.id = W.OUTLIER_ID
+                      <where>
+                          <include refid="query-where"/>
+                      </where>
+                      ORDER BY w.HANDLED_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_ORDER_OUTLIER_LOG W
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+   <insert id="insertBatch" parameterType="java.util.List">
+       insert into WMS_ORDER_OUTLIER_LOG(ID,ORDER_CODE,SKU_CODE,HANDLED_TIME,HANDLED_BY,MIN_UNIT_PRICE,UNIT_PRICE,OUTLIER_ID,ORDER_SOURCE)
+       select WMS_SEQ_COMMON.nextval,A.* from
+       (
+       <foreach collection="list" item="item" index="index" separator="UNION ALL">
+           select
+           #{item.orderCode, jdbcType=VARCHAR},
+           #{item.skuCode, jdbcType=VARCHAR},
+           #{item.handledTime},
+           #{item.handledBy, jdbcType=VARCHAR},
+           #{item.minUnitPrice, jdbcType=DECIMAL},
+           #{item.unitPrice, jdbcType=DECIMAL},
+           #{item.outlierId, jdbcType=VARCHAR},
+           #{item.orderSource, jdbcType=VARCHAR}
+           from dual
+       </foreach>
+       )A
+   </insert>
+</mapper>

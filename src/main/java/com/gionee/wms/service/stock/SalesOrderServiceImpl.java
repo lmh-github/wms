@@ -1,5 +1,6 @@
 package com.gionee.wms.service.stock;
 
+import com.gionee.wms.aspect.annotation.OutlierLog;
 import com.gionee.wms.common.ActionUtils;
 import com.gionee.wms.common.JsonUtils;
 import com.gionee.wms.common.WmsConstants;
@@ -105,6 +106,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     @Autowired
     private SalesOrderNodeInfoService salesOrderNodeInfoService;
 
+    @Autowired
+    private OrderOutlierService orderOutlierService;
+
     @Override
     public List<SalesOrder> getSalesOrderList(Map<String, Object> criteria, Page page) throws ServiceException {
         if (criteria == null) {
@@ -194,6 +198,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     }
 
     @Override
+    @OutlierLog
     public void addSalesOrder(SalesOrder order, List<SalesOrderGoods> orderGoodsList) throws ServiceException {
         // 初始化订单状态、配送状态、通知状态、通知次数、接收时间、发票状态
         if ("2".equals(WmsConstants.WMS_COMPANY)) {

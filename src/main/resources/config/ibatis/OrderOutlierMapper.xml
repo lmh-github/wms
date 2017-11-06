@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.OrderOutlierDao">
+
+
+    <resultMap id="query-result" type="com.gionee.wms.entity.OrderOutlier">
+        <id property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="beginTime" column="BEGIN_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="orderSource" column="ORDER_SOURCE"/>
+        <result property="skuIds" column="SKU_IDS"/>
+        <result property="unitPrice" column="UNIT_PRICE"/>
+        <result property="logSwitch" column="LOG_SWITCH"/>
+        <result property="skuNames" column="SKU_NAMES"/>
+    </resultMap>
+
+    <sql id="columns">
+        ID,
+        NAME,
+        BEGIN_TIME,
+        END_TIME,
+        ORDER_SOURCE,
+        SKU_IDS,
+        UNIT_PRICE,
+        LOG_SWITCH,
+        SKU_NAMES
+    </sql>
+
+    <insert id="insert" parameterType="com.gionee.wms.entity.OrderOutlier">
+        <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="id">
+            SELECT WMS_SEQ_COMMON.nextval FROM dual
+        </selectKey>
+        INSERT INTO WMS_ORDER_OUTLIER(
+        <include refid="columns"/>
+        )
+        VALUES (
+            #{id, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{beginTime},
+            #{endTime},
+            #{orderSource, jdbcType=VARCHAR},
+            #{skuIds, jdbcType=VARCHAR},
+            #{unitPrice, jdbcType=DECIMAL},
+            #{logSwitch, jdbcType=VARCHAR},
+            #{skuNames, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE WMS_ORDER_OUTLIER
+        <set>
+            <if test="name != null">NAME = #{name, jdbcType=VARCHAR},</if>
+            <if test="beginTime != null">BEGIN_TIME = #{beginTime},</if>
+            <if test="endTime != null">END_TIME = #{endTime},</if>
+            <if test="orderSource != null">ORDER_SOURCE = #{orderSource, jdbcType=VARCHAR},</if>
+            <if test="skuIds != null">SKU_IDS = #{skuIds, jdbcType=VARCHAR},</if>
+            <if test="unitPrice != null">UNIT_PRICE = #{unitPrice, jdbcType=DECIMAL},</if>
+            <if test="logSwitch != null">LOG_SWITCH = #{logSwitch, jdbcType=VARCHAR},</if>
+            <if test="skuNames != null">SKU_NAMES = #{skuNames, jdbcType=VARCHAR}</if>
+        </set>
+        WHERE
+        <if test="id !=null">
+            ID = #{id}
+        </if>
+    </update>
+
+    <sql id="query-where">
+        <if test="name != null">AND NAME = #{name, jdbcType=VARCHAR}</if>
+        <if test="beginTime != null">AND BEGIN_TIME &gt;= #{beginTime}</if>
+        <if test="endTime != null">AND END_TIME &gt;= #{endTime}</if>
+        <if test="orderSource != null">AND ORDER_SOURCE = #{orderSource, jdbcType=VARCHAR}</if>
+        <if test="skuIds != null">AND SKU_IDS = #{skuIds, jdbcType=VARCHAR}</if>
+        <if test="unitPrice != null">AND UNIT_PRICE = #{unitPrice, jdbcType=DECIMAL}</if>
+        <if test="logSwitch != null">AND LOG_SWITCH = #{logSwitch, jdbcType=VARCHAR}</if>
+        <if test="orderTime != null">AND #{orderTime} BETWEEN BEGIN_TIME AND END_TIME</if>
+    </sql>
+
+    <select id="query" parameterType="map" resultMap="query-result">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                            <include refid="columns"/>
+                      FROM WMS_ORDER_OUTLIER W
+                      <where>
+                          <include refid="query-where"/>
+                      </where>
+                      ORDER BY w.BEGIN_TIME DESC) T
+               WHERE ROWNUM &lt;= #{page.endRow})
+             WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryAll" parameterType="map" resultMap="query-result">
+          SELECT
+                <include refid="columns"/>
+          FROM WMS_ORDER_OUTLIER W
+          <where>
+              <include refid="query-where"/>
+          </where>
+          ORDER BY w.BEGIN_TIME DESC
+    </select>
+
+    <select id="queryCount" parameterType="map" resultType="int">
+        SELECT COUNT(1) FROM WMS_ORDER_OUTLIER W
+        <where>
+            <include refid="query-where"/>
+        </where>
+    </select>
+
+    <select id="get" parameterType="long" resultMap="query-result">
+        SELECT
+        <include refid="columns"/>
+        FROM WMS_ORDER_OUTLIER
+        WHERE ID = #{id}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String">
+        delete from WMS_ORDER_OUTLIER where id=#{id}
+    </delete>
+
+</mapper>
