@@ -21,6 +21,8 @@
 	
 	<!-- 自动扫描，实现注解IOC -->
 	<context:component-scan base-package="com.gionee.wms" />
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
 	
 	<!-- hibernate validator -->
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
