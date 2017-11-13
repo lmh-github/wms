@@ -172,10 +172,14 @@
 			<li><a class="edit" href="${ctx}/stock/salesOrder!input.action?id={sid_order}" target="dialog" rel="dlg_orderInput" mask="true" width="1024" height="768" warn="请选择销售订单"><span>查看/修改订单</span></a></li>
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!inputShippingInfo.action?id={sid_order}" target="dialog" rel="dlg_shippingInput" mask="true" width="600" height="600" warn="请选择销售订单"><span>编辑物流</span></a></li>
+            <shiro:hasPermission name="order:order_push">
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!toConfigAutoPush.action" target="dialog" rel="dlg_configInput" mask="true" width="400" height="200" warn="自动推送配置"><span>自动推送配置</span></a></li>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="order:stock_push_check">
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!toConfigPushCheck.action" target="dialog" rel="dlg_configInput" mask="true" width="400" height="200" warn="推送库存校验配置"><span>推送库存校验配置</span></a></li>
+            </shiro:hasPermission>
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!copy.action?id={sid_order}" target="ajaxTodo" title="<span style='color:#e91e63;font-size:15px;'>请确定原订单已经取消，如果货已发出需通知物流截件，继续操作请点击&nbsp;确定！</span>" mask="true"><span>一键复制</span></a></li>
 			<li class="line">line</li>
