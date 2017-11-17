@@ -1,6 +1,7 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.*;
+import com.gionee.wms.common.Base64;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.dao.SalesOrderDao;
 import com.gionee.wms.dto.*;
@@ -11,10 +12,12 @@ import com.gionee.wms.entity.SalesOrderGoods;
 import com.gionee.wms.service.common.MailService;
 import com.gionee.wms.service.log.LogService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.thoughtworks.xstream.XStream;
+import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
 import net.sf.json.xml.XMLSerializer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.slf4j.Logger;
@@ -186,25 +189,9 @@ public class EInvoiceServiceImpl implements EInvoiceService {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public ServiceCtrlMessage<XzContentResp> downEInvoice(String orderCode) {
-        SalesOrder salesOrder = salesOrderDao.queryOrderByOrderCode(orderCode);
-        if (salesOrder == null) {
-            return new ServiceCtrlMessage(false, "订单号不存在！");
-        }
-        try {
-            KpInterface requestInterface = createRequestInterface(xzService, salesOrder, null);
-            KpInterface responseKpInterface = action(requestInterface);
-            ReturnStateInfo returnStateInfo = responseKpInterface.getReturnStateInfo();
-            if (SUCCESS_CODE.equals(returnStateInfo.getReturnCode())) {
-                String content = AesUtil.decrypt(responseKpInterface.getData().getContent());
-                XzContentResp contentResp = XmlHelper1.toBean(content, XzContentResp.class);
-                return new ServiceCtrlMessage<>(true, null, contentResp);
-            }
-            return new ServiceCtrlMessage(false, String.format("%s:%s", returnStateInfo.getReturnCode(), returnStateInfo.getReturnMessage()));
-        } catch (Exception e) {
-        }
-
-        return null;
+        return new ServiceCtrlMessage<>(false, "此接口在【航信】已经屏蔽！");
     }
 
     /**
@@ -366,19 +353,37 @@ public class EInvoiceServiceImpl implements EInvoiceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
     public ServiceCtrlMessage downloadInvoicePdfAnd2Img(String orderCode) {
         try {
             InvoiceInfo invoiceInfo = invoiceInfoSerivce.get(orderCode);
-            if (Lists.newArrayList(FAILURE.toString(), RED.toString(), ORDER_CANCEL.toString()).contains(invoiceInfo.getStatus())) {
+            if (!SUCCESS.toString().equals(invoiceInfo.getStatus())) {
                 return new ServiceCtrlMessage(false, "此状态发票不能再进行取票操作！");
             }
-            if (isBlank(invoiceInfo.getPdfUrl())) {
+            String pdfUrl = invoiceInfo.getPdfUrl();
+            if (isBlank(pdfUrl)) {
                 return new ServiceCtrlMessage(false, "发票文件未生成，无法取票！");
             }
-            if ((new Date().getTime() - invoiceInfo.getOpDate().getTime()) > 1000 * 60 * 10) { // 发票生成十分钟内，等待签章生成后再下载
-                downFileAnd2Img(orderCode, invoiceInfo.getPdfUrl());
-                return new ServiceCtrlMessage(true, "操作成功！");
+
+            // 发票生成5分钟内，等待签章生成后再下载
+            if ((System.currentTimeMillis() - invoiceInfo.getOpDate().getTime()) > 1000 * 60 * 5) {
+                if (pdfUrl.startsWith("invoice")) {
+                    File file = new File(EInvoiceDir.EINVOICE_BASE_DIR + pdfUrl);
+                    if (file.exists() && file.length() > 0) {
+                        return new ServiceCtrlMessage(true, "操作成功！");
+                    }
+                    // 某些情况下，会出现文件下载了，但是大小为0，这时候删除这样的文件
+                    if (file.exists() && file.length() == 0) {
+                        FileUtils.deleteQuietly(file);
+                    }
+                }
+                String jsonData = invoiceInfo.getJsonData();
+                if (JSONUtils.mayBeJSON(jsonData)) {
+                    pdfUrl = JSONObject.fromObject(jsonData).optString("PDF_URL");
+                    downFileAnd2Img(orderCode, pdfUrl);
+                    return new ServiceCtrlMessage(true, "操作成功！");
+                } else {
+                    return new ServiceCtrlMessage(false, "未找到发票文件路径！");
+                }
             }
             return new ServiceCtrlMessage(false, "等待签章生成，延迟下载！");
         } catch (Exception e) {
