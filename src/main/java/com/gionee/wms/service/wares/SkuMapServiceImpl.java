@@ -23,7 +23,7 @@ import com.gionee.wms.service.ServiceException;
 /**
  * @author ZuoChangjun 2014-01-06 10:52:31
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service("skuMapService")
 public class SkuMapServiceImpl implements SkuMapService {
 	private static Log log = LogFactory.getLog(SkuMapServiceImpl.class);

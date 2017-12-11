@@ -668,4 +668,29 @@
 		delete from wms_receive_goods 
 	 	 where id = #{id}
 	</delete>
+
+    <select id="rmaSalesOrderExportQuery" resultType="Map">
+        SELECT
+            R.RECEIVE_CODE,
+            R.ORIGINAL_CODE                                   ORDER_CODE,
+            TO_CHAR(R.PREPARED_TIME, 'yyyy-mm-dd hh24:mi:ss') CREATE_TIME,
+            R.PREPARED_BY,
+            RG.SKU_CODE,
+            RG.SKU_NAME,
+            CASE RG.WARES_STATUS
+            WHEN
+                '1'
+                THEN '良品'
+            WHEN '2'
+                THEN '次品'
+            END                                               WARES_STATUS,
+            TO_CHAR(RG.QUANTITY)                              QUANTITY
+        FROM WMS_RECEIVE R INNER JOIN WMS_RECEIVE_GOODS RG ON R.ID = RG.RECEIVE_ID
+        WHERE R.RECEIVE_TYPE = '102'
+            <if test="receiveCode != null">AND R.RECEIVE_CODE = #{receiveCode}</if>
+            <if test="originalCode != null">AND R.ORIGINAL_CODE = #{originalCode}</if>
+            <if test="preparedTimeBegin != null">AND R.PREPARED_TIME &gt;= #{preparedTimeBegin, jdbcType=DATE}</if>
+            <if test="preparedTimeEnd != null">AND R.PREPARED_TIME &lt;= #{preparedTimeEnd, jdbcType=DATE}</if>
+        ORDER BY PREPARED_TIME DESC
+    </select>
  </mapper>

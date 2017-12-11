@@ -103,7 +103,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage accept(Long id) {
         WorkOrder workOrder = workOrderDao.get(id);
         if ("待处理".equals(workOrder.getStatus())) {
@@ -120,7 +120,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage up(WorkOrder workOrder) {
         Long id = workOrder.getId();
         WorkOrder poWorkOrder = workOrderDao.get(id);
@@ -146,7 +146,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage finish(WorkOrder workOrder) {
         Long id = workOrder.getId();
         WorkOrder poWorkOrder = workOrderDao.get(id);
@@ -167,7 +167,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage cancel(WorkOrder workOrder) {
         Long id = workOrder.getId();
         WorkOrder poWorkOrder = workOrderDao.get(id);

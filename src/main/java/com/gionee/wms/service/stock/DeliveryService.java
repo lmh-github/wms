@@ -4,6 +4,7 @@ import com.gionee.wms.dto.DeliverySummary;
 import com.gionee.wms.dto.Page;
 import com.gionee.wms.entity.*;
 import com.gionee.wms.service.ServiceException;
+import com.gionee.wms.vo.DeliveryDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -154,5 +155,19 @@ public interface DeliveryService {
     String confirmDeliveryWap(Long warehouseId, String batchCode);
 
     void addDelivery(Map<String, Object> params);
+
+    /**
+     * 查询发货明细
+     * @param params
+     * @return
+     */
+    List<DeliveryDetails> queryDeliveryDetailsList(Map<String, Object> params);
+
+    /**
+     * 查询总记录数
+     * @param params
+     * @return
+     */
+    Integer queryDeliveryDetailsCount(Map<String, Object> params);
 
 }

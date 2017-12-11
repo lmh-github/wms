@@ -272,7 +272,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 特殊功能，用于修改订单为已签收状态
-     *
      * @return
      * @throws Exception
      */
@@ -290,7 +289,8 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
                 SalesOrder salesOrder = salesOrderService.getSalesOrderByCode(orderCode);
                 salesOrderLog.setOrderId(salesOrder.getId());
                 salesOrderLog.setOrderStatus(WmsConstants.OrderStatus.CANCELED.getCode());
-                salesOrderLog.setOpUser(ActionUtils.getLoginName() == null ? WmsConstants.DEFAULT_USERNAME_LOG : ActionUtils.getLoginName());
+                salesOrderLog.setOpUser(ActionUtils.getLoginName() == null ? WmsConstants.DEFAULT_USERNAME_LOG : ActionUtils
+                    .getLoginName());
                 salesOrderLog.setOpTime(new Date());
                 salesOrderLog.setRemark("更新订单为已签收，原来状态为：" + salesOrder.getOrderStatus());
                 salesOrderLogService.insertSalesOrderLog(salesOrderLog);
@@ -311,7 +311,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 打印订单
-     *
      * @return
      * @throws Exception
      */
@@ -453,7 +452,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 打印订单
-     *
      * @return
      * @throws Exception
      */
@@ -661,7 +659,8 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
                 ajaxError("此订单" + WmsConstants.getOrderStatusZh(persistent.getOrderStatus()) + "不能修改");
                 return null;
             }
-            if (persistent.getOrderPushStatus() != null && persistent.getOrderPushStatus().intValue() == OrderPushStatusEnum.PUSHED.getCode()) {
+            if (persistent.getOrderPushStatus() != null && persistent.getOrderPushStatus()
+                .intValue() == OrderPushStatusEnum.PUSHED.getCode()) {
                 ajaxError("此订单已经推送到顺丰不能进行修改！<br>您可以线下通知顺丰取消当前订单，另外再重建一单再次进行推送！");
                 return null;
             }
@@ -859,7 +858,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 发送电子面单请求
-     *
      * @param xml
      * @return
      * @throws Exception
@@ -1178,7 +1176,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 进入订单状态统计页面
-     *
      * @return
      * @throws Exception
      */
@@ -1210,7 +1207,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 配置自动推送
-     *
      * @return
      * @throws Exception
      */
@@ -1221,7 +1217,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 库存校验
-     *
      * @return
      * @throws Exception
      */
@@ -1232,7 +1227,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 修改自动推送配置
-     *
      * @return
      * @throws Exception
      */
@@ -1244,7 +1238,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 订单手动推送到顺丰
-     *
      * @return String
      * @throws Exception
      */
@@ -1264,7 +1257,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 一键复制订单
-     *
      * @return
      * @throws Exception
      */
@@ -1322,7 +1314,6 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     /**
      * 查看串号
-     *
      * @return
      */
     public String queryImeis() {
@@ -1896,9 +1887,9 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
 
     public void setUrlType(Integer urlType) {
         this.urlType = urlType;
-        if(urlType == 1){
+        if (urlType == 1) {
             setType("普通订单");
-        }else if(urlType ==2){
+        } else if (urlType == 2) {
             setType("换货订单");
         }
     }

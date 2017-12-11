@@ -23,17 +23,6 @@
 				</select>
 			</li>
 			<li>
-				<label>商品分类：</label>
-				<select  name="catPath">
-				<c:forEach items="${categoryList}" var="cat">
-					<option value="${cat.catPath }" ${(cat.catPath==catPath)?"selected='true'":""}>
-					<c:set var="level" value="${fn:length(fn:split(cat.catPath,','))}"/>
-					<c:forEach begin="1" end="${level-1}">&nbsp;&nbsp;</c:forEach>${cat.catName }
-					</option>
-				</c:forEach>
-				</select>
-			</li>
-			<li>
 				<label>SKU编码：</label>
 				<input type="text" name="skuCode" value="${skuCode}"/>
 			</li>
@@ -64,8 +53,6 @@
 				<th>可销售库存</th>
 				<th>占用库存</th>
 				<th>不可销售库存</th>
-				<th>库存下限</th>
-				<th>库存上限</th>
 				<th>操作</th>
 			</tr>
 		</thead>
@@ -107,14 +94,8 @@
 					<a title="查看库存流水" href="${ctx}/stock/stockChange.action?skuCode=${sku.skuCode}&warehouseId=${warehouse.id}&stockType=<s:property value='@com.gionee.wms.common.WmsConstants$StockType@STOCK_UNSALES.code'/>"  target="navTab" rel="tab_stockChange" class="btnView">
 				</td>
 				<td>
-					<s:if test="limitLower>-1">${limitLower}</s:if>
-				</td>
-				<td>
-					<s:if test="limitUpper>-1">${limitUpper}</s:if>
-				</td>
-				<td>
-					<a title="设置安全库存" target="dialog" mask="true" width="500" height="600" href="${ctx}/stock/stock!inputLimit.action?id=${id }">设置安全库存</a>
-                    <s:if test="warehouse.warehouseName != '东莞电商仓' ">&nbsp;|&nbsp;<a href="${ctx}/stock/stock!queryRealTimeInvBalance.action?skuCode=${sku.skuCode}&warehouse=${warehouse.warehouseCode}" target="dialog" rel="dlg_RealTimeInventoryBalance" mask="true" width="600" height="500" warn="查看实时库存">查看实时库存</a></s:if>
+					<%--<a title="设置安全库存" target="dialog" mask="true" width="500" height="600" href="${ctx}/stock/stock!inputLimit.action?id=${id }">设置安全库存</a>--%>
+                    <s:if test="warehouse.warehouseName != '东莞电商仓' "><a href="${ctx}/stock/stock!queryRealTimeInvBalance.action?skuCode=${sku.skuCode}&warehouse=${warehouse.warehouseCode}" target="dialog" rel="dlg_RealTimeInventoryBalance" maxable="false" resizable="false" mask="true" width="600" height="500" warn="查看实时库存">查看实时库存</a></s:if>
 				</td>
 			</tr>
 			</s:iterator>

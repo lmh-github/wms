@@ -66,7 +66,7 @@
     <div class="panelBar">
         <ul class="toolBar">
             <li>
-                <a class="add" href="${ctx}/trans/toAddAndEdit.do" target="dialog" mask="true" width="800" height="600"><span>添加调拨单</span></a>
+                <a class="add" href="${ctx}/trans/toAddAndEdit.do" target="dialog" maxable="false" mask="true" width="800" height="600"><span>添加调拨单</span></a>
             </li>
             <li class="line">line</li>
             <li>

@@ -439,6 +439,13 @@
             <artifactId>dwr</artifactId>
             <version>3.0.0-RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.18</version>
+        </dependency>
+
     </dependencies>
 
     <build>

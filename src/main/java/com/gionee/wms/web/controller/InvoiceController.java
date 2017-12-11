@@ -1,11 +1,11 @@
 package com.gionee.wms.web.controller;
 
+import com.gionee.wms.common.ApplicationContextHelper;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.*;
 import com.gionee.wms.entity.InvoiceInfo;
 import com.gionee.wms.service.stock.EInvoiceService;
-import com.gionee.wms.service.stock.EwmGenerateService;
 import com.gionee.wms.service.stock.InvoiceInfoService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
 import com.gionee.wms.web.action.stock.InvoiceInfoAction;
@@ -41,10 +41,6 @@ public class InvoiceController {
 
     @Autowired
     private InvoiceInfoService invoiceInfoSerivce;
-    @Autowired
-    private EInvoiceService eInvoiceService;
-    @Autowired
-    private EwmGenerateService ewmGenerateService;
 
     @RequestMapping("/list.do")
     public String query(QueryMap queryMap, Page page, ModelMap modelMap) {
@@ -96,7 +92,7 @@ public class InvoiceController {
     @ResponseBody
     public Object makeInvoice(QueryMap queryMap, String orderCode) {
         try {
-            ServiceCtrlMessage<KpContentResp> message = eInvoiceService.makeEInvoice(orderCode);
+            ServiceCtrlMessage<KpContentResp> message = ApplicationContextHelper.getBean(EInvoiceService.class).makeEInvoice(orderCode);
             if (message.isResult()) {
                 return DwzMessage.success(defaultString(message.getMessage(), "开票成功！"), queryMap);
             } else {
@@ -118,7 +114,7 @@ public class InvoiceController {
     @ResponseBody
     public Object downloadEInvoice(QueryMap queryMap, String orderCode) {
         try {
-            ServiceCtrlMessage<XzContentResp> message = eInvoiceService.downEInvoice(orderCode);
+            ServiceCtrlMessage<XzContentResp> message = ApplicationContextHelper.getBean(EInvoiceService.class).downEInvoice(orderCode);
             if (message.isResult()) {
                 return DwzMessage.success(message.getMessage(), queryMap);
             } else {
@@ -140,7 +136,7 @@ public class InvoiceController {
     @ResponseBody
     public Object chEInvoice(QueryMap queryMap, String orderCode) {
         try {
-            ServiceCtrlMessage message = eInvoiceService.invalidEIvoice(orderCode, true);
+            ServiceCtrlMessage message = ApplicationContextHelper.getBean(EInvoiceService.class).invalidEIvoice(orderCode, true);
             if (message.isResult()) {
                 return DwzMessage.success(defaultString(message.getMessage(), "冲红成功！"), queryMap);
             } else {
@@ -156,7 +152,7 @@ public class InvoiceController {
     @ResponseBody
     public Object downPDF(QueryMap queryMap, String orderCode) {
         try {
-            ServiceCtrlMessage message = eInvoiceService.downloadInvoicePdfAnd2Img(orderCode);
+            ServiceCtrlMessage message = ApplicationContextHelper.getBean(EInvoiceService.class).downloadInvoicePdfAnd2Img(orderCode);
             if (message.isResult()) {
                 return DwzMessage.success(defaultString(message.getMessage(), "操作成功！"), queryMap);
             } else {

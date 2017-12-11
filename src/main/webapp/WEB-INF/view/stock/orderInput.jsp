@@ -16,7 +16,7 @@
 <input type="hidden" name="order.orderStatus" value="${order.orderStatus }"/>
 <input type="hidden" id="editGoods" name="editGoods" value="false" />
 <div class="pageContent">
-	<div class="pageFormContent" layoutH="97">
+	<div class="pageFormContent" layoutH="93">
 		<fieldset>
 			<legend>基本信息</legend>
 			<dl>

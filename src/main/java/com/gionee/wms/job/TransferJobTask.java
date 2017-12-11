@@ -13,6 +13,9 @@ import java.util.List;
 
 import static com.gionee.wms.common.WmsConstants.LogType.BIZ_LOG;
 
+/**
+ * @author rcw
+ */
 public class TransferJobTask {
 
     private static Logger logger = LoggerFactory.getLogger(TransferJobTask.class);
@@ -23,6 +26,9 @@ public class TransferJobTask {
     private LogService logService;
 
 
+    /**
+     * 任务执行方法入口
+     */
     public void execute() {
         logger.info("*****开始推送调拨单到顺丰start*****");
         List<Transfer> list = transferService.getTransfered();

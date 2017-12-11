@@ -325,7 +325,7 @@
 			AND t2.sku_code=#{skuCodeEqual}
 		</if>
 		)
-		ORDER BY t1.join_time
+		ORDER BY t1.ORDER_TIME
 		<if test="sort == null">desc</if>
 		<if test="sort != null">${sort}</if>
 		) A
@@ -1127,5 +1127,28 @@
 		on t1.order_id=t2.id
 		where t1.id=#{id}
 	</select>
+
+    <!-- SAP过账数据导出SQL -->
+    <select id="sapPostDataQuery" resultType="com.gionee.wms.vo.SapPostData">
+        SELECT
+          s.ORDER_STATUS    orderStatus,
+          s.ORDER_SOURCE    orderSource,
+          s.PAYMENT_NAME    payMethod,
+          k.MATERIAL_CODE   materialCode,
+          SUM(g.QUANTITY)   quantity,
+          g.UNIT_PRICE      price
+        FROM WMS_SALES_ORDER S INNER JOIN WMS_SALES_ORDER_GOODS G ON s.ID = g.ORDER_ID
+          INNER JOIN WMS_SKU k ON g.SKU_CODE = k.SKU_CODE
+          INNER JOIN (SELECT
+                        L.ORDER_ID,
+                        L.ORDER_STATUS
+                      FROM WMS_SALES_ORDER_LOG L
+                      WHERE L.OP_TIME &gt;= TO_DATE('2017-08-01', 'yyyy-mm-dd') AND
+                            L.OP_TIME &lt;= TO_DATE('2017-08-10 23:59:59', 'yyyy-mm-dd hh24:mi:ss') AND
+                            L.ORDER_STATUS IN (1, 4, 10)
+                      GROUP BY L.ORDER_ID, L.ORDER_STATUS) L ON s.ID = L.ORDER_ID
+        WHERE s.ORDER_STATUS IN (1, 4, 10) AND S.ORDER_SOURCE IN (1, 2)
+        GROUP BY k.MATERIAL_CODE, g.UNIT_PRICE, s.ORDER_STATUS, s.ORDER_SOURCE, s.PAYMENT_NAME
+    </select>
   
 </mapper>

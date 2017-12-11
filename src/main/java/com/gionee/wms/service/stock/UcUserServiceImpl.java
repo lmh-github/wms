@@ -21,7 +21,7 @@ public class UcUserServiceImpl implements UcUserService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage save(UcUser ucUser) {
         ucUser.setStatus("enabled");
         ucUser.setCreateTime(new Date());

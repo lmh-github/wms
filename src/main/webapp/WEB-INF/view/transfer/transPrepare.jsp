@@ -6,7 +6,7 @@
 <jsp:useBean id="now" class="java.util.Date"/>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
-<div class="pageContent" id="divTransPrepare1" style="padding: 5px;">
+<div class="pageContent" id="divTransPrepare1" style="padding: 5px 5px 0 5px;height: 100%;">
     <fieldset id="transFieldset${rand}">
         <legend>在这里进行配货，请先扫描调货单的条形码</legend>
         <ul>
@@ -28,7 +28,7 @@
                         $t.val("");
                         return showMsg("请输入有效的信息！");
                     }
-                    $.post("${ctx}/trans/trans.do", {"transferId": $t.val()}, function (data) {
+                    $.post("${ctx}/trans/trans${type}.do", {"transferId": $t.val()}, function (data) {
                         try {
                             var jsonData = $.parseJSON(data);
                             soundError();
@@ -54,7 +54,7 @@
             // 第二步配货
             function step2(html) {
                 $("#transFieldset${rand}").hide();
-                $("#step2${rand}").html(html).show();
+                $("#step2${rand}").html(html).show().find(":text:visible:not([readonly])").focus();
             }
         })();
     </script>

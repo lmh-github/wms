@@ -33,7 +33,7 @@ public class SalesOrderNodeInfoServiceImpl implements SalesOrderNodeInfoService 
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage saveFromSalesOrder(SalesOrder salesOrder, List<SalesOrderGoods> orderGoodsList) {
         if (salesOrder == null || orderGoodsList == null) {
             return new ServiceCtrlMessage(false, "");

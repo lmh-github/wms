@@ -29,8 +29,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -122,7 +122,8 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             ReturnStateInfo returnStateInfo = responseKpInterface.getReturnStateInfo();
             invoiceInfo.setReturnCode(returnStateInfo.getReturnCode());
             if (SUCCESS_CODE.equals(returnStateInfo.getReturnCode())) {
-                KpContentResp contentResp = XmlHelper1.toBean(responseKpInterface.getData().getContent(), KpContentResp.class);
+                KpContentResp contentResp = XmlHelper1.toBean(responseKpInterface.getData()
+                    .getContent(), KpContentResp.class);
 
                 invoiceInfo.setKprq(parseDate(contentResp.getKprq()));
                 invoiceInfo.setFpDm(contentResp.getFpDm());
@@ -131,7 +132,8 @@ public class EInvoiceServiceImpl implements EInvoiceService {
                 invoiceInfo.setStatus(WAIT_DOWNLOAD.toString());
                 invoiceInfo.setOpDate(new Date());
                 invoiceInfo.setOpUser(getLoginNameAndDefault());
-                invoiceInfo.setJsonData(new XMLSerializer().read(responseKpInterface.getData().getContent()).toString());
+                invoiceInfo.setJsonData(new XMLSerializer().read(responseKpInterface.getData().getContent())
+                    .toString());
                 invoiceInfo.setPdfUrl(contentResp.getPdfUrl());
 
                 invoiceInfoSerivce.saveOrUpdate(invoiceInfo, true);
@@ -148,8 +150,10 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             invoiceInfo.setStatus(FAILURE.toString()); // 开票失败
             invoiceInfo.setJsonData(returnStateInfo.getReturnMessage());
             invoiceInfoSerivce.saveOrUpdate(invoiceInfo, true);
-            logService.insertLog(new Log(BIZ_LOG.getCode(), orderCode, String.format("retcode:%s,returnMessage:%s", returnStateInfo.getReturnCode(), returnStateInfo.getReturnMessage()), "system", new Date()));
-            return new ServiceCtrlMessage(false, String.format("%s:%s", returnStateInfo.getReturnCode(), returnStateInfo.getReturnMessage()));
+            logService.insertLog(new Log(BIZ_LOG.getCode(), orderCode, String.format("retcode:%s,returnMessage:%s", returnStateInfo
+                .getReturnCode(), returnStateInfo.getReturnMessage()), "system", new Date()));
+            return new ServiceCtrlMessage(false, String.format("%s:%s", returnStateInfo.getReturnCode(), returnStateInfo
+                .getReturnMessage()));
         } catch (Exception e) {
             logger.error("开票异常！", e);
 
@@ -198,7 +202,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage invalidEIvoice(String orderCode, boolean forced) {
         InvoiceInfo invoiceInfo1 = invoiceInfoSerivce.get(orderCode);
         if (invoiceInfo1 == null) {
@@ -228,7 +232,8 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             KpInterface responseKpInterface = action(createRequestInterface(chService, salesOrder, salesOrderGoodses));
             ReturnStateInfo returnStateInfo = responseKpInterface.getReturnStateInfo();
             if (SUCCESS_CODE.equals(returnStateInfo.getReturnCode())) {
-                KpContentResp contentResp = XmlHelper1.toBean(responseKpInterface.getData().getContent(), KpContentResp.class);
+                KpContentResp contentResp = XmlHelper1.toBean(responseKpInterface.getData()
+                    .getContent(), KpContentResp.class);
 
                 InvoiceInfo invoiceInfo = invoiceInfoSerivce.get(orderCode);
                 invoiceInfo.setReturnCode(returnStateInfo.getReturnCode());
@@ -238,13 +243,15 @@ public class EInvoiceServiceImpl implements EInvoiceService {
                 invoiceInfo.setPreviewImgUrl(null);
                 invoiceInfo.setOpDate(new Date());
                 invoiceInfo.setOpUser(getLoginNameAndDefault());
-                invoiceInfo.setJsonData(new XMLSerializer().read(responseKpInterface.getData().getContent()).toString());
+                invoiceInfo.setJsonData(new XMLSerializer().read(responseKpInterface.getData().getContent())
+                    .toString());
 
                 invoiceInfoSerivce.saveOrUpdate(invoiceInfo, false);
                 return new ServiceCtrlMessage<>(true, null, contentResp);
             }
 
-            return new ServiceCtrlMessage(false, String.format("%s:%s", returnStateInfo.getReturnCode(), returnStateInfo.getReturnMessage()));
+            return new ServiceCtrlMessage(false, String.format("%s:%s", returnStateInfo.getReturnCode(), returnStateInfo
+                .getReturnMessage()));
         } catch (Exception e) {
             logger.error("发票冲红异常！", e);
             logService.insertLog(new Log(BIZ_LOG.getCode(), orderCode, e.getMessage(), getLoginNameAndDefault(), new Date()));
@@ -356,7 +363,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
     public ServiceCtrlMessage downloadInvoicePdfAnd2Img(String orderCode) {
         try {
             InvoiceInfo invoiceInfo = invoiceInfoSerivce.get(orderCode);
-            if (!SUCCESS.toString().equals(invoiceInfo.getStatus())) {
+            if (!Arrays.asList(SUCCESS.toString(), WAIT_DOWNLOAD.toString()).contains(invoiceInfo.getStatus())) {
                 return new ServiceCtrlMessage(false, "此状态发票不能再进行取票操作！");
             }
             String pdfUrl = invoiceInfo.getPdfUrl();
@@ -402,19 +409,25 @@ public class EInvoiceServiceImpl implements EInvoiceService {
             @Override
             public void run() {
                 try {
-                    BufferedInputStream bufferedInputStream = null; // 用于IO复用
+                    //BufferedInputStream bufferedInputStream = null; // 用于IO复用
                     InputStream inputStream = null;
+                    InputStream pdfInputStream = null;
                     String pdf = orderCode + ".pdf";
-                    FileOutputStream pdfOutputStream = new FileOutputStream(new File(EInvoiceDir.PDF.getSavePath(pdf)));
+                    File pdfFile = new File(EInvoiceDir.PDF.getSavePath(pdf));
+                    FileOutputStream pdfOutputStream = new FileOutputStream(pdfFile);
                     String img = orderCode + ".jpg";
                     FileOutputStream imgOutputStream = new FileOutputStream(new File(EInvoiceDir.IMG.getSavePath(img)));
                     try {
                         inputStream = HttpClientUtil.httpRetryGet(pdfUrl).getContent();
-                        bufferedInputStream = new BufferedInputStream(inputStream);
-                        bufferedInputStream.mark(Integer.MAX_VALUE); // 最大值，标记整个流可以复用
-                        IOUtils.copy(bufferedInputStream, pdfOutputStream);
-                        bufferedInputStream.reset();
-                        PdfUtil.pdf2Img(bufferedInputStream, imgOutputStream, 3.0f);
+                        //bufferedInputStream = new BufferedInputStream(inputStream);
+                        //bufferedInputStream.mark(Integer.MAX_VALUE); // 最大值，标记整个流可以复用
+                        IOUtils.copy(inputStream, pdfOutputStream);
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(pdfOutputStream);
+
+                        pdfInputStream = new FileInputStream(pdfFile);
+                        //bufferedInputStream.reset();
+                        PdfUtil.pdf2Img(pdfInputStream, imgOutputStream, 3.0f);
 
                         InvoiceInfo invoiceInfo = new InvoiceInfo();
                         invoiceInfo.setOrderCode(orderCode);
@@ -435,7 +448,7 @@ public class EInvoiceServiceImpl implements EInvoiceService {
                         }
                     } finally {
                         IOUtils.closeQuietly(inputStream);
-                        IOUtils.closeQuietly(bufferedInputStream);
+                        IOUtils.closeQuietly(pdfInputStream);
                         IOUtils.closeQuietly(pdfOutputStream);
                         IOUtils.closeQuietly(imgOutputStream);
                     }

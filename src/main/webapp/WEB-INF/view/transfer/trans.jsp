@@ -12,7 +12,7 @@
         <table>
             <tr>
                 <td height="30">调拨仓：</td>
-                <td>${transfer.transferTo }</td>
+                <td>${transferTo }</td>
             </tr>
             <tr>
                 <td height="30">调货单：</td>
@@ -21,7 +21,14 @@
                 </td>
             </tr>
             <tr>
-                <td height="30">扫描个体编码：</td>
+                <td height="30">扫描类型：</td>
+                <td>
+                    <input type="radio" name="isImei" id="imei${rand}" checked value="1"/><label style="float: inherit;width: inherit;vertical-align: text-top;margin-right: 10px;" for="imei${rand}">IMEI</label>
+                    <input type="radio" name="isImei" id="box${rand}" value="0" /><label style="float: inherit;width: inherit;vertical-align: text-top;" for="box${rand}">箱号</label>
+                </td>
+            </tr>
+            <tr>
+                <td height="30">扫描编码：</td>
                 <td id="scanTd${rand}">
                     <input id="scanInput${rand}" name="sv" type="text" class="textInput" maxlength="21" autocomplete="off"/><span id="scanTips${rand}" style="color: red;"></span>
                 </td>
@@ -35,13 +42,13 @@
         </table>
     </form>
 </fieldset>
-<div id="goodsPanel${rand}">
+<div id="goodsPanel${rand}" style="position: absolute;top: 160px;right: 0;bottom: 5px;left: 0;overflow: auto;">
     <%@include file="transGoodsFragment.jsp" %>
 </div>
 <script type="text/javascript">
     (function () {
         checkFilsh(); // 一进来就检查配货完成情况
-        $("#scanInput${rand}").keydown(function (event) { // 个体编码输入框事件
+        $("#scanInput${rand}").keydown(function (event) { // 编码输入框事件
             if (event.keyCode == 13) {
                 var $t = $(this), sv = $t.val($.trim($t.val())).val(), num;
                 if (!/\d{4,}/.test(sv)) {
@@ -53,7 +60,7 @@
                     num = window.prompt("请输入配货数量：", 1) || "";
                     if (!/\d+/.test(num) || +num == 0) {
                         soundError();
-                        return showMsg("请输入正确的数量");
+                        return showMsg("请输入正确的数量！");
                     }
                 }
                 var formData = {}, fields = $("#fm${rand}").serializeArray();
@@ -61,25 +68,28 @@
                     formData[this.name] = this.value;
                 });
                 formData["num"] = num;
-                $.post("${ctx}/trans/scan.do", formData, function (data) {
-                    $t.val("");
-                    try {
-                        var jsonData = $.parseJSON(data);
-                        soundError();
-                        showMsg(jsonData.message);
-                    } catch (e) {
-                        showMsg("");
-                        $("#goodsPanel${rand}").html(data);
-                        checkFilsh();
+                $.ajax({
+                    type: "post",
+                    url: "${ctx}/trans/scan.do",
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    success: function (data) {
+                        $t.val("");
+                        try {
+                            var jsonData = $.parseJSON(data);
+                            soundError();
+                            showMsg(jsonData.message);
+                        } catch (e) {
+                            showMsg("");
+                            $("#goodsPanel${rand}").html(data);
+                            checkFilsh();
+                        }
                     }
+
                 });
             }
         }); // End Event
-
-        // 指定显示焦点
-        setTimeout(function () {
-            $("#fm${rand}").find(":input:visible:not([readonly])").eq(0).focus();
-        }, 500);
 
         // 显示提示消息
         function showMsg(msg) {
@@ -92,6 +102,7 @@
             if (finish) {
                 $("#scanTd${rand}").html("<span style='color:green;font-weight:bold;'>扫描已完成</span>");
                 $("#wlTr${rand}").show();
+                $("#goodsPanel${rand}").css("top", 190);
             }
         } // End checkFilsh
 
@@ -105,14 +116,22 @@
                 $.each(fields, function () {
                     formData[this.name] = this.value;
                 });
-                $.post("${ctx}/trans/dispatch.do", formData, function (data) {
-                    if (data.result) {
-                        alertMsg.correct("操作成功！")
-                        navTab.reload();
-                    } else {
-                        $("#wlTips${rand}").html(data.message);
+                $.ajax({
+                    type: "post",
+                    url: "${ctx}/trans/dispatch${type}.do",
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.result) {
+                            alertMsg.correct("操作成功！")
+                            navTab.reload();
+                        } else {
+                            $("#wlTips${rand}").html(data.message);
+                        }
                     }
-                }, "JSON");
+                });
             }
         }); // End Event
     })();

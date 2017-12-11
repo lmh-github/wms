@@ -23,7 +23,10 @@
 	<context:component-scan base-package="com.gionee.wms" />
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
-	
+
+    <!-- @Transactional 生效 -->
+	<tx:annotation-driven/>
+
 	<!-- hibernate validator -->
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
@@ -102,13 +105,13 @@
 		<aop:pointcut id="categoryServiceMethod" expression="execution(* com.gionee.wms.service.wares.CategoryServiceImpl.*(..))" />
 		<aop:advisor advice-ref="categoryServiceTxAdvice" pointcut-ref="categoryServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 商品属性事务 -->
-	<tx:advice id="skuAttrServiceTxAdvice" transaction-manager="transactionManager">
+	<tx:advice id="skuAttrServiceTxAdvice">
 		<tx:attributes>
-			<tx:method name="addAttr" propagation="REQUIRED" rollback-for="ServiceException"/>
-			<tx:method name="deleteAttr" propagation="REQUIRED" rollback-for="ServiceException"/>
-			<tx:method name="updateAttr" propagation="REQUIRED" rollback-for="ServiceException"/>
+			<tx:method name="addAttr" rollback-for="ServiceException"/>
+			<tx:method name="deleteAttr" rollback-for="ServiceException"/>
+			<tx:method name="updateAttr" rollback-for="ServiceException"/>
 			<tx:method name="get*" read-only="true"/>
 		</tx:attributes>
 	</tx:advice>
@@ -116,7 +119,7 @@
 		<aop:pointcut id="skuAttrServiceMethod" expression="execution(* com.gionee.wms.service.wares.SkuAttrServiceImpl.*(..))" />
 		<aop:advisor advice-ref="skuAttrServiceTxAdvice" pointcut-ref="skuAttrServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 商品及SKU事务 -->
 	<tx:advice id="waresServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -130,7 +133,7 @@
 		<aop:pointcut id="waresServiceMethod" expression="execution(* com.gionee.wms.service.wares.WaresServiceImpl.*(..))" />
 		<aop:advisor advice-ref="waresServiceTxAdvice" pointcut-ref="waresServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 仓库管理事务 -->
 	<tx:advice id="warehouseServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -142,7 +145,7 @@
 		<aop:pointcut id="warehouseServiceMethod" expression="execution(* com.gionee.wms.service.basis.WarehouseServiceImpl.*(..))" />
 		<aop:advisor advice-ref="warehouseServiceTxAdvice" pointcut-ref="warehouseServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 配送方式管理事务 -->
 	<tx:advice id="shippingServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -154,7 +157,7 @@
 		<aop:pointcut id="shippingServiceMethod" expression="execution(* com.gionee.wms.service.basis.ShippingServiceImpl.*(..))" />
 		<aop:advisor advice-ref="shippingServiceTxAdvice" pointcut-ref="shippingServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 供应商管理事务 -->
 	<tx:advice id="supplierServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -166,7 +169,7 @@
 		<aop:pointcut id="supplierServiceMethod" expression="execution(* com.gionee.wms.service.basis.SupplierServiceImpl.*(..))" />
 		<aop:advisor advice-ref="supplierServiceTxAdvice" pointcut-ref="supplierServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 库存事务 -->
 	<tx:advice id="stockServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -180,7 +183,7 @@
 		<aop:pointcut id="stockServiceMethod" expression="execution(* com.gionee.wms.service.stock.StockServiceImpl.*(..))" />
 		<aop:advisor advice-ref="stockServiceTxAdvice" pointcut-ref="stockServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 盘点事务 -->
 	<tx:advice id="checkServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -194,7 +197,7 @@
 		<aop:pointcut id="checkServiceMethod" expression="execution(* com.gionee.wms.service.stock.CheckServiceImpl.*(..))" />
 		<aop:advisor advice-ref="checkServiceTxAdvice" pointcut-ref="checkServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 订单事务 -->
 	<tx:advice id="salesOrderServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -209,7 +212,7 @@
 		<aop:pointcut id="salesOrderServiceMethod" expression="execution(* com.gionee.wms.service.stock.SalesOrderServiceImpl.*(..))" />
 		<aop:advisor advice-ref="salesOrderServiceTxAdvice" pointcut-ref="salesOrderServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 采购事务 -->
 	<tx:advice id="purchaseServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -220,7 +223,7 @@
 		<aop:pointcut id="purchaseServiceMethod" expression="execution(* com.gionee.wms.service.stock.PurchaseServiceImpl.*(..))" />
 		<aop:advisor advice-ref="purchaseServiceTxAdvice" pointcut-ref="purchaseServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 收货事务 -->
 	<tx:advice id="receiveServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -233,7 +236,7 @@
 		<aop:pointcut id="receiveServiceMethod" expression="execution(* com.gionee.wms.service.stock.ReceiveServiceImpl.*(..))" />
 		<aop:advisor advice-ref="receiveServiceTxAdvice" pointcut-ref="receiveServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 发货事务 -->
 	<tx:advice id="deliveryServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -248,7 +251,7 @@
 		<aop:pointcut id="deliveryServiceMethod" expression="execution(* com.gionee.wms.service.stock.DeliveryServiceImpl.*(..))" />
 		<aop:advisor advice-ref="deliveryServiceTxAdvice" pointcut-ref="deliveryServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 个体事务 -->
 	<tx:advice id="indivServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -260,7 +263,7 @@
 		<aop:pointcut id="indivServiceMethod" expression="execution(* com.gionee.wms.service.wares.IndivServiceImpl.*(..))" />
 		<aop:advisor advice-ref="indivServiceTxAdvice" pointcut-ref="indivServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 调拨事务 -->
 	<tx:advice id="transferServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -275,7 +278,7 @@
 		<aop:pointcut id="transferServiceMethod" expression="execution(* com.gionee.wms.service.stock.TransferServiceImpl.*(..))" />
 		<aop:advisor advice-ref="transferServiceTxAdvice" pointcut-ref="transferServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 退货事务 -->
 	<tx:advice id="backServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -289,7 +292,7 @@
 		<aop:pointcut id="backServiceMethod" expression="execution(* com.gionee.wms.service.stock.BackServiceImpl.*(..))" />
 		<aop:advisor advice-ref="backServiceTxAdvice" pointcut-ref="backServiceMethod" />
 	</aop:config>
-	
+
 	<!-- 统计事务 -->
 	<tx:advice id="statServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>

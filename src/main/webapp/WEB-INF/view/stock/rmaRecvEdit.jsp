@@ -29,7 +29,7 @@
 			</dl>
 			<dl class="nowrap">
 				<dt>备注：</dt>
-				<dd><textarea name="receive.remark" cols="80" rows="1" id="remark">${receive.remark }</textarea></dd>
+				<dd><textarea name="receive.remark" readonly rows="1" id="remark" style="width: 527px;height: 35px;resize: none">${receive.remark }</textarea></dd>
 			</dl>
 		</fieldset>
 		

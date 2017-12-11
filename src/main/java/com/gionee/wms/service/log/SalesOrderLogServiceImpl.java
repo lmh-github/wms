@@ -22,7 +22,7 @@ import com.gionee.wms.service.ServiceException;
 /**
  * @author ZuoChangjun 2014-02-12 16:14:00
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service("salesOrderLogService")
 public class SalesOrderLogServiceImpl implements SalesOrderLogService {
 	private static Log log = LogFactory.getLog(SalesOrderLogServiceImpl.class);

@@ -1,22 +1,22 @@
 package com.gionee.wms.service.wares;
 
-import java.util.List;
-import java.util.Map;
-
+import com.gionee.wms.common.JsonUtils;
+import com.gionee.wms.dao.CategoryDao;
+import com.gionee.wms.entity.Category;
+import com.gionee.wms.service.ServiceException;
+import com.gionee.wms.vo.CategoryVo;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.gionee.wms.common.JsonUtils;
-import com.gionee.wms.dao.CategoryDao;
-import com.gionee.wms.entity.Category;
-import com.gionee.wms.service.ServiceException;
-import com.gionee.wms.vo.CategoryVo;
+import java.util.List;
+import java.util.Map;
 
 @Service("categoryService")
 public class CategoryServiceImpl implements CategoryService {
+    @Autowired
 	private CategoryDao categoryDao;
 	private static final int CATETORY_LEVEL_MAX = 10;
 
@@ -88,10 +88,4 @@ public class CategoryServiceImpl implements CategoryService {
 			throw new ServiceException(e);
 		}
 	}
-
-	@Autowired
-	public void setCategoryDao(CategoryDao categoryDao) {
-		this.categoryDao = categoryDao;
-	}
-
 }

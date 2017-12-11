@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,8 +39,8 @@ import static com.gionee.wms.common.WmsConstants.TransferStatus.DELIVERYING;
 import static com.gionee.wms.common.WmsConstants.TransferStatus.UN_DELIVERYD;
 
 /**
- * 配货
- * Created by Pengbin on 2017/4/24.
+ * 调货|配货|分仓
+ * @author XXX
  */
 @Controller
 @RequestMapping("/trans")
@@ -54,7 +55,6 @@ public class TransferController {
 
     /**
      * 列表查询
-     *
      * @param modelMap
      * @param queryMap
      * @param page
@@ -76,7 +76,6 @@ public class TransferController {
 
     /**
      * 导出
-     *
      * @param queryMap
      * @return
      */
@@ -157,7 +156,6 @@ public class TransferController {
 
     /**
      * 取消
-     *
      * @param queryMap
      * @param transferId
      * @return
@@ -191,7 +189,6 @@ public class TransferController {
 
     /**
      * 添加跳转
-     *
      * @param modelMap   modelMap
      * @param transferId
      * @return
@@ -215,7 +212,6 @@ public class TransferController {
 
     /**
      * 添加或者修改
-     *
      * @param queryMap
      * @param transfer
      * @return
@@ -242,7 +238,6 @@ public class TransferController {
 
     /**
      * 选择商品跳转
-     *
      * @param transferId
      * @return
      */
@@ -254,7 +249,6 @@ public class TransferController {
 
     /**
      * 添加调拨商品
-     *
      * @param queryMap
      * @param transferId
      * @param goods
@@ -264,7 +258,6 @@ public class TransferController {
     @ResponseBody
     public Object addGoods(QueryMap queryMap, Long transferId, TransferGoods goods) {
         try {
-
             transferService.addTransferGoods(transferService.getTransferById(transferId), goods);
             return DwzMessage.success("添加成功！", queryMap);
         } catch (Exception e) {
@@ -275,7 +268,6 @@ public class TransferController {
 
     /**
      * 删除调拨商品
-     *
      * @param queryMap
      * @param goodsId
      * @return
@@ -294,7 +286,6 @@ public class TransferController {
 
     /**
      * 删除调拨单
-     *
      * @param queryMap
      * @param transferId
      * @return
@@ -317,29 +308,40 @@ public class TransferController {
 
     /**
      * 配货跳转
-     *
      * @param modelMap   modelMap
      * @param transferId 调货单ID
+     * @param type       SF顺丰|null
      * @return
      */
-    @RequestMapping("/trans.do")
+    @RequestMapping("/trans{type}.do")
     @ResponseBody
-    public Object trans(ModelMap modelMap, String transferId) {
+    public Object trans(ModelMap modelMap, String transferId, @PathVariable("type") String type) {
         if (StringUtils.isBlank(transferId)) {
             return new ModelAndView("transfer/transPrepare");
         } else {
             if (Pattern.matches("\\d+", transferId)) {
                 Transfer transfer = transferService.getTransferById(Long.valueOf(transferId));
                 if (transfer == null) {
-                    return new ServiceCtrlMessage<>(false, "调拨单：" + transferId + " 不存在！");
+                    return new ServiceCtrlMessage<>(false, "调拨单：【" + transferId + "】不存在！");
                 }
-                if (transfer.getOrderPushStatus() != null) {
-                    return new ServiceCtrlMessage<>(false, "调拨单：" + transferId + " 不属于该模块！");
+                if ("SF".equals(type)) {
+                    if (transfer.getOrderPushStatus() == null) {
+                        return new ServiceCtrlMessage<>(false, "调拨单：【" + transferId + "】不属于该模块！");
+                    }
+                    Warehouse warehouse = warehouseService.getWarehouse(Long.valueOf(transfer.getTransferTo()));
+                    modelMap.put("transferTo", warehouse.getWarehouseName());
+                } else {
+                    // 顺丰调货单
+                    if (transfer.getOrderPushStatus() != null) {
+                        return new ServiceCtrlMessage<>(false, "调拨单：【" + transferId + "】不属于该模块！");
+                    }
+                    modelMap.put("transferTo", transfer.getTransferTo());
                 }
                 if (!Arrays.asList(UN_DELIVERYD.getCode(), DELIVERYING.getCode()).contains(transfer.getStatus())) {
                     return new ServiceCtrlMessage<>(false, "调拨单：" + transferId + " 已经发货或者取消！");
                 }
                 modelMap.put("transfer", transfer);
+                modelMap.put("type", type);
                 load(modelMap, Long.valueOf(transferId));
 
                 return new ModelAndView("transfer/trans", modelMap);
@@ -350,20 +352,20 @@ public class TransferController {
 
     /**
      * 扫描配货
-     *
      * @param sv         SKU|IMEI
      * @param num        数量
      * @param transferId 调拨单ID
+     * @param isImei     是否是IMEI扫描
      * @return
      */
     @RequestMapping("/scan.do")
     @ResponseBody
-    public Object scan(ModelMap modelMap, String sv, Integer num, Long transferId) {
+    public Object scan(ModelMap modelMap, String sv, Integer num, Long transferId, Boolean isImei) {
         try {
             if (StringUtils.isBlank(sv) || transferId == null) {
-                return new ServiceCtrlMessage<>(false, "参数为空");
+                return new ServiceCtrlMessage<>(false, "参数为空！");
             }
-            ServiceCtrlMessage message = transferService.picking(sv, num, transferId);
+            ServiceCtrlMessage message = transferService.picking(sv, num, transferId, isImei);
             if (message.isResult()) {
                 Transfer transfer = transferService.getTransferById(transferId);
                 modelMap.put("transfer", transfer);
@@ -380,16 +382,16 @@ public class TransferController {
 
     /**
      * 完成配货，提交运单号，准备出库
-     *
      * @param transferId 调拨单
      * @param logisticNo 运单号
+     * @param type       SF顺丰|null
      * @return
      */
-    @RequestMapping("/dispatch.do")
+    @RequestMapping("/dispatch{type}.do")
     @ResponseBody
-    public Object dispatch(Long transferId, String logisticNo) {
+    public Object dispatch(Long transferId, String logisticNo, @PathVariable("type") String type) {
         try {
-            return transferService.dispatch(transferId, logisticNo);
+            return transferService.dispatch(transferId, logisticNo, type);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return new ServiceCtrlMessage<>(false, "操作出现异常！");
@@ -398,7 +400,6 @@ public class TransferController {
 
     /**
      * 加载信息
-     *
      * @param modelMap
      * @param transferId
      */

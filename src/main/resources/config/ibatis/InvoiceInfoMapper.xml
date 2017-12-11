@@ -242,7 +242,7 @@
     
     <select id="queryToMakeInvoiceOrder" resultType="string">
         SELECT i.ORDER_CODE FROM WMS_INVOICE i INNER JOIN WMS_SALES_ORDER o ON i.ORDER_CODE = o.ORDER_CODE
-        WHERE i.STATUS IN ('WAIT_MAKE', 'KP_DELAYED', 'FAILURE') AND o.INVOICE_AMOUNT &gt; 20 AND o.ORDER_STATUS IN (1, 5) AND o.SHIPPING_NAME = '顺丰速运'
+        WHERE i.STATUS IN ('WAIT_MAKE', 'KP_DELAYED', 'FAILURE') AND o.INVOICE_AMOUNT &gt; 0 AND o.ORDER_STATUS IN (1, 5) AND o.SHIPPING_NAME = '顺丰速运'
     </select>
 
     <select id="queryToCancelInvoiceOrder" resultType="string">

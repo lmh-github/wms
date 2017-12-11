@@ -5,7 +5,10 @@ import com.gionee.wms.common.DateConvert;
 import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.*;
-import com.gionee.wms.dao.*;
+import com.gionee.wms.dao.IndivDao;
+import com.gionee.wms.dao.StatDao;
+import com.gionee.wms.dao.TransferDao;
+import com.gionee.wms.dao.WaresDao;
 import com.gionee.wms.dto.Page;
 import com.gionee.wms.dto.StockRequest;
 import com.gionee.wms.entity.*;
@@ -43,6 +46,9 @@ import static com.gionee.wms.common.WmsConstants.StockBizType.OUT_TRANSFER;
 import static com.gionee.wms.common.WmsConstants.StockType.STOCK_SALES;
 import static com.gionee.wms.common.WmsConstants.TransferStatus.*;
 
+/**
+ * @author rcw
+ */
 @Service("transferService")
 public class TransferServiceImpl extends CommonServiceImpl implements TransferService {
 
@@ -52,8 +58,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     private TransferDao transferDao;
     @Autowired
     private IndivDao indivDao;
-    @Autowired
-    private WarehouseDao warehouseDao;
     @Autowired
     private StockService stockService;
     @Autowired
@@ -71,7 +75,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
     @Override
     public int getTransferListTotal(Map<String, Object> criteria) {
-        // TODO Auto-generated method stub
         return transferDao.getTransferListTotal(criteria);
     }
 
@@ -155,7 +158,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage purchaseOrder(Transfer transfer) {
         WmsPurchaseOrderRequest request = new WmsPurchaseOrderRequest();
         WmsPurchaseOrderRequestHeader header = new WmsPurchaseOrderRequestHeader();
@@ -177,7 +180,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             WmsPurchaseOrderRequestItem item = new WmsPurchaseOrderRequestItem();
             SkuMap skuMap = skuMapService.getSkuMapBySkuCode(good.getSkuCode(), "sf");
             if (skuMap == null) {
-                logger.info("调拨单推送失败," + good.getSkuCode() + "不是顺丰sku");
+                logger.error("调拨单推送失败," + good.getSkuCode() + "不是顺丰sku");
                 logService.insertLog(new Log(BIZ_LOG.getCode(), "顺丰入库单：" + transfer.getTransferId(), good.getSkuCode() + "没有", "system", new Date()));
                 return new ServiceCtrlMessage(false, "调拨单推送失败," + good.getSkuCode() + "不是顺丰sku");
             }
@@ -205,13 +208,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public ServiceCtrlMessage picking(String sv, Integer num, Long transferId) {
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceCtrlMessage picking(String sv, Integer num, Long transferId, Boolean isImei) {
         Transfer transfer = getTransferById(transferId);
         if (!Arrays.asList(DELIVERYING.getCode(), UN_DELIVERYD.getCode()).contains(transfer.getStatus())) {
             return new ServiceCtrlMessage<>(false, "调拨单状态异常，请检查！");
         }
-        if (sv.length() <= 5) { // 配件
+        // 配件
+        if (sv.length() <= 5) {
             List<TransferGoods> goodsList = transferDao.getTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("transferId", transferId).put("skuCode", sv).getMap());
             if (goodsList.isEmpty()) {
                 return new ServiceCtrlMessage(false, "此调拨单未找到SKU：" + sv);
@@ -225,34 +229,72 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                 updateTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("goodsId", g.getId()).put("preparedNum", num + preparedNum).getMap());
                 return new ServiceCtrlMessage(true, "配货成功！");
             }
+        } else {
+            // 箱号
+            if (!isImei) {
+                List<Indiv> indivs = indivDao.queryIndivListByCaseCode(sv);
+                if (CollectionUtils.isEmpty(indivs)) {
+                    return new ServiceCtrlMessage(false, String.format("箱号【%s】未找到！", sv));
+                }
 
+                List<TransferGoods> goodsList = transferDao.getTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("transferId", transferId).put("skuCode", indivs.get(0).getSkuCode()).getMap());
+                if (goodsList.isEmpty()) {
+                    return new ServiceCtrlMessage(false, String.format("箱号【%s】不属于此调拨单的SKU！", sv));
+                }
 
-        } else { // 串码
+                for (Indiv indiv : indivs) {
+                    if (IndivStockStatus.IN_WAREHOUSE.getCode() != indiv.getStockStatus()) {
+                        return new ServiceCtrlMessage(false, String.format("箱号【%s】中【%s】不是在库中状态！", sv, indiv.getIndivCode()));
+                    }
+                    if (IndivWaresStatus.NON_DEFECTIVE.getCode() != indiv.getWaresStatus()) {
+                        return new ServiceCtrlMessage(false, String.format("箱号【%s】中【%s】不是【良品】状态！", sv, indiv.getIndivCode()));
+                    }
+                    if (!transfer.getWarehouseId().equals(indiv.getWarehouseId())) {
+                        return new ServiceCtrlMessage(false, String.format("箱号【%s】中【%s】不属于该仓库！", sv, indiv.getIndivCode()));
+                    }
+                }
+
+                TransferGoods transferGoods = goodsList.get(0);
+                if (transferGoods.getQuantity() < indivs.size()) {
+                    return new ServiceCtrlMessage(false, String.format("箱【%s】中数量【%s】必须大于或等于SKU【%s】的配货数量！", sv, indivs.size(), transferGoods.getSkuCode()));
+                }
+                Integer preparedNum = transferGoods.getPreparedNum() == null ? 0 : transferGoods.getPreparedNum();
+                if (preparedNum != null && preparedNum + indivs.size() > transferGoods.getQuantity()) {
+                    return new ServiceCtrlMessage(false, String.format("箱【%s】中数量【%s】必须大于或等于SKU【%s】的待配货数量！", sv, indivs.size(), transferGoods.getSkuCode()));
+                }
+                addIndivs(transferId, transferId.toString(), indivs);
+                updateTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("goodsId", transferGoods.getId()).put("preparedNum", ++preparedNum).getMap());
+                return new ServiceCtrlMessage(true, "配货成功！");
+            }
+
             Indiv indiv = indivDao.queryIndivByCode(sv);
             if (indiv == null) {
                 return new ServiceCtrlMessage(false, "未找到IMEI：" + sv);
             }
             List<TransferGoods> goodsList = transferDao.getTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("transferId", transferId).put("skuCode", indiv.getSkuCode()).getMap());
             if (goodsList.isEmpty()) {
-                return new ServiceCtrlMessage(false, "IMEI：" + sv + "不属于此调拨单的SKU");
+                return new ServiceCtrlMessage(false, String.format("IMEI【%s】不属于此调拨单的SKU", sv));
             }
             for (TransferGoods g : goodsList) {
                 int preparedNum = g.getPreparedNum() == null ? 0 : g.getPreparedNum();
                 if (preparedNum + 1 > g.getQuantity()) {
-                    return new ServiceCtrlMessage(false, String.format("SKU：%s 已经超出配货数量！", g.getSkuCode()));
+                    return new ServiceCtrlMessage(false, String.format("SKU【%s】已经超出配货数量！", g.getSkuCode()));
                 }
 
                 Warehouse warehouse = warehouseService.getWarehouse(transfer.getWarehouseId());
                 if (!indiv.getWarehouseId().equals(warehouse.getId())) {
-                    return new ServiceCtrlMessage(false, String.format("IMEI：%s 不属于：%s", sv, warehouse.getWarehouseName()));
+                    return new ServiceCtrlMessage(false, String.format("IMEI【%s】不属于【%s】", sv, warehouse.getWarehouseName()));
+                }
+                if (IndivWaresStatus.NON_DEFECTIVE.getCode() != indiv.getWaresStatus()) {
+                    return new ServiceCtrlMessage(false, String.format("IMEI【%s】不是【良品】状态！", sv, indiv.getIndivCode()));
                 }
                 if (IndivStockStatus.IN_WAREHOUSE.getCode() != indiv.getStockStatus()) {
-                    return new ServiceCtrlMessage(false, String.format("IMEI：%s 不是在库中", sv));
+                    return new ServiceCtrlMessage(false, String.format("IMEI【%s】不是在库中", sv));
                 }
 
                 addIndiv(transferId, String.valueOf(transferId), indiv.getId());
                 updateTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("goodsId", g.getId()).put("preparedNum", ++preparedNum).getMap());
-                return new ServiceCtrlMessage(true, "配货成功");
+                return new ServiceCtrlMessage(true, "配货成功！");
             }
         }
 
@@ -263,15 +305,15 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public ServiceCtrlMessage dispatch(Long transferId, String logisticNo) {
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceCtrlMessage dispatch(Long transferId, String logisticNo, String type) {
         Transfer transfer = getTransferById(transferId);
         if (DELIVERYED.getCode() == transfer.getStatus()) {
             return new ServiceCtrlMessage(false, "已经发货，无法继续操作！");
         }
         List<TransferGoods> transferGoods = getTransferGoodsById(transferId);
         if (CollectionUtils.isEmpty(transferGoods)) {
-            return new ServiceCtrlMessage(false, "调拨商品为空，无法发货！");
+            return new ServiceCtrlMessage(false, "出库商品为空，无法发货！");
         }
         for (TransferGoods g : transferGoods) {
             if (g.getQuantity() == null || g.getPreparedNum() == null || g.getQuantity().intValue() != g.getPreparedNum().intValue()) {
@@ -282,7 +324,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         indivDao.updatePrepareToDly(LinkMapUtils.<String, Object>newHashMap().put("prepareId", transferId).put("outId", transferId).put("outCode", transferId).put("outTime", new Date()).put("stockStatus", OUT_WAREHOUSE.getCode()).getMap());
         for (TransferGoods g : transferGoods) {
             StockRequest stockRequest = new StockRequest(transfer.getWarehouseId(), g.getSkuId(), STOCK_SALES, g.getQuantity(), OUT_TRANSFER, String.valueOf(transferId));
-            stockService.decreaseStock(stockRequest); // 扣减可销库存
+            // 扣减可销库存
+            stockService.decreaseStock(stockRequest);
         }
 
         transfer.setStatus(DELIVERYED.getCode());
@@ -290,6 +333,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         transfer.setShippingTime(new Date());
 
         transferDao.updateTransfer(transfer);
+
+        // 需要初始化顺丰或者加入顺丰库存流水
+        if ("SF".equals(type)) {
+            for (TransferGoods goods : transferGoods) {
+                StockRequest stockRequest = new StockRequest(Long.valueOf(transfer.getTransferTo()), goods.getSkuId(), STOCK_SALES, goods.getQuantity(), OUT_TRANSFER, transfer.getTransferId() + "");
+                stockService.increaseStock(stockRequest, false);
+            }
+        }
 
         return new ServiceCtrlMessage(true, "发货成功！");
     }
@@ -906,11 +957,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
                 if (null != type && type == 1) {
                     // 转换分仓收货仓
-                    Long transferTo = warehouseMap.get(transfer.getTransferTo().replaceAll("\\s",""));
+                    Long transferTo = warehouseMap.get(transfer.getTransferTo().replaceAll("\\s", ""));
                     if (transferTo == null) {
                         throw new Exception("导入失败,找不到对应收货仓:" + transfer.getTransferTo());
                     }
-                    transfer.setTransferTo( transferTo.toString());
+                    transfer.setTransferTo(transferTo.toString());
                 }
                 if (sku == null) {
                     throw new Exception("导入失败,sku code:" + transferGoods.getSkuCode() + "找不到对应商品!");
@@ -960,7 +1011,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addBatch(List<Transfer> transferList) {
         List<TransferGoods> transferGoodsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(transferList)) {

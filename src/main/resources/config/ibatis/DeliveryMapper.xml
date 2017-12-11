@@ -518,4 +518,67 @@
   	<delete id="deleteDeliveryByOrderCode" parameterType="string">
   		delete from wms_delivery where original_code=#{orderCode}
   	</delete>
+
+    <select id="queryDeliveryDetailsList" resultType="com.gionee.wms.vo.DeliveryDetails">
+        SELECT *
+        FROM (
+               SELECT
+                 ROWNUM RM,
+                 T.*
+               FROM (
+                      SELECT
+                        S.ORDER_SOURCE   orderSource,
+                        L.OP_TIME        deliveryDate,
+                        S.ORDER_CODE     orderCode,
+                        S.PAYMENT_NAME   payment,
+                        S.PAY_NO         payNo,
+                        G.SKU_NAME       skuName,
+                        G.QUANTITY       quantity,
+                        G.UNIT_PRICE     price,
+                        S.INVOICE_AMOUNT invoiceAmount,
+                        S.CONSIGNEE      consignee,
+                        S.SHIPPING_NAME  expressType,
+                        S.SHIPPING_NO    expressNo,
+                        K.MATERIAL_CODE  materialCode,
+                        S.ORDER_STATUS   orderStatus,
+                        N.REAL_WAREHOUSE departure
+                      FROM WMS_SALES_ORDER S
+                        INNER JOIN WMS_SALES_ORDER_GOODS G ON s.ID = g.ORDER_ID
+                        INNER JOIN WMS_SKU k ON g.SKU_CODE = k.SKU_CODE
+                        LEFT JOIN WMS_SALES_ORDER_NODE_INFO N ON S.ORDER_CODE = N.ORDER_CODE
+                        INNER JOIN (SELECT
+                                      L.ORDER_ID,
+                                      MIN(l.OP_TIME) OP_TIME
+                                    FROM WMS_SALES_ORDER_LOG L
+                                    WHERE
+                                          <if test="finishedTimeBegin != null">L.OP_TIME &gt;= TO_DATE(TO_CHAR(#{finishedTimeBegin, jdbcType=DATE}, 'yyyy-mm-dd'), 'yyyy-mm-dd') AND </if>
+                                          <if test="finishedTimeEnd != null">L.OP_TIME &lt;= TO_DATE(TO_CHAR(#{finishedTimeEnd, jdbcType=DATE}, 'yyyy-mm-dd "23:59:59"'), 'yyyy-mm-dd hh24:mi:ss') AND </if>
+                                          L.ORDER_STATUS IN (1, 4, 10)
+                                    GROUP BY L.ORDER_ID) L ON s.ID = L.ORDER_ID
+                      WHERE s.ORDER_STATUS IN (1, 4, 10)
+                      ORDER BY L.OP_TIME DESC
+                    ) T
+               WHERE ROWNUM &lt;= #{page.endRow}
+             ) WARP
+        WHERE WARP.RM &gt;= #{page.startRow}
+    </select>
+
+    <select id="queryDeliveryDetailsCount" resultType="int">
+        SELECT
+          COUNT(1)
+        FROM WMS_SALES_ORDER S
+          INNER JOIN WMS_SALES_ORDER_GOODS G ON s.ID = g.ORDER_ID
+          INNER JOIN WMS_SKU k ON g.SKU_CODE = k.SKU_CODE
+          LEFT JOIN WMS_SALES_ORDER_NODE_INFO N ON S.ORDER_CODE = N.ORDER_CODE
+          INNER JOIN (SELECT
+                        L.ORDER_ID,
+                        MIN(l.OP_TIME) OP_TIME
+                      FROM WMS_SALES_ORDER_LOG L
+                      WHERE
+                            <if test="finishedTimeBegin != null">L.OP_TIME &gt;= TO_DATE(TO_CHAR(#{finishedTimeBegin, jdbcType=DATE}, 'yyyy-mm-dd'), 'yyyy-mm-dd') AND </if>
+                            <if test="finishedTimeEnd != null">L.OP_TIME &lt;= TO_DATE(TO_CHAR(#{finishedTimeEnd, jdbcType=DATE}, 'yyyy-mm-dd "23:59:59"'), 'yyyy-mm-dd hh24:mi:ss') AND </if>
+                            L.ORDER_STATUS IN (1, 4, 10)
+                      GROUP BY L.ORDER_ID) L ON s.ID = L.ORDER_ID
+        WHERE s.ORDER_STATUS IN (1, 4, 10)
+    </select>
 </mapper>

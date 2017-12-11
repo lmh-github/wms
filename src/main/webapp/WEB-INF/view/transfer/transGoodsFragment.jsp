@@ -3,7 +3,7 @@
 <s:set var="IndivStockStatus" value="@com.gionee.wms.common.WmsConstants$IndivStockStatus@values()"/>
 <fieldset>
     <legend>配货信息</legend>
-    <table class="list" style="width: 100%">
+    <table class="list" style="width: 100%" layoutH="170">
         <thead>
         <tr>
             <th>商品名称</th>

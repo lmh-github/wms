@@ -5,24 +5,23 @@
  */
 package com.gionee.wms.service.log;
 
-import java.util.List;
-import java.util.Map;
-
+import com.gionee.wms.dao.LogDao;
+import com.gionee.wms.entity.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gionee.wms.dao.LogDao;
-import com.gionee.wms.entity.Log;
+import java.util.List;
+import java.util.Map;
 
 
 
 /**
  * @author ZuoChangjun 2014-01-08 16:11:37
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service("logService")
 public class LogServiceImpl implements LogService {
 	private static org.apache.commons.logging.Log log = LogFactory.getLog(LogServiceImpl.class);

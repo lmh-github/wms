@@ -4,12 +4,11 @@
 <%@taglib prefix="s" uri="/struts-tags" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
-<h2 class="contentTitle"></h2>
-<form id="fm${rand}" action="${ctx}/trans/addAndEdit.do?callbackType=closeCurrent&navTabId=tab_trans_list" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+<form id="fm${rand}" class="pageForm required-validate" action="${ctx}/trans/addAndEdit.do?callbackType=closeCurrent&navTabId=tab_trans_list" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
     <input type="hidden" name="transferId" value="${transfer.transferId}"/>
     <input type="hidden" name="transType" value="0"/>
     <div class="pageContent">
-        <div class="pageFormContent" layoutH="97">
+        <div class="pageFormContent" layoutH="50">
             <fieldset>
                 <legend>基本信息</legend>
                 <dl>
@@ -140,26 +139,26 @@
                 </fieldset>
             </c:if>
         </div>
-        <div class="formBar">
-            <ul>
-                <s:if test="#attr.transfer == null || #attr.transfer.status == 1">
-                    <li>
-                        <div class="buttonActive">
-                            <div class="buttonContent">
-                                <button type="submit">保存</button>
-                            </div>
-                        </div>
-                    </li>
-                </s:if>
+    </div>
+    <div class="formBar">
+        <ul>
+            <s:if test="#attr.transfer == null || #attr.transfer.status == 1">
                 <li>
-                    <div class="button">
+                    <div class="buttonActive">
                         <div class="buttonContent">
-                            <button class="close" type="button">关闭</button>
+                            <button type="submit">保存</button>
                         </div>
                     </div>
                 </li>
-            </ul>
-        </div>
+            </s:if>
+            <li>
+                <div class="button">
+                    <div class="buttonContent">
+                        <button class="close" type="button">关闭</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
 </form>
 <script type="text/javascript">
@@ -170,6 +169,3 @@
         }
     }
 </script>
-
-
-

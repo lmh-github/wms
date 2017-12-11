@@ -78,7 +78,7 @@ public class DatabaseIDGenerator implements IDGenerator {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRES_NEW)
     synchronized public Integer getId(String key) {
         IdState idState;
         if (idContainer.containsKey(key)) {

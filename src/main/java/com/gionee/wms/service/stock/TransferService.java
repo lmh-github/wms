@@ -113,17 +113,19 @@ public interface TransferService {
      * @param sv         SKU|IMEI
      * @param num        数量
      * @param transferId 调拨单ID
+     * @param isImei     是否IEMI扫描|箱号
      * @return ServiceCtrlMessage
      */
-    ServiceCtrlMessage picking(String sv, Integer num, Long transferId);
+    ServiceCtrlMessage picking(String sv, Integer num, Long transferId, Boolean isImei);
 
     /**
      * 扫描运单号，完成配货
      * @param transferId
      * @param logisticNo
+     * @param type       SF顺丰|null
      * @return
      */
-    ServiceCtrlMessage dispatch(Long transferId, String logisticNo);
+    ServiceCtrlMessage dispatch(Long transferId, String logisticNo, String type);
 
     /**
      * 转换EXCEL List

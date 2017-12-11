@@ -8,7 +8,6 @@ import org.apache.struts2.ServletActionContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.ws.Service;
 import java.io.File;
 import java.io.IOException;
 
@@ -95,11 +94,11 @@ public class ActionUtils {
     }
 
     /**
-     * 获取当前登录的用户名，没有则返回系统用户System
+     * 获取当前登录的用户名
      * @return
      */
-    public static String getLoginNameAndDefault(){
-        return StringUtils.defaultString(getLoginName(), "System");
+    public static String getLoginNameAndDefault() {
+        return StringUtils.defaultString(getLoginName(), WmsConstants.DEFAULT_USERNAME_LOG);
     }
 
     public static void logout() {

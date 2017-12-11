@@ -7,6 +7,7 @@ import com.gionee.wms.entity.SalesOrder;
 import com.gionee.wms.entity.SalesOrderGoods;
 import com.gionee.wms.vo.OrderStatusVo;
 import com.gionee.wms.vo.SalesOrderVo;
+import com.gionee.wms.vo.SapPostData;
 
 @BatisDao
 public interface SalesOrderDao {
@@ -147,4 +148,6 @@ public interface SalesOrderDao {
 	void updateOrderGoods(SalesOrderGoods salesOrderGoods);
 	
 	SalesOrderGoods queryGoodsById(Long id);
+
+	List<SapPostData> sapPostDataQuery();
 }

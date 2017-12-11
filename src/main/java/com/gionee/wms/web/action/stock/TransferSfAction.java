@@ -19,6 +19,7 @@ import com.gionee.wms.service.wares.WaresService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
 import com.gionee.wms.web.action.CrudActionSupport;
 import com.google.common.collect.Maps;
+import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -37,8 +38,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 顺丰分仓调货
+ * 顺丰调货
+ * @author rcw
  */
+@Data
 @Controller("TransferSfAction")
 @Scope("prototype")
 public class TransferSfAction extends CrudActionSupport<Transfer> {
@@ -60,18 +63,18 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
     @Autowired
     private QimenBusinessService qimenBusinessService;
 
-    /**
-     * 页面相关属性 *
-     */
     private List<Transfer> transferList;
     private Long transferId;
-    private Integer selectEnabled;// 是否允许页面select可用
-    private Boolean editEnabled;// 是否允许页面数据编辑
+    /** 是否允许页面select可用 */
+    private Integer selectEnabled;
+    /** 是否允许页面数据编辑 */
+    private Boolean editEnabled;
     private Transfer transfer;
     private Boolean editGoods;
     private String exports;
     private String skuCode;
-    private List<Warehouse> warehouseList;// 仓库列表
+    /** 仓库列表 */
+    private List<Warehouse> warehouseList;
     private Page page = new Page();
     private TransferGoods goods;
     private Long id;
@@ -80,48 +83,22 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
     private String barCodeImgPath;
     private Long warehouseId;
     private String indivCode;
-    private Integer waresStatus;// 商品良次品状态
+    /** 商品良次品状态 */
+    private Integer waresStatus;
     private String[] indivCodes;
     private String[] skuCodes;
     private Integer[] waresStatuss;
     private Integer[] indivEnableds;
-    private List<TransferPartner> transferPartnerList;// 调拨合作伙伴列表
-    private Date createTimeBegin;// 开始时间
-    private Date createTimeEnd;// 结束时间
-    private Date shippingTimeBegin;// 开始时间
-    private Date shippingTimeEnd;// 结束时间
-
-    public String getExports() {
-        return exports;
-    }
-
-    public void setExports(String exports) {
-        this.exports = exports;
-    }
-
-    public Boolean getEditGoods() {
-        return editGoods;
-    }
-
-    public void setEditGoods(Boolean editGoods) {
-        this.editGoods = editGoods;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSkuCode() {
-        return skuCode;
-    }
-
-    public void setSkuCode(String skuCode) {
-        this.skuCode = skuCode;
-    }
+    /** 调拨合作伙伴列表 */
+    private List<TransferPartner> transferPartnerList;
+    /** 开始时间 */
+    private Date createTimeBegin;
+    /** 结束时间 */
+    private Date createTimeEnd;
+    /** 开始时间 */
+    private Date shippingTimeBegin;
+    /** 结束时间 */
+    private Date shippingTimeEnd;
 
     /**
      * 查询调拨单列表
@@ -558,26 +535,19 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
 
     @Override
     public Transfer getModel() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void prepareInput() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void prepareUpdate() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void prepareAdd() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     public Page getPage() {
@@ -587,192 +557,5 @@ public class TransferSfAction extends CrudActionSupport<Transfer> {
         return page;
     }
 
-    public void setPage(Page page) {
-        this.page = page;
-    }
 
-    public List<Transfer> getTransferList() {
-        return transferList;
-    }
-
-    public void setTransferList(List<Transfer> transferList) {
-        this.transferList = transferList;
-    }
-
-    public Long getTransferId() {
-        return transferId;
-    }
-
-    public void setTransferId(Long transferId) {
-        this.transferId = transferId;
-    }
-
-    public Integer getSelectEnabled() {
-        return selectEnabled;
-    }
-
-    public void setSelectEnabled(Integer selectEnabled) {
-        this.selectEnabled = selectEnabled;
-    }
-
-    public Boolean getEditEnabled() {
-        return editEnabled;
-    }
-
-    public void setEditEnabled(Boolean editEnabled) {
-        this.editEnabled = editEnabled;
-    }
-
-    public Transfer getTransfer() {
-        return transfer;
-    }
-
-    public void setTransfer(Transfer transfer) {
-        this.transfer = transfer;
-    }
-
-    public List<Warehouse> getWarehouseList() {
-        return warehouseList;
-    }
-
-    public void setWarehouseList(List<Warehouse> warehouseList) {
-        this.warehouseList = warehouseList;
-    }
-
-    public TransferGoods getGoods() {
-        return goods;
-    }
-
-    public void setGoods(TransferGoods goods) {
-        this.goods = goods;
-    }
-
-    public List<TransferGoods> getGoodsList() {
-        return goodsList;
-    }
-
-    public void setGoodsList(List<TransferGoods> goodsList) {
-        this.goodsList = goodsList;
-    }
-
-    public Long getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Long goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getBarCodeImgPath() {
-        return barCodeImgPath;
-    }
-
-    public void setBarCodeImgPath(String barCodeImgPath) {
-        this.barCodeImgPath = barCodeImgPath;
-    }
-
-    public Long getWarehouseId() {
-        return warehouseId;
-    }
-
-    public void setWarehouseId(Long warehouseId) {
-        this.warehouseId = warehouseId;
-    }
-
-    public String getIndivCode() {
-        return indivCode;
-    }
-
-    public void setIndivCode(String indivCode) {
-        this.indivCode = indivCode;
-    }
-
-    public Integer getWaresStatus() {
-        return waresStatus;
-    }
-
-    public void setWaresStatus(Integer waresStatus) {
-        this.waresStatus = waresStatus;
-    }
-
-    public String[] getIndivCodes() {
-        return indivCodes;
-    }
-
-    public void setIndivCodes(String[] indivCodes) {
-        this.indivCodes = indivCodes;
-    }
-
-    public String[] getSkuCodes() {
-        return skuCodes;
-    }
-
-    public void setSkuCodes(String[] skuCodes) {
-        this.skuCodes = skuCodes;
-    }
-
-    public Integer[] getWaresStatuss() {
-        return waresStatuss;
-    }
-
-    public void setWaresStatuss(Integer[] waresStatuss) {
-        this.waresStatuss = waresStatuss;
-    }
-
-    public Integer[] getIndivEnableds() {
-        return indivEnableds;
-    }
-
-    public void setIndivEnableds(Integer[] indivEnableds) {
-        this.indivEnableds = indivEnableds;
-    }
-
-    public List<TransferPartner> getTransferPartnerList() {
-        return transferPartnerList;
-    }
-
-    public void setTransferPartnerList(List<TransferPartner> transferPartnerList) {
-        this.transferPartnerList = transferPartnerList;
-    }
-
-    public Date getCreateTimeBegin() {
-        return createTimeBegin;
-    }
-
-    public void setCreateTimeBegin(Date createTimeBegin) {
-        this.createTimeBegin = createTimeBegin;
-    }
-
-    public Date getCreateTimeEnd() {
-        return createTimeEnd;
-    }
-
-    public void setCreateTimeEnd(Date createTimeEnd) {
-        this.createTimeEnd = createTimeEnd;
-    }
-
-    public Date getShippingTimeBegin() {
-        return shippingTimeBegin;
-    }
-
-    public void setShippingTimeBegin(Date shippingTimeBegin) {
-        this.shippingTimeBegin = shippingTimeBegin;
-    }
-
-    public Date getShippingTimeEnd() {
-        return shippingTimeEnd;
-    }
-
-    public void setShippingTimeEnd(Date shippingTimeEnd) {
-        this.shippingTimeEnd = shippingTimeEnd;
-    }
-
-    public QimenBusinessService getQimenBusinessService() {
-
-        return qimenBusinessService;
-    }
-
-    public void setQimenBusinessService(QimenBusinessService qimenBusinessService) {
-        this.qimenBusinessService = qimenBusinessService;
-    }
 }

@@ -76,7 +76,7 @@ public class ChBuilder implements EInvoiceBuildService {
         modelMap.put("XHF_DH", EInvoiceConfig.E_XHF_DH); // 销货方电话
         modelMap.put("GHFMC", order.getConsignee()); // 购货方名称，即发票抬头 购货方为“ 个人” 时，可输入名称，输入名称是为“个人(名称)”，”（”为半角；例 个人(王杰)
         modelMap.put("GHF_SJ", order.getMobile()); // 购货方手机
-        modelMap.put("GHFQYLX", "01"); // 购货方企业类型（03 个人）
+        modelMap.put("GHFQYLX", "03"); // 购货方企业类型（03 个人）
         modelMap.put("KPY", EInvoiceConfig.E_KPY); // 开票员
         modelMap.put("SKY", EInvoiceConfig.E_SKY); // 收款员
         modelMap.put("FHR", EInvoiceConfig.E_FHR); // 复核人

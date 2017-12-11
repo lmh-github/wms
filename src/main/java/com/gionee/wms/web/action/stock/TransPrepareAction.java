@@ -120,7 +120,7 @@ public class TransPrepareAction extends TransPrepareBaseAction {
         if (!CollectionUtils.isEmpty(indivs) && !CollectionUtils.isEmpty(goodsList)) {
             for (TransferGoods transferGoods : goodsList) {
                 if (transferGoods.getSkuCode().equals(indivs.get(0).getSkuCode())
-                    && WmsConstants.ENABLED_TRUE == transferGoods.getIndivEnabled()) {
+                    && transferGoods.getSkuCode().startsWith("1")) {
                     // 申请数量必须大于等于包装箱中个体数量
                     Integer quantity = transferGoods.getQuantity();
 
@@ -181,7 +181,6 @@ public class TransPrepareAction extends TransPrepareBaseAction {
 
     /**
      * 确认调拨
-     *
      * @return
      * @throws Exception
      */

@@ -64,7 +64,7 @@ sfCode${bspSourceMap.sfCode!}<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transi
                     </tr>
                     <tr>
                         <td>月结账号：7693255199</td>
-                        <td>声明价值：<br>保价费用：</td>
+                        <td>声明价值：${(order.invoiceAmount?if_exists)?string("#.##")}<br>保价费用：</td>
                         <td><span style="visibility: hidden">运费：元</span></td>
                     </tr>
                     <tr style="display: none;">

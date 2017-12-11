@@ -750,7 +750,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateBatchByResponses(List<WmsRealTimeInventoryBalanceQueryResponse> responses, Map<String, String> skuMapping) {
         if (!CollectionUtils.isEmpty(responses)) {
             List<Stock> stocks = Lists.newArrayList();

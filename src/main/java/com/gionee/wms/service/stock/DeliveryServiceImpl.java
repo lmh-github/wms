@@ -14,6 +14,7 @@ import com.gionee.wms.service.basis.ShippingService;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.common.CommonServiceImpl;
 import com.gionee.wms.service.stat.OrderStatService;
+import com.gionee.wms.vo.DeliveryDetails;
 import com.gionee.wms.vo.SalesOrderVo;
 import com.gionee.wms.web.client.OrderCenterClient;
 import com.google.common.collect.Lists;
@@ -959,6 +960,18 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
     @Override
     public void addDelivery(Map<String, Object> params) {
         deliveryDao.addDelivery(params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<DeliveryDetails> queryDeliveryDetailsList(Map<String, Object> params) {
+        return deliveryDao.queryDeliveryDetailsList(params);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Integer queryDeliveryDetailsCount(Map<String, Object> params) {
+        return deliveryDao.queryDeliveryDetailsCount(params);
     }
 
 }

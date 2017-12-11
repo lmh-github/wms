@@ -191,3 +191,72 @@ body, #splitBar { background:#e5edef;}
 
 
 
+@media screen and (-webkit-min-device-pixel-ratio:0){
+    input[type="checkbox"],
+    input[type="radio"] {
+        position: relative;
+        -webkit-appearance: none;
+        -webkit-user-select: none;
+        background-image: -webkit-linear-gradient(#EDEDED, #EDEDED 38%, #DEDEDE);
+        border: 1px solid rgba(0, 0, 0, 0.35);
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.75);
+        margin: 0 1px 0 0;
+    }
+
+    input[type='checkbox'] {
+        bottom: 2px;
+        height: 15px;
+        vertical-align: middle;
+        width: 15px;
+    }
+    input[type='checkbox']:checked::before {
+        position: absolute;
+        left: 3px;
+        top: 6px;
+        content: '';
+        height: 2px;
+        background-color: #666;
+        width: 72%;
+        -webkit-transform: rotate(120deg);
+    }
+    input[type='checkbox']:checked::after {
+        position: absolute;
+        left: 2px;
+        top: 8px;
+        content: '';
+        height: 2px;
+        width: 4px;
+        background-color: #666;
+        -webkit-transform: rotate(-150deg);
+    }
+    input[type='checkbox']:disabled {
+        border: 1px solid rgba(0, 0, 0, 0.10);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+    }
+
+    input[type="radio"]{
+        border-radius: 100%;
+        bottom: 3px;
+        height: 15px;
+        vertical-align: middle;
+        width: 15px;
+    }
+    input[type='radio']:checked::before {
+        background-color: #377bcb;
+        border-radius: 100%;
+        bottom: 3px;
+        content: '';
+        display: block;
+        left: 3px;
+        position: absolute;
+        right: 3px;
+        top: 3px;
+    }
+    input[type='checkbox']:active,
+    input[type='radio']:active {
+        background-image: -webkit-linear-gradient(#fcfcfc, #f8f8f8 38%, #e7e7e7);
+        box-shadow: none;
+        text-shadow: none;
+    }
+}

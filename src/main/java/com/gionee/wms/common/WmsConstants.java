@@ -638,7 +638,15 @@ public class WmsConstants {
         /**
          * 牧申贸易
          */
-        MSMY("25","牧申贸易");
+        MSMY("25","牧申贸易"),
+        /**
+         *达旭升
+         */
+        DXS("26","达旭升"),
+        /**
+         * 普天精诚
+         */
+        PTJC("27","普天精诚");
 
         private final String code;
         private final String name;
@@ -782,7 +790,15 @@ public class WmsConstants {
         /**
          * 牧申贸易
          */
-        MSMY("25","牧申贸易");
+        MSMY("25","牧申贸易"),
+        /**
+         *达旭升
+         */
+        DXS("26","达旭升"),
+        /**
+         * 普天精诚
+         */
+        PTJC("27","普天精诚");
 
         private final String code;
         private final String name;

@@ -91,7 +91,7 @@ public class DockSfServiceImpl implements DockSfService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public DockSFResponse dock(String sailOrderPushInfoXML) {
         WmsSailOrderPushInfo sailOrderPushInfo = JaxbUtil.unmarshToObjBinding(WmsSailOrderPushInfo.class, sailOrderPushInfoXML);
         if (sailOrderPushInfo == null) {

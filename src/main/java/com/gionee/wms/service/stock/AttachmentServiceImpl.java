@@ -17,7 +17,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage add(Attachment attachment) {
         if (attachment == null) {
             return new ServiceCtrlMessage(false, "没有要保存的信息！");
@@ -29,7 +29,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage invalid(Long id) {
         Attachment attachment = attachmentDao.get(id);
         attachment.setStatus("无效");

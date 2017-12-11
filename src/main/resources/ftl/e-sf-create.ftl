@@ -29,6 +29,7 @@
     </#if>
     <#if order.paymentType==2>
         <AddedService name="COD" value="${(order.payableAmount?if_exists)?string}" value1="7693255199"></AddedService></#if>
+        <AddedService name="INSURE" value="${(order.payableAmount?if_exists)?string}"></AddedService>
     </Order>
     </Body>
 </Request>

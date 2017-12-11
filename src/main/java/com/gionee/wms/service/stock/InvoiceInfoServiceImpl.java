@@ -1,6 +1,7 @@
 package com.gionee.wms.service.stock;
 
 import com.gionee.wms.common.ActionUtils;
+import com.gionee.wms.common.ApplicationContextHelper;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.EInvoiceStatus;
 import com.gionee.wms.common.WmsConstants.OrderSourceGionee;
@@ -41,13 +42,11 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
     @Autowired
     private InvoiceInfoDao invoiceInfoDao;
     @Autowired
-    private EInvoiceService eInvoiceService;
-    @Autowired
     private IDGenerator idGenerator;
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int saveOrUpdate(InvoiceInfo invoiceInfo, boolean exclude) {
         if (invoiceInfo == null) {
             return 0;
@@ -68,7 +67,7 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int saveByOrder(SalesOrder order) {
         // 只有官网和天猫订单开票
         if (!WmsConstants.OrderSource.OFFICIAL_GIONEE.getCode().equals(order.getOrderSource()) && !WmsConstants.OrderSource.TMALL_GIONEE.getCode().equals(order.getOrderSource())) {
@@ -98,7 +97,7 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ServiceCtrlMessage cancelOrder(String idOrCode) {
         InvoiceInfo invoiceInfo = invoiceInfoDao.get(idOrCode);
         if (invoiceInfo == null) {
@@ -114,7 +113,7 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
 
             return new ServiceCtrlMessage(true, "操作成功！");
         } else {
-            return eInvoiceService.invalidEIvoice(invoiceInfo.getOrderCode(), false);
+            return ApplicationContextHelper.getBean(EInvoiceService.class).invalidEIvoice(invoiceInfo.getOrderCode(), false);
         }
     }
 
@@ -201,7 +200,7 @@ public class InvoiceInfoServiceImpl implements InvoiceInfoService {
 
     /** {@inheritDoc} */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean successZInvoice(String idOrCode) {
         InvoiceInfo invoiceInfo = invoiceInfoDao.get(idOrCode);
         if (invoiceInfo != null) {

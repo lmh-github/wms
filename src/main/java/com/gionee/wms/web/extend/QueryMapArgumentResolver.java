@@ -67,8 +67,8 @@ public class QueryMapArgumentResolver implements HandlerMethodArgumentResolver {
                     ret.put(key.substring(0, key.length() - 2), Float.parseFloat(value));
                 } else if (key.endsWith("l")) {
                     ret.put(key.substring(0, key.length() - 2), Long.parseLong(value));
-                } else if (key.endsWith("_d")) {
-                    ret.put(key.substring(0, key.length() - 2), dateFormat.parse(value));
+                } else if (key.endsWith("_dt")) {
+                    ret.put(key.substring(0, key.length() - 3), dateFormat.parse(value));
                 } else if (key.endsWith("_t")) {
                     ret.put(key.substring(0, key.length() - 2), timeFormat.parse(value));
                 } else {

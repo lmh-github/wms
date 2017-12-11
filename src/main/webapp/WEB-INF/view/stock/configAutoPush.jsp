@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@taglib prefix="s" uri="/struts-tags"%>
 <jsp:useBean id="now" class="java.util.Date" />
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
@@ -14,7 +15,9 @@
       <dl>
         <dt>自动推送：</dt>
         <dd>
+            <shiro:hasPermission name="order:order_push">
           <label for="auto_push_sf_radio_0"><input id="auto_push_sf_radio_0" type="radio" name="config.value" value="true" ${config.value == 'true' ? 'checked' : '' } />开</label>
+            </shiro:hasPermission>
           <label for="auto_push_sf_radio_1"><input id="auto_push_sf_radio_1" type="radio" name="config.value" value="false" ${config.value == 'false' ? 'checked' : '' } />关</label>
         </dd>
       </dl>

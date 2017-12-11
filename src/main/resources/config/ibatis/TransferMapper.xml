@@ -494,7 +494,6 @@
 			<if test="status != null">t1.status=#{status},</if>
 			<if test="orderPushStatus != null">t1.order_push_status=#{orderPushStatus},</if>
 			<if test="orderConfirmStatus != null">t1.order_confirm_status=#{orderConfirmStatus},</if>
-			t1.create_time=sysdate,
 			<if test="handledBy != null">t1.handled_by=#{handledBy},</if>
 			<if test="consignee != null">t1.consignee=#{consignee},</if>
 			<if test="contact != null">t1.contact=#{contact},</if>

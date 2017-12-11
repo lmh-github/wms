@@ -44,7 +44,9 @@ public class OrderManagerImpl implements OrderManager {
     public static final long ACCESS_VALID_TIME_OFFSET = 300000L; // 访问有效期,设为5分钟
     private static Logger logger = LoggerFactory.getLogger(OrderManagerImpl.class);
     private JsonUtils jsonUtils = new JsonUtils(Inclusion.ALWAYS);
+    @Autowired
     private SalesOrderService salesOrderService;
+    @Autowired
     private ShippingService shippingService;
     @Autowired
     private BackService backService;
@@ -501,15 +503,4 @@ public class OrderManagerImpl implements OrderManager {
         }
         return WmsCodeEnum.SUCCESS;
     }
-
-    @Autowired
-    public void setSalesOrderService(SalesOrderService salesOrderService) {
-        this.salesOrderService = salesOrderService;
-    }
-
-    @Autowired
-    public void setShippingService(ShippingService shippingService) {
-        this.shippingService = shippingService;
-    }
-
 }

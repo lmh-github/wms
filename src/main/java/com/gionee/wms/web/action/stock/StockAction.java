@@ -25,6 +25,7 @@ import com.sf.integration.warehouse.request.WmsRealTimeInventoryBalanceQueryRequ
 import com.sf.integration.warehouse.response.WmsInventoryBalancePageQueryResponse;
 import com.sf.integration.warehouse.response.WmsInventoryBalancePageQueryResponseItem;
 import com.sf.integration.warehouse.response.WmsRealTimeInventoryBalanceQueryResponse;
+import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
@@ -46,35 +47,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author xxx
+ */
+@Data
 @Controller("StockAction")
 @Scope("prototype")
 public class StockAction extends CrudActionSupport<Stock> {
 
     private static final long serialVersionUID = -8940733721506429911L;
 
+    @Autowired
     private WarehouseService warehouseService;
+    @Autowired
     private CategoryService categoryService;
+    @Autowired
     private StockService stockService;
+    @Autowired
     private WaresService waresService;
-
     @Autowired
     private SFWebService sfWebService;
-
     @Autowired
     private SkuMapService skuMapService;
 
-    /**
-     * 页面相关属性
-     **/
-    private List<Stock> stockList; // 库存列表
+
+    /** 库存列表 */
+    private List<Stock> stockList;
     private Long warehouseId;
     private Long skuId;
-    private Stock stock;// 库存model
-    private String catPath;// 商品分类
-    private Long id;// 库存ID
+    /** 库存model */
+    private Stock stock;
+    /** 商品分类 */
+    private String catPath;
+    /** 库存ID */
+    private Long id;
     private String skuCode;
     private String skuName;
-    private List<Category> categoryList;// 商品分类
+    /** 商品分类 */
+    private List<Category> categoryList;
     private List<Warehouse> warehouseList;
     private Page page = new Page();
     private String exports;
@@ -144,8 +154,6 @@ public class StockAction extends CrudActionSupport<Stock> {
         OutputStream out = null;
         try {
             String templeteFile = ActionUtils.getProjectPath() + "/export/stock_exp_template.xls";
-            // String tempFile = ActionUtils.getClassPath() +
-            // "config/excel/order_info_list.xls";
             String tempFile = ActionUtils.getProjectPath() + "/export/stock_exp_list.xls";
             System.out.println(templeteFile + " " + tempFile);
             File file = ExcelExpUtil.expExcel(excelModule, templeteFile, tempFile);
@@ -174,14 +182,14 @@ public class StockAction extends CrudActionSupport<Stock> {
     }
 
     @Override
-    public void prepareList() throws Exception {
+    public void prepareList() {
         // 初始化属性对象
         categoryList = categoryService.getCategoryList(null);
 
         warehouseList = warehouseService.getValidWarehouses();
     }
 
-    public String getSkuInfo() throws Exception {
+    public String getSkuInfo() {
         Validate.notNull(skuCode);
         Sku sku = waresService.getSkuByCode(skuCode);
         JsonUtils jsonUtils = new JsonUtils(Inclusion.ALWAYS);
@@ -192,11 +200,11 @@ public class StockAction extends CrudActionSupport<Stock> {
     /**
      * 进入安全库存设置页面
      */
-    public String inputLimit() throws Exception {
+    public String inputLimit() {
         return "input_limit";
     }
 
-    public void prepareInputLimit() throws Exception {
+    public void prepareInputLimit() {
         Validate.notNull(id);
         // 初始化Model对象
         stock = stockService.getStock(id);
@@ -205,7 +213,7 @@ public class StockAction extends CrudActionSupport<Stock> {
     /**
      * 更新安全库存
      */
-    public String updateLimit() throws Exception {
+    public String updateLimit() {
         Validate.notNull(stock);
         if (stock.getLimitLower() == null) {
             stock.setLimitLower(-1);
@@ -223,7 +231,7 @@ public class StockAction extends CrudActionSupport<Stock> {
         return null;
     }
 
-    public void prepareUpdateLimit() throws Exception {
+    public void prepareUpdateLimit() {
         Validate.notNull(id);
         // 初始化Model对象
         stock = stockService.getStock(id);
@@ -234,15 +242,6 @@ public class StockAction extends CrudActionSupport<Stock> {
      */
     @Override
     public String input() throws Exception {
-        // // 初始化商品属性信息
-        // if (stock.getWares().getId() != null) {
-        // waresAttrInfo =
-        // waresService.getWaresWithAttrInfo(sku.getWares().getId());
-        // }
-        // // 如果为编辑操作，需要判断数据是否允许编辑
-        // if (id != null) {
-        // editEnabled = CollectionUtils.isEmpty(stockService.getStockList(id));
-        // }
         return INPUT;
     }
 
@@ -251,43 +250,6 @@ public class StockAction extends CrudActionSupport<Stock> {
      */
     @Override
     public String add() throws Exception {
-        // if (CollectionUtils.isNotEmpty(itemIdList)) {
-        // for (Integer itemId : itemIdList) {
-        // if (itemId == null) {
-        // logger.error("添加SKU时出错：属性值不能为空");
-        // ajaxError("添加SKU失败：属性值不能为空");
-        // return null;
-        // }
-        // }
-        // // sku.setItemIds(StringUtils.join(itemIdList, ","));
-        // sku.setItemIds(Joiner.on(",").skipNulls().join(itemIdList));
-        // } else {
-        // sku.setItemIds("");
-        // }
-        // try {
-        // if(waresService.indivCodeEnabled(stock.getSku().getId())){
-        // if(CollectionUtils.isNotEmpty(indivList)){
-        // Iterator<Indiv> indivItr = indivList.iterator();
-        // while(indivItr.hasNext()){
-        // Indiv indiv = indivItr.next();
-        // if(indiv!=null){
-        // indiv.setWaresStatus(stockType);
-        // }else{
-        // indivItr.remove();
-        // }
-        // }
-        // }else{
-        // logger.warn("添加库存信息时未绑定商品身份码");
-        // }
-        //
-        // }
-        // stockService.addStockWithIndiv(stock,
-        // indivList,StockType.valueOf(stockType));
-        // ajaxSuccess("库存信息添加成功");
-        // } catch (ServiceException e) {
-        // logger.error(e.getMessage(), e);
-        // ajaxError("库存信息添加失败：" + e.getMessage());
-        // }
         return null;
     }
 
@@ -296,16 +258,6 @@ public class StockAction extends CrudActionSupport<Stock> {
      */
     @Override
     public String update() throws Exception {
-        // if (!accountService.isPermitted(PermissionConstants.CAT_EDIT)) {
-        // throw new AccessException();
-        // }
-        // try {
-        // waresService.updateSku(sku);
-        // ajaxSuccess("SKU编辑成功");
-        // } catch (ServiceException e) {
-        // logger.error("SKU编辑时出错", e);
-        // ajaxError("SKU编辑失败：" + e.getMessage());
-        // }
         return null;
     }
 
@@ -314,60 +266,34 @@ public class StockAction extends CrudActionSupport<Stock> {
      */
     @Override
     public String delete() throws Exception {
-        // if (!accountService.isPermitted(PermissionConstants.CAT_DELETE)) {
-        // throw new AccessException();
-        // }
-        // try {
-        // waresService.deleteSku(id);
-        // ajaxSuccess("SKU删除成功");
-        // } catch (ServiceException e) {
-        // logger.error("SKU删除时出错", e);
-        // ajaxError("SKU删除失败：" + e.getMessage());
-        // }
         return null;
     }
 
-    // 为add方法准备数据
     @Override
     public void prepareAdd() throws Exception {
         stock = new Stock();
     }
 
-    // 为input方法准备数据
     @Override
     public void prepareInput() throws Exception {
-        // 初始化Model对象
-
         // 初始化仓库列表
         warehouseList = warehouseService.getValidWarehouses();
 
     }
 
-    // 为update方法准备数据
+
     @Override
     public void prepareUpdate() throws Exception {
         prepareModel();
     }
 
-    private void prepareModel() throws Exception {
-        // if (id != null) {
-        // sku = waresService.getSku(id);
-        // } else {
-        // sku = new Sku();
-        // }
-
+    private void prepareModel() {
     }
 
-    // ModelDriven接口方法
+
     @Override
     public Stock getModel() {
-        // if (sku == null) {
-        // sku = new Sku();
-        // Wares wares = new Wares();
-        // Category cat = new Category();
-        // wares.setCategory(cat);
-        // sku.setWares(wares);
-        // }
+
         return stock;
     }
 
@@ -401,13 +327,17 @@ public class StockAction extends CrudActionSupport<Stock> {
     }
 
 
-    // 刷新所有顺丰仓库存
+    /**
+     * 刷新所有顺丰仓库存
+     * @return
+     */
     public String refresh() {
         Map<String, Object> criteria = Maps.newHashMap();
         criteria.put("sfWarehouseName", "顺丰");
         List<Warehouse> warehouses = warehouseService.getWarehouseList(criteria);
         if (!CollectionUtils.isEmpty(warehouses)) {
-            Map<String, String> skuMapping = Maps.newHashMap(); // 查询商品映射
+            // 查询商品映射
+            Map<String, String> skuMapping = Maps.newHashMap();
             List<WmsRealTimeInventoryBalanceQueryRequest> requests = Lists.newArrayList();
             for (Warehouse warehouse : warehouses) {
                 List<String> itemIds = Lists.newArrayList();
@@ -440,7 +370,11 @@ public class StockAction extends CrudActionSupport<Stock> {
         return "refresh";
     }
 
-    // 顺丰接口仅支持每次20条数据查询 为此拆分成多个WmsRealTimeInventoryBalanceQueryRequest对象
+    /**
+     * 顺丰接口仅支持每次20条数据查询 为此拆分成多个WmsRealTimeInventoryBalanceQueryRequest对象
+     * @param request
+     * @return
+     */
     private List<WmsRealTimeInventoryBalanceQueryRequest> split(WmsRealTimeInventoryBalanceQueryRequest request) {
         List<WmsRealTimeInventoryBalanceQueryRequest> list = new ArrayList<>();
         List<String> tmpSkuList = Lists.newArrayList();
@@ -477,7 +411,6 @@ public class StockAction extends CrudActionSupport<Stock> {
 
     /**
      * 根据SKU查询顺丰实时库存
-     *
      * @return String
      */
     public String queryRealTimeInvBalance() {
@@ -503,14 +436,6 @@ public class StockAction extends CrudActionSupport<Stock> {
             }
 
             context.put("inv_response", response.getList().get(0));
-            // List<WmsRealTimeInventoryBalanceQueryResponseItem> list = Lists.newArrayList();
-            // WmsRealTimeInventoryBalanceQueryResponseItem item = new WmsRealTimeInventoryBalanceQueryResponseItem();
-            // item.setTotal_stock(50d);
-            // item.setOn_hand_stock(100d);
-            // item.setAvailable_stock(150d);
-            // item.setIn_transit_stock(30d);
-            // list.add(item);
-            // response.setList(list);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("库存查询中，查询顺丰实时库存异常！", e);
@@ -522,7 +447,6 @@ public class StockAction extends CrudActionSupport<Stock> {
 
     /**
      * 根据SKU查询顺丰非实时库存
-     *
      * @return String
      */
     public String queryInvBalance() {
@@ -536,8 +460,10 @@ public class StockAction extends CrudActionSupport<Stock> {
             }
 
             WmsInventoryBalancePageQueryRequest request = new WmsInventoryBalancePageQueryRequest();
-            request.setCompany(WmsConstants.SF_COMPANY); // 货主
-            request.setWarehouse(WmsConstants.SF_WAREHOUSE); // 仓库
+            // 货主
+            request.setCompany(WmsConstants.SF_COMPANY);
+            // 仓库
+            request.setWarehouse(WmsConstants.SF_WAREHOUSE);
             request.setItem(skuMap.getOuterSkuCode());
 
             WmsInventoryBalancePageQueryResponse response = sfWebService.outsideToLscmService(WmsInventoryBalancePageQueryRequest.class, WmsInventoryBalancePageQueryResponse.class, request);
@@ -547,7 +473,8 @@ public class StockAction extends CrudActionSupport<Stock> {
                 return "sf_inv_list";
             }
 
-            WmsInventoryBalancePageQueryResponseItem item = response.getList().get(0); // 默认取第一个商品
+            // 默认取第一个商品
+            WmsInventoryBalancePageQueryResponseItem item = response.getList().get(0);
             context.put("inv_qty", item.getOn_hand_qty());
             return "sf_inv_list";
 
@@ -559,90 +486,5 @@ public class StockAction extends CrudActionSupport<Stock> {
         }
     }
 
-    // -- 供页面传值 --
-
-    public void setSkuCode(String skuCode) {
-        this.skuCode = skuCode;
-    }
-
-    public Long getWarehouseId() {
-        return warehouseId;
-    }
-
-    public void setWarehouseId(Long warehouseId) {
-        this.warehouseId = warehouseId;
-    }
-
-    public String getSkuCode() {
-        return skuCode;
-    }
-
-    public String getCatPath() {
-        return catPath;
-    }
-
-    public void setCatPath(String catPath) {
-        this.catPath = catPath;
-    }
-
-    public String getSkuName() {
-        return skuName;
-    }
-
-    public void setSkuName(String skuName) {
-        this.skuName = skuName;
-    }
-
-    public List<Stock> getStockList() {
-        return stockList;
-    }
-
-    // --供页面取值--
-    public Page getPage() {
-        if (page == null) {
-            page = new Page();
-        }
-        return page;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Category> getCategoryList() {
-        return categoryList;
-    }
-
-    public List getWarehouseList() {
-        return warehouseList;
-    }
-
-    @Autowired
-    public void setCategoryService(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
-    @Autowired
-    public void setStockService(StockService stockService) {
-        this.stockService = stockService;
-    }
-
-    @Autowired
-    public void setWarehouseService(WarehouseService warehouseService) {
-        this.warehouseService = warehouseService;
-    }
-
-    @Autowired
-    public void setWaresService(WaresService waresService) {
-        this.waresService = waresService;
-    }
-
-    public String getExports() {
-        return exports;
-    }
-
-    public void setExports(String exports) {
-        this.exports = exports;
-    }
 
 }

@@ -4,6 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="s" uri="/struts-tags"%>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<s:set value="@java.lang.Math@random().toString().substring(2, 10)" name="rand"/>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <form id="pagerForm" method="post" action="#rel#">
 	<input type="hidden" name="page.currentPage" value="1" />
@@ -172,10 +173,8 @@
 			<li><a class="edit" href="${ctx}/stock/salesOrder!input.action?id={sid_order}" target="dialog" rel="dlg_orderInput" mask="true" width="1024" height="768" warn="请选择销售订单"><span>查看/修改订单</span></a></li>
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!inputShippingInfo.action?id={sid_order}" target="dialog" rel="dlg_shippingInput" mask="true" width="600" height="600" warn="请选择销售订单"><span>编辑物流</span></a></li>
-            <shiro:hasPermission name="order:order_push">
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!toConfigAutoPush.action" target="dialog" rel="dlg_configInput" mask="true" width="400" height="200" warn="自动推送配置"><span>自动推送配置</span></a></li>
-            </shiro:hasPermission>
             <shiro:hasPermission name="order:stock_push_check">
 			<li class="line">line</li>
 			<li><a class="edit" href="${ctx}/stock/salesOrder!toConfigPushCheck.action" target="dialog" rel="dlg_configInput" mask="true" width="400" height="200" warn="推送库存校验配置"><span>推送库存校验配置</span></a></li>
@@ -243,7 +242,7 @@
 				<td>
 					<s:if test="@com.gionee.wms.common.WmsConstants@WMS_COMPANY==1">
 					<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@RECEIVED.code">
-						<a target="dialog" mask="true" width="800" height="600" href="${ctx}/stock/rmaRecv!inputInit.action?orderId=${id }"><span>退货</span></a>	
+						<a target="dialog" mask="true" width="810" height="600" href="${ctx}/stock/rmaRecv!inputInit.action?orderId=${id }"><span>退货</span></a>
 					</s:if>
 					</s:if>
 					<%-- <s:if test="orderStatus!=@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code && orderStatus!=@com.gionee.wms.common.WmsConstants$OrderStatus@CANCELED.code
@@ -260,7 +259,7 @@
                       <a target="ajaxTodo" title="确定要取消${orderCode }的订单吗?" href="${ctx }/stock/salesOrder!cancelOrder.action?orderCode=${orderCode }"><span>取消</span></a>
                     </s:if>
 					<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@REFUSEING.code">
-						<a target="dialog" mask="true" width="800" height="600" href="${ctx}/stock/rmaRecv!inputRefuse.action?orderId=${id }"><span>拒收</span></a>	
+						<a target="dialog" mask="true" width="800" height="600" href="${ctx}/stock/rmaRecv!inputRefuse.action?orderId=${id }"><span>拒收</span></a>
 					</s:if>                    
                     <s:if test="shippingName == '顺丰速运' && orderStatus == @com.gionee.wms.common.WmsConstants$OrderStatus@FILTERED.code && (orderPushStatus == null || orderPushStatus == @com.gionee.wms.common.WmsConstants$OrderPushStatusEnum@UN_PUSHED.code)">
                       &nbsp;|&nbsp;<a target="ajaxTodo" title="&lt;b style='color:red;font-size:14px;'&gt;推送前请仔细检查下订单的发票金额！&lt;/b&gt;" href="${ctx }/stock/salesOrder!pushToSF.action?id=${id}"><span>顺丰发货</span></a>
