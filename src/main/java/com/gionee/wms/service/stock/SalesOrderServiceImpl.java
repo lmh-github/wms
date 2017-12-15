@@ -1437,7 +1437,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
                 list.get(i).setHandledBy(ActionUtils.getLoginName());
                 list.get(i).setHandledTime(new Date());
                 list.get(i).setOrderStatus(OrderStatus.FILTERED.getCode());
-                list.get(i).setOrderCode(prefix + OrderCodeUtils.generateRadix());
+                list.get(i).setOrderCode(StringUtils.defaultString(list.get(i).getOrderCode(), prefix + OrderCodeUtils.generateRadix()));
                 list.get(i).setDeliveryCode(list.get(i).getOrderCode() + "01"); // 添加初始化一个发货流水号
 
                 if (salesOrders.size() == 0) {

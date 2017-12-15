@@ -436,9 +436,9 @@ public class ReceiveServiceImpl extends CommonServiceImpl implements ReceiveServ
         }
 
         // 已出库、已签收订单可以退货
-        if (Arrays.asList(OrderStatus.SHIPPED.getCode(), OrderStatus.RECEIVED.getCode())
+        if (Arrays.asList(OrderStatus.SHIPPED.getCode(), OrderStatus.RECEIVED.getCode(), OrderStatus.BACKED.getCode())
             .indexOf(salesOrder.getOrderStatus()) == -1) {
-            throw new ServiceException("销售订单状态必须为【已出库】或者【已签收】状态！");
+            throw new ServiceException("销售订单状态必须为【已出库】【已签收】【已退货】状态！");
         }
 
         // ---创建退货入库单---//

@@ -241,7 +241,8 @@
 				<td>${remarkBacked}</td>
 				<td>
 					<s:if test="@com.gionee.wms.common.WmsConstants@WMS_COMPANY==1">
-					<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@RECEIVED.code">
+					<s:if test="orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@SHIPPED.code || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@RECEIVED.code
+                            || orderStatus==@com.gionee.wms.common.WmsConstants$OrderStatus@BACKED.code">
 						<a target="dialog" mask="true" width="810" height="600" href="${ctx}/stock/rmaRecv!inputInit.action?orderId=${id }"><span>退货</span></a>
 					</s:if>
 					</s:if>

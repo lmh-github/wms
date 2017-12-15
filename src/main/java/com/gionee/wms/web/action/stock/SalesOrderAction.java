@@ -1295,6 +1295,7 @@ public class SalesOrderAction extends CrudActionSupport<SalesOrder> implements P
         mapping.put("8", "array,goodsList,skuName");
         mapping.put("9", "array,goodsList,unitPrice");
         mapping.put("10", "array,goodsList,quantity");
+        mapping.put("13", "orderCode");
         File destFile = new File(ServletActionContext.getServletContext().getRealPath("/upload/" + fileFileName));
         FileUtils.copyFile(file, destFile);
 
