@@ -163,6 +163,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         WmsPurchaseOrderRequest request = new WmsPurchaseOrderRequest();
         WmsPurchaseOrderRequestHeader header = new WmsPurchaseOrderRequestHeader();
 
+        transfer = transferDao.getTransferById(transfer.getTransferId());
         Warehouse warehouse = warehouseService.getWarehouse(Long.valueOf(transfer.getTransferTo()));
         String warehouseCode = warehouse.getWarehouseCode();
 
@@ -263,7 +264,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                     return new ServiceCtrlMessage(false, String.format("箱【%s】中数量【%s】必须大于或等于SKU【%s】的待配货数量！", sv, indivs.size(), transferGoods.getSkuCode()));
                 }
                 addIndivs(transferId, transferId.toString(), indivs);
-                updateTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("goodsId", transferGoods.getId()).put("preparedNum", ++preparedNum).getMap());
+                updateTransferGoods(LinkMapUtils.<String, Object>newHashMap().put("goodsId", transferGoods.getId()).put("preparedNum", preparedNum + indivs.size()).getMap());
                 return new ServiceCtrlMessage(true, "配货成功！");
             }
 

@@ -1,6 +1,8 @@
 package com.gionee.wms.web.controller;
 
+import com.gionee.wms.common.ActionUtils;
 import com.gionee.wms.common.JsonUtils;
+import com.gionee.wms.common.OneBarcodeUtil;
 import com.gionee.wms.common.excel.ExcelUtil;
 import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
@@ -409,6 +411,28 @@ public class TransferController {
 
         List<Indiv> indivList = transferService.getIndivList(transferId);
         modelMap.put("indivList", indivList);
+    }
+
+    /**
+     * 打印
+     * @param modelMap
+     * @param transferId
+     * @return
+     */
+    @RequestMapping({"/print.do"})
+    public String print(ModelMap modelMap, Long transferId) {
+        Transfer transfer = this.transferService.getTransferById(transferId);
+        List<TransferGoods> goodsList = this.transferService.getTransferGoodsById(transferId);
+        modelMap.put("transfer", transfer);
+        modelMap.put("goodsList", goodsList);
+        String barCodePath = ActionUtils.getProjectPath() + "/barCodeTransferTemp/";
+        String fileName = OneBarcodeUtil.generateBar(String.valueOf(transferId), barCodePath);
+        if (fileName != null) {
+            String barCodeImgPath = "/barCodeTransferTemp/" + fileName;
+            modelMap.put("barCodeImgPath", barCodeImgPath);
+        }
+
+        return "transfer/printTransfer";
     }
 
 }

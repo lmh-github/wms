@@ -646,7 +646,11 @@ public class WmsConstants {
         /**
          * 普天精诚
          */
-        PTJC("27","普天精诚");
+        PTJC("27","普天精诚"),
+        /**
+         * 苏州谷鹿
+         */
+        SZGL("28","苏州谷鹿");
 
         private final String code;
         private final String name;
@@ -798,7 +802,11 @@ public class WmsConstants {
         /**
          * 普天精诚
          */
-        PTJC("27","普天精诚");
+        PTJC("27","普天精诚"),
+        /**
+         * 苏州谷鹿
+         */
+        SZGL("28","苏州谷鹿");
 
         private final String code;
         private final String name;
