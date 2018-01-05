@@ -36,7 +36,7 @@ public class ChBuilder implements EInvoiceBuildService {
         BigDecimal hjxmje = new BigDecimal(0); // 合计项目金额
         BigDecimal hjse = new BigDecimal(0); // 合计税额
         for (SalesOrderGoods g : goods) {
-            if (g.getUnitPrice().doubleValue() <= 20) { // 小于20块钱的物品不开发票
+            if (g.getUnitPrice().doubleValue() == 0) { // 不为0的物品都开发票
                 continue;
             }
             BigDecimal xmje = g.getUnitPrice().multiply(new BigDecimal(g.getQuantity())).setScale(2, ROUND_DOWN);
