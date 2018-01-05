@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="FacetManager">
-    <facet type="web" name="Web">
-      <configuration>
-        <descriptors>
-          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/web.xml" />
-        </descriptors>
-        <webroots>
-          <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
-        </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/src/main/java" />
-          <root url="file://$MODULE_DIR$/src/main/resources" />
-        </sourceRoots>
-      </configuration>
-    </facet>
-    <facet type="Spring" name="Spring">
-      <configuration />
-    </facet>
-  </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -40,7 +21,7 @@
     <orderEntry type="library" name="Maven: javassist:javassist:3.11.0.GA" level="project" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.struts:struts2-spring-plugin:2.3.14.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:3.0-alpha-1" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:jstl:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:3.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
@@ -85,6 +66,10 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-log4j12:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi:3.5-FINAL" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.5-FINAL" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:ooxml-schemas:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.3.0" level="project" />
+    <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.jdom:jdom2:2.0.5" level="project" />
     <orderEntry type="library" name="Maven: net.sf.json-lib:json-lib:jdk15:2.4" level="project" />
     <orderEntry type="library" name="Maven: net.sf.ezmorph:ezmorph:1.0.6" level="project" />
@@ -132,5 +117,7 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.directwebremoting:dwr:3.0.0-RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.18" level="project" />
   </component>
 </module>
