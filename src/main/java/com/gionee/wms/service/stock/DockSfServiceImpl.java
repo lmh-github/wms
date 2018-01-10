@@ -5,15 +5,18 @@ import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.dao.IndivDao;
 import com.gionee.wms.dao.SalesOrderDao;
+import com.gionee.wms.dao.SalesOrderImeiDao;
 import com.gionee.wms.dao.SalesOrderPushInfoDao;
 import com.gionee.wms.entity.*;
 import com.gionee.wms.service.log.SalesOrderLogService;
+import com.gionee.wms.vo.UpdDestJsonRequestVo;
 import com.google.common.collect.Lists;
 import com.sf.integration.warehouse.request.WmsSailOrderPushInfo;
 import com.sf.integration.warehouse.request.WmsSailOrderPushInfoContainerItem;
 import com.sf.integration.warehouse.request.WmsSailOrderPushInfoHeader;
 import com.sf.integration.warehouse.response.DockSFResponse;
 import org.apache.commons.collections.CollectionUtils;
+import org.omg.CORBA.OBJ_ADAPTER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +91,11 @@ public class DockSfServiceImpl implements DockSfService {
     private SalesOrderDao salesOrderDao;
     @Autowired
     private IndivDao indivDao;
+    @Autowired
+    private SalesOrderImeiDao salesOrderImeiDao;
+    @Autowired
+    private UpdDestJsonService updDestJsonService;
+
 
     /** {@inheritDoc} */
     @Override
@@ -175,10 +183,44 @@ public class DockSfServiceImpl implements DockSfService {
                 // 其他电商平台
                 orderService.notifyTOP(Lists.newArrayList(salesOrder));
             }
+
+            //同步IMEI码到第三方系统
+            updDestJsonService.sendIMEI(fillUpdDestJsonParam(salesOrder));
         }
 
         return new DockSFResponse(true, "成功！");
     }
+
+    /**
+     * 查询订单，填充接口参数需要的IMEI和FullAddress
+     * @param salesOrder
+     * @return
+     */
+    private UpdDestJsonRequestVo fillUpdDestJsonParam(SalesOrder salesOrder){
+        UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();;
+        List<SalesOrderImei> salesOrderImeis = queryImeis(salesOrder);
+        for (SalesOrderImei order:salesOrderImeis) {
+            vo.put(order.getImei(),salesOrder.getFullAddress());
+        }
+        return vo;
+    }
+
+    /**
+     * 根据 order_code 查询所有的 Imei
+     * @param salesOrder
+     * @return
+     */
+    private  List<SalesOrderImei> queryImeis(SalesOrder salesOrder){
+        if(salesOrder.getOrderCode()!=null){
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("order_code", salesOrder.getOrderCode());
+            List<SalesOrderImei> salesOrderImeis = salesOrderImeiDao.queryImeis(params);
+            return salesOrderImeis;
+        }
+        return null;
+    }
+
+
 
     /**
      * 记录操作日志

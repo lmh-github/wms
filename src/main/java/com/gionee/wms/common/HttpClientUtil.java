@@ -5,6 +5,7 @@
  */
 package com.gionee.wms.common;
 
+import com.gionee.wms.vo.UpdDestJsonRequestVo;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -15,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -161,6 +163,32 @@ public class HttpClientUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
 
+        } finally {
+            // 关闭连接 ,释放资源
+            // client.getConnectionManager().shutdown();
+        }
+        return result;
+    }
+
+    //TODO  http post请求传递json数据类型
+    public static String httpPostWithJson(String url, String jsonParam) throws ClientProtocolException, IOException {
+
+        HttpClient client = HttpClients.createDefault();
+        HttpPost post = new HttpPost(url);
+        StringEntity param = new StringEntity(jsonParam,"utf-8");//解决中文乱码问题
+        param.setContentEncoding("UTF-8");
+        param.setContentType("application/json");
+        post.setEntity(param);
+        String result = null;
+        try {
+            HttpResponse res = client.execute(post);
+            if (res.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                HttpEntity entity = res.getEntity();
+                result = EntityUtils.toString(entity, "UTF-8");
+                // System.out.println(result);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             // 关闭连接 ,释放资源
             // client.getConnectionManager().shutdown();

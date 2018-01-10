@@ -119,5 +119,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: org.directwebremoting:dwr:3.0.0-RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.16.18" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="tomcat" level="project" />
   </component>
 </module>

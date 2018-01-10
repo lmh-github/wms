@@ -5,6 +5,7 @@ import com.gionee.wms.common.DateConvert;
 import com.gionee.wms.common.LinkMapUtils;
 import com.gionee.wms.common.WmsConstants;
 import com.gionee.wms.common.WmsConstants.*;
+import com.gionee.wms.common.constant.Consts;
 import com.gionee.wms.dao.IndivDao;
 import com.gionee.wms.dao.StatDao;
 import com.gionee.wms.dao.TransferDao;
@@ -20,6 +21,7 @@ import com.gionee.wms.service.common.CommonServiceImpl;
 import com.gionee.wms.service.log.LogService;
 import com.gionee.wms.service.wares.SkuMapService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
+import com.gionee.wms.vo.UpdDestJsonRequestVo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -72,6 +74,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     private SFWebService sfWebService;
     @Autowired
     private LogService logService;
+    @Autowired
+    private UpdDestJsonService updDestJsonService;
 
     @Override
     public int getTransferListTotal(Map<String, Object> criteria) {
@@ -342,9 +346,27 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                 stockService.increaseStock(stockRequest, false);
             }
         }
+        // 同步IMEI码到第三方系统
+        updDestJsonService.sendIMEI(fillUpdDestJsonParam(transfer));
 
         return new ServiceCtrlMessage(true, "发货成功！");
     }
+
+    /**
+     * 封装IMEI和Address数据
+     * @param transfer
+     * @return
+     */
+    private UpdDestJsonRequestVo fillUpdDestJsonParam(Transfer transfer){
+        UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();;
+        List<Indiv> indivList = getIndivList(transfer.getTransferId());
+        for (Indiv indiv:indivList) {
+            vo.put(indiv.getIndivCode(),transfer.getTransferTo());
+        }
+        return vo;
+    }
+
+
 
     /**
      * 顺丰
@@ -872,6 +894,21 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
                 stockService.increaseStock(stockRequest);
             }
         }
+
+        // 发送IMEI退货信息，destName标记为 **退货**
+        updDestJsonService.sendIMEI(fillUpdDestJsonParam(indivCodes));
+    }
+
+    /**
+     * 查询订单，填充接口参数需要的IMEI和FullAddress
+     * @return
+     */
+    private UpdDestJsonRequestVo fillUpdDestJsonParam(String[] indivCodes){
+        UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();
+        for(String indivcode:indivCodes){
+            vo.put(indivcode, Consts.BACK_DEST_NAME_DEFAULT);
+        }
+        return vo;
     }
 
     /**

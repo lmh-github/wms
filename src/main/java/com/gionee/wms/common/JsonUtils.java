@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Kevin
  * @ClassName: JsonUtils
- * @Description: TODO(这里用一句话描述这个类的作用)
+ * @Description:
  * @date 2011-8-1 下午04:52:38
  */
 public class JsonUtils {

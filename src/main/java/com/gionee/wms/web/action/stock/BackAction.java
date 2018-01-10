@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.gionee.wms.common.constant.Consts;
+import com.gionee.wms.service.stock.UpdDestJsonService;
+import com.gionee.wms.vo.UpdDestJsonRequestVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -56,6 +59,8 @@ public class BackAction extends CrudActionSupport<Transfer> {
 	private SalesOrderService salesOrderService;
 	@Autowired
 	private IndivService indivService;
+    @Autowired
+    private UpdDestJsonService updDestJsonService;
 
 	/** 页面相关属性 **/
 	private List<Back> backList;
@@ -286,6 +291,14 @@ public class BackAction extends CrudActionSupport<Transfer> {
 			salesOrderService.notifyOrder(Lists.newArrayList(order), params);
 			logger.info("BackAction--handledBack--end");
 			ajaxSuccess("处理退货成功");
+
+            // 发送IMEI退货信息到第三方
+            UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();
+            for (Indiv indiv : list) {
+                vo.put(indiv.getIndivCode(), Consts.BACK_DEST_NAME_DEFAULT);
+            }
+            updDestJsonService.sendIMEI(vo);
+
 		} catch (Exception e) {
 			logger.error("处理退货时出错", e);
 			ajaxError("处理退货单失败：" + e.getMessage());
