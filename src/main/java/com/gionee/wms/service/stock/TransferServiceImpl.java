@@ -347,26 +347,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             }
         }
         // 同步IMEI码到第三方系统
-        updDestJsonService.sendIMEI(fillUpdDestJsonParam(transfer));
+        updDestJsonService.sendIMEI(transfer);
 
         return new ServiceCtrlMessage(true, "发货成功！");
     }
-
-    /**
-     * 封装IMEI和Address数据
-     * @param transfer
-     * @return
-     */
-    private UpdDestJsonRequestVo fillUpdDestJsonParam(Transfer transfer){
-        UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();;
-        List<Indiv> indivList = getIndivList(transfer.getTransferId());
-        for (Indiv indiv:indivList) {
-            vo.put(indiv.getIndivCode(),transfer.getTransferTo());
-        }
-        return vo;
-    }
-
-
 
     /**
      * 顺丰
@@ -896,19 +880,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         }
 
         // 发送IMEI退货信息，destName标记为 **退货**
-        updDestJsonService.sendIMEI(fillUpdDestJsonParam(indivCodes));
-    }
-
-    /**
-     * 查询订单，填充接口参数需要的IMEI和FullAddress
-     * @return
-     */
-    private UpdDestJsonRequestVo fillUpdDestJsonParam(String[] indivCodes){
-        UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();
-        for(String indivcode:indivCodes){
-            vo.put(indivcode, Consts.BACK_DEST_NAME_DEFAULT);
-        }
-        return vo;
+        updDestJsonService.sendIMEI(indivCodes);
     }
 
     /**

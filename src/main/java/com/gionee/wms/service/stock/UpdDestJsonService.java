@@ -1,6 +1,11 @@
 package com.gionee.wms.service.stock;
 
+import com.gionee.wms.entity.Indiv;
+import com.gionee.wms.entity.SalesOrder;
+import com.gionee.wms.entity.Transfer;
 import com.gionee.wms.vo.UpdDestJsonRequestVo;
+
+import java.util.List;
 
 /**
  * 发送出库的IMEI到第三方业务
@@ -9,5 +14,33 @@ import com.gionee.wms.vo.UpdDestJsonRequestVo;
  */
 public interface UpdDestJsonService {
 
+    /**
+     * 发送IMEI和地址信息到第三方
+     * @param vo
+     */
     void sendIMEI(UpdDestJsonRequestVo vo);
+
+    /**
+     * 销售单退货发送IMEI
+     * @param indivs
+     */
+    void sendIMEI(List<Indiv> indivs);
+
+    /**
+     * 销售单出库发送IMEI
+     * @param salesOrder
+     */
+    void sendIMEI(SalesOrder salesOrder);
+
+    /**
+     * 调货出库发送IMEI
+     * @param transfer
+     */
+    void sendIMEI( Transfer transfer);
+
+    /**
+     * 调货退货发送IMEI
+     * @param indivCodes
+     */
+    void sendIMEI(String[] indivCodes);
 }

@@ -21,7 +21,7 @@ public class UpdDestJsonRequestVo {
     }
 
     public void put(String imei, String destName){
-        IMEIAndAddress imeiAndAddress = new IMEIAndAddress(destName, imei);
+        IMEIAndAddress imeiAndAddress = new IMEIAndAddress(imei, destName);
         arr.add(imeiAndAddress);
     }
 }

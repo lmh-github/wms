@@ -9,6 +9,7 @@ import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.Page;
 import com.gionee.wms.dto.QueryMap;
 import com.gionee.wms.entity.*;
+import com.gionee.wms.service.ServiceException;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
@@ -394,9 +395,12 @@ public class TransferController {
     public Object dispatch(Long transferId, String logisticNo, @PathVariable("type") String type) {
         try {
             return transferService.dispatch(transferId, logisticNo, type);
-        } catch (Exception e) {
+        }catch ( ServiceException e) {
             logger.error(e.getMessage(), e);
-            return new ServiceCtrlMessage<>(false, "操作出现异常！");
+            return new ServiceCtrlMessage<>(false, e.getMessage());
+        }catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return new ServiceCtrlMessage<>(false, "操作出现异常");
         }
     }
 

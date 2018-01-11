@@ -293,11 +293,7 @@ public class BackAction extends CrudActionSupport<Transfer> {
 			ajaxSuccess("处理退货成功");
 
             // 发送IMEI退货信息到第三方
-            UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();
-            for (Indiv indiv : list) {
-                vo.put(indiv.getIndivCode(), Consts.BACK_DEST_NAME_DEFAULT);
-            }
-            updDestJsonService.sendIMEI(vo);
+            updDestJsonService.sendIMEI(list);
 
 		} catch (Exception e) {
 			logger.error("处理退货时出错", e);

@@ -4,12 +4,13 @@ import com.gionee.wms.common.HttpClientUtil;
 import com.gionee.wms.common.JsonUtils;
 import com.gionee.wms.common.constant.Consts;
 import com.gionee.wms.vo.UpdDestJsonRequestVo;
+import com.gionee.wms.vo.UpdDestJsonResponseVo;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 /**
- *
+ * 调用UpdDestJson接口，发送IMEI任务
  * Created by lmh on 2018/1/11.
  */
 public class UpdDestJsonTimerSchedule extends TimerSchedule{
@@ -32,7 +33,6 @@ public class UpdDestJsonTimerSchedule extends TimerSchedule{
     @Override
     public void task() {
         send();
-//        setRunFlag(false);//停止定时任务
     }
 
     /**
@@ -42,11 +42,17 @@ public class UpdDestJsonTimerSchedule extends TimerSchedule{
         try {
             JsonUtils jsonUtils = new JsonUtils();
             String param =jsonUtils .toJson(getRequestParam());
-            LOG.info("请求参数："+param);
+            LOG.info("发送IMEI请求参数："+param);
             String res = HttpClientUtil.httpPostWithJson(Consts.URL_DATATRANSETL_UPDDESTJSON, param);
-//            UpdDestJsonResponseVo result = jsonUtils.fromJson(res, UpdDestJsonResponseVo.class);
+//            System.out.println("请求参数："+param);
 //            System.out.println(res);
             LOG.info(res);
+            UpdDestJsonResponseVo result = jsonUtils.fromJson(res, UpdDestJsonResponseVo.class);
+            if(result!=null && Consts.API_UPDDESTJSON_SUCCESS.equalsIgnoreCase(result.getErr())){
+                setRunFlag(false);//停止定时任务
+//                System.out.println("end");
+                LOG.info("发送IMEI成功，停止定时任务");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,6 +61,7 @@ public class UpdDestJsonTimerSchedule extends TimerSchedule{
     public static void main(String[] args) {
         UpdDestJsonRequestVo vo = new UpdDestJsonRequestVo();
         vo.put("123", "test");
+        vo.put("321", "test");
         new UpdDestJsonTimerSchedule(vo).schedule(0, 1000,2);
     }
 }
