@@ -57,6 +57,13 @@ public class UpdDestJsonServiceImpl  implements  UpdDestJsonService{
     }
 
     @Override
+    public void sendIMEIBat(List<SalesOrder> salesOrders) {
+        for(SalesOrder s:salesOrders){
+            sendIMEI(s);
+        }
+    }
+
+    @Override
     public void sendIMEI(Transfer transfer) {
         sendIMEI(fillTransferPollStockParam(transfer));
     }

@@ -63,6 +63,9 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
     private OrderStatService orderStatService;
     @Autowired
     private SalesOrderNodeInfoService salesOrderNodeInfoService;
+    @Autowired
+    private UpdDestJsonService updDestJsonService;
+
 
     @Override
     public void addDeliveryBatch(DeliveryBatch deliveryBatch, List<SalesOrder> orders) throws ServiceException {
@@ -338,6 +341,7 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
 
         // 通知订单中心已发货
         salesOrderService.notifyOrder(shippedOrderList);
+        updDestJsonService.sendIMEIBat(shippedOrderList);//发送IMEI收货地址信息
     }
 
     private void checkConfirm(DeliveryBatch deliveryBatch) throws ServiceException {
@@ -910,15 +914,14 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
                     paramsMap.put("opTime", nowTime);
                     paramsMap.put("remark", "更新订单为已出库状态");
                     salesOrderLogDao.batchInsertSalesOrderLog(paramsMap);
-
                     // TODO 订单节点记录
-
                 } catch (Exception e) {
                     logger.error("业务日志记录异常", e);
                 }
 
                 salesOrderService.notifyOrder(orderList);
                 orderStatService.addSalesOutStat(statList);
+                updDestJsonService.sendIMEIBat(orderList);//发送IMEI收货地址信息
 
                 //删除对应的批次信息
                 deliveryDao.deleteDeliveryByBatchCode(batchCode);

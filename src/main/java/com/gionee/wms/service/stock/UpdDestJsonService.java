@@ -33,6 +33,12 @@ public interface UpdDestJsonService {
     void sendIMEI(SalesOrder salesOrder);
 
     /**
+     * 销售单批量出库发送IMEI
+     * @param salesOrders
+     */
+    void sendIMEIBat(List<SalesOrder> salesOrders);
+
+    /**
      * 调货出库发送IMEI
      * @param transfer
      */
