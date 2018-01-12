@@ -35,7 +35,8 @@ public class LogInterceptor extends AbstractInterceptor {
 	private LogService logService;
 	private static final long serialVersionUID = 1358600090729208361L;
 
-	public String intercept(ActionInvocation invocation) {
+    @Override
+	public String intercept(ActionInvocation invocation) throws Exception{
 		//System.out.println("日志拦截器已经开始启动...");
 		String fullClassName = invocation.getAction().getClass().toString();
 		String shortClassName = fullClassName.substring(fullClassName
@@ -71,13 +72,7 @@ public class LogInterceptor extends AbstractInterceptor {
 				e.printStackTrace();
 			}
 		}
-
-		try {
-			invocation.invoke();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "success";
+		return invocation.invoke();
 	}
 
 	/**
