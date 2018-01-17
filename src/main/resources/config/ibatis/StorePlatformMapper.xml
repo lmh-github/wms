@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gionee.wms.dao.StorePlatformDao" >
+  <resultMap id="BaseResultMap" type="com.gionee.wms.entity.StorePlatform" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="SKU_NO" property="skuNo" jdbcType="VARCHAR" />
+    <result column="SKU_NAME" property="skuName" jdbcType="VARCHAR" />
+    <result column="SKU_UNIT" property="skuUnit" jdbcType="VARCHAR" />
+    <result column="TOTAL_NUM" property="totalNum" jdbcType="DECIMAL" />
+    <result column="USED_NUM" property="usedNum" jdbcType="DECIMAL" />
+    <result column="UNUSED_NUM" property="unusedNum" jdbcType="DECIMAL" />
+    <result column="TYPE" property="type" jdbcType="CHAR" />
+    <result column="PLATFORM_NO" property="platformNo" jdbcType="VARCHAR" />
+    <result column="PLATFORM_NAME" property="platformName" jdbcType="VARCHAR" />
+    <result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="END_TIME" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="VALIDITY" property="validity" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="CHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_BY" property="updateBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, SKU_NO, SKU_NAME, SKU_UNIT, TOTAL_NUM, USED_NUM, UNUSED_NUM, TYPE, PLATFORM_NO, 
+    PLATFORM_NAME, START_TIME, END_TIME, VALIDITY, STATUS, CREATE_BY, CREATE_DATE, UPDATE_BY, 
+    UPDATE_DATE, REMARK
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from WMS_STORE_PLATFORM
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from WMS_STORE_PLATFORM
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.gionee.wms.entity.StorePlatform" >
+    insert into WMS_STORE_PLATFORM (ID, SKU_NO, SKU_NAME, 
+      SKU_UNIT, TOTAL_NUM, USED_NUM, 
+      UNUSED_NUM, TYPE, PLATFORM_NO, 
+      PLATFORM_NAME, START_TIME, END_TIME, 
+      VALIDITY, STATUS, CREATE_BY, 
+      CREATE_DATE, UPDATE_BY, UPDATE_DATE, 
+      REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{skuNo,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, 
+      #{skuUnit,jdbcType=VARCHAR}, #{totalNum,jdbcType=DECIMAL}, #{usedNum,jdbcType=DECIMAL}, 
+      #{unusedNum,jdbcType=DECIMAL}, #{type,jdbcType=CHAR}, #{platformNo,jdbcType=VARCHAR}, 
+      #{platformName,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{validity,jdbcType=DECIMAL}, #{status,jdbcType=CHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gionee.wms.entity.StorePlatform" >
+    insert into WMS_STORE_PLATFORM
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="skuNo != null" >
+        SKU_NO,
+      </if>
+      <if test="skuName != null" >
+        SKU_NAME,
+      </if>
+      <if test="skuUnit != null" >
+        SKU_UNIT,
+      </if>
+      <if test="totalNum != null" >
+        TOTAL_NUM,
+      </if>
+      <if test="usedNum != null" >
+        USED_NUM,
+      </if>
+      <if test="unusedNum != null" >
+        UNUSED_NUM,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="platformNo != null" >
+        PLATFORM_NO,
+      </if>
+      <if test="platformName != null" >
+        PLATFORM_NAME,
+      </if>
+      <if test="startTime != null" >
+        START_TIME,
+      </if>
+      <if test="endTime != null" >
+        END_TIME,
+      </if>
+      <if test="validity != null" >
+        VALIDITY,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="createBy != null" >
+        CREATE_BY,
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE,
+      </if>
+      <if test="updateBy != null" >
+        UPDATE_BY,
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="skuNo != null" >
+        #{skuNo,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="skuUnit != null" >
+        #{skuUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="totalNum != null" >
+        #{totalNum,jdbcType=DECIMAL},
+      </if>
+      <if test="usedNum != null" >
+        #{usedNum,jdbcType=DECIMAL},
+      </if>
+      <if test="unusedNum != null" >
+        #{unusedNum,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="platformNo != null" >
+        #{platformNo,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null" >
+        #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validity != null" >
+        #{validity,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gionee.wms.entity.StorePlatform" >
+    update WMS_STORE_PLATFORM
+    <set >
+      <if test="skuNo != null" >
+        SKU_NO = #{skuNo,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        SKU_NAME = #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="skuUnit != null" >
+        SKU_UNIT = #{skuUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="totalNum != null" >
+        TOTAL_NUM = #{totalNum,jdbcType=DECIMAL},
+      </if>
+      <if test="usedNum != null" >
+        USED_NUM = #{usedNum,jdbcType=DECIMAL},
+      </if>
+      <if test="unusedNum != null" >
+        UNUSED_NUM = #{unusedNum,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=CHAR},
+      </if>
+      <if test="platformNo != null" >
+        PLATFORM_NO = #{platformNo,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null" >
+        PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        START_TIME = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        END_TIME = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validity != null" >
+        VALIDITY = #{validity,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="createBy != null" >
+        CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        UPDATE_BY = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null" >
+        UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gionee.wms.entity.StorePlatform" >
+    update WMS_STORE_PLATFORM
+    set SKU_NO = #{skuNo,jdbcType=VARCHAR},
+      SKU_NAME = #{skuName,jdbcType=VARCHAR},
+      SKU_UNIT = #{skuUnit,jdbcType=VARCHAR},
+      TOTAL_NUM = #{totalNum,jdbcType=DECIMAL},
+      USED_NUM = #{usedNum,jdbcType=DECIMAL},
+      UNUSED_NUM = #{unusedNum,jdbcType=DECIMAL},
+      TYPE = #{type,jdbcType=CHAR},
+      PLATFORM_NO = #{platformNo,jdbcType=VARCHAR},
+      PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      START_TIME = #{startTime,jdbcType=TIMESTAMP},
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+      VALIDITY = #{validity,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=CHAR},
+      CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      UPDATE_BY = #{updateBy,jdbcType=VARCHAR},
+      UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+    <select id="getAll" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from WMS_STORE_PLATFORM
+        <where>
+            <if test="skuNo != null" >
+                AND SKU_NO = #{skuNo,jdbcType=VARCHAR}
+            </if>
+            <if test="skuName != null" >
+                AND  SKU_NAME = #{skuName,jdbcType=VARCHAR}
+            </if>
+            <if test="totalNum != null" >
+                AND    TOTAL_NUM = #{totalNum,jdbcType=DECIMAL}
+            </if>
+            <if test="usedNum != null" >
+                AND   USED_NUM = #{usedNum,jdbcType=DECIMAL}
+            </if>
+            <if test="unusedNum != null" >
+                AND  UNUSED_NUM = #{unusedNum,jdbcType=DECIMAL}
+            </if>
+            <if test="type != null" >
+                AND   TYPE = #{type,jdbcType=CHAR}
+            </if>
+            <if test="platformNo != null" >
+                AND  PLATFORM_NO = #{platformNo,jdbcType=VARCHAR}
+            </if>
+            <if test="platformName != null" >
+                AND    PLATFORM_NAME = #{platformName,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null" >
+                AND  START_TIME = #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null" >
+                AND  END_TIME = #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="validity != null" >
+                AND  VALIDITY = #{validity,jdbcType=DECIMAL}
+            </if>
+            <if test="status != null" >
+                AND STATUS = #{status,jdbcType=CHAR}
+            </if>
+            <if test="createBy != null" >
+                AND  CREATE_BY = #{createBy,jdbcType=VARCHAR}
+            </if>
+            <if test="createDate != null" >
+                AND CREATE_DATE = #{createDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="updateBy != null" >
+                AND UPDATE_BY = #{updateBy,jdbcType=VARCHAR}
+            </if>
+            <if test="updateDate != null" >
+                AND  UPDATE_DATE = #{updateDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="remark != null" >
+                AND  REMARK = #{remark,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="getFirst" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from WMS_STORE_PLATFORM
+        <where>
+            SKU_NO = #{skuNo,jdbcType=VARCHAR}
+            AND  PLATFORM_NO = #{platformNo,jdbcType=VARCHAR}
+            AND rownum=1
+        </where>
+
+    </select>
+</mapper>

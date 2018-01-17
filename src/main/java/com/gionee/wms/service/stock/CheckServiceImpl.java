@@ -282,7 +282,7 @@ public class CheckServiceImpl extends CommonServiceImpl implements CheckService 
 			checkDao.updateCheck(check);
 
 			// 更新各SKU的库存盘点盈亏数据
-			// stockDao.updateStockCheckInfoByCheckId(check.getId());
+//			 stockDao.updateStockCheckInfoByCheckId(check.getId());
 		} catch (DataAccessException e) {
 			throw new ServiceException(e);
 		}

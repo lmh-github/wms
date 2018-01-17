@@ -643,6 +643,20 @@
 	</select>
 
     <insert id="insertBatch" parameterType="java.util.List">
+        insert into wms_transfer(id, warehouse_id, transfer_to, remark, logistic_no,
+        create_time, handled_by, consignee, contact,order_amount, trans_type,order_push_status)
+        select A.* from
+        (
+        <foreach collection="list" item="item" index="index" separator="UNION ALL">
+            select
+            #{item.transferId}, #{item.warehouseId, jdbcType=VARCHAR}, #{item.transferTo, jdbcType=VARCHAR},
+            #{item.remark, jdbcType=VARCHAR}, #{item.logisticNo, jdbcType=VARCHAR}, sysdate, #{item.handledBy, jdbcType=VARCHAR},
+            #{item.consignee, jdbcType=VARCHAR}, #{item.contact, jdbcType=VARCHAR},
+            #{item.orderAmount}, #{item.transType, jdbcType=VARCHAR},#{item.orderPushStatus,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )A
+        <!--
         insert into wms_transfer(id,TRANSFER_TO,create_time,CONSIGNEE, contact,order_amount, flow_type,warehouse_id,REMARK)
         select A.* from
         (
@@ -659,7 +673,7 @@
                 #{item.remark, jdbcType=VARCHAR}
                 from dual
             </foreach>
-        )A
+        )A-->
     </insert>
 
 

@@ -365,7 +365,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
      */
     @Override
     public void addTransferSf(Transfer transfer) {
-        // TODO Auto-generated method stub
         transfer.setTransferId(Long.valueOf(getBizCode(TRANSFER)));
         transfer.setOrderPushStatus("0");
         transferDao.addTransferSf(transfer);
@@ -381,7 +380,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
     @Override
     public Transfer getTransferById(Long transferId) {
-        // TODO Auto-generated method stub
         return transferDao.getTransferById(transferId);
     }
 
@@ -398,7 +396,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
     @Override
     public void addTransfer(Transfer transfer) {
-        // TODO Auto-generated method stub
+        transfer.setHandledBy(ActionUtils.getLoginName());
         transfer.setTransferId(Long.valueOf(getBizCode(TRANSFER)));
         transfer.setFlowType("待审核");
         transferDao.addTransfer(transfer);
@@ -406,7 +404,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
     @Override
     public void updateTransfer(Transfer transfer) {
-        // TODO Auto-generated method stub
         transferDao.updateTransfer(transfer);
     }
 
@@ -958,13 +955,20 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         List<Transfer> transferList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(transfers)) {
             Map<String, Long> warehouseMap = getWarehouseMap(warehouseService.getWarehouseList(null));
+            String loginName = ActionUtils.getLoginName();
+            String orderPushStatus = type == null?null:"0";//type=1 表示顺丰调拨单，orderPushStatus必须设置值，否则会在"调货-->调拨单"中重复出现
+            String flowType = type ==null?"待审核":null;
+            int transType = 0;
+            long warehouse = 1643L;
             for (int i = 0; i < transfers.size(); i++) {
                 Transfer transfer = transfers.get(i);
-                transfer.setFlowType("待审核");
-                transfer.setWarehouseId(1643L);
+                transfer.setFlowType(flowType);
+                transfer.setWarehouseId(warehouse);
+                transfer.setHandledBy(loginName);
+                transfer.setOrderPushStatus(orderPushStatus);
+                transfer.setTransType(transType);
                 TransferGoods transferGoods = transfer.getGoodsList().get(0);
                 Sku sku = waresDao.querySkuBySkuCode(transferGoods.getSkuCode());
-
                 if (null != type && type == 1) {
                     // 转换分仓收货仓
                     Long transferTo = warehouseMap.get(transfer.getTransferTo().replaceAll("\\s", ""));

@@ -8,8 +8,10 @@ import com.gionee.wms.common.excel.excelexport.module.ExcelModule;
 import com.gionee.wms.common.excel.excelexport.userinterface.ExcelExpUtil;
 import com.gionee.wms.dto.Page;
 import com.gionee.wms.dto.QueryMap;
+import com.gionee.wms.dto.ShiroUser;
 import com.gionee.wms.entity.*;
 import com.gionee.wms.service.ServiceException;
+import com.gionee.wms.service.account.AccountService;
 import com.gionee.wms.service.basis.WarehouseService;
 import com.gionee.wms.service.stock.TransferService;
 import com.gionee.wms.vo.ServiceCtrlMessage;
@@ -55,6 +57,8 @@ public class TransferController {
     private TransferService transferService;
     @Autowired
     private WarehouseService warehouseService;
+    @Autowired
+    private AccountService accountService;
 
     /**
      * 列表查询
