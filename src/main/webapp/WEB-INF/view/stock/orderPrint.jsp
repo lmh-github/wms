@@ -346,8 +346,8 @@ function doPrint(orderIdStr, type) {
                         LODOP.ADD_PRINT_HTM(0, 0, "100%", "100%", matchs[2]);
                         LODOP.ADD_PRINT_BARCODE("18mm", "11mm", "63mm", "15mm", "128A", matchs[1]);
                         LODOP.ADD_PRINT_BARCODE("128mm", "45mm", "63mm", "15mm", "128A", matchs[1]);
-                        LODOP.PRINT();
-                        //LODOP.PREVIEW();
+                        // LODOP.PRINT();
+                        LODOP.PREVIEW();
 
                     } else {
                         alert(html);

@@ -326,4 +326,21 @@
         </where>
 
     </select>
+
+    <select id="getSku" parameterType="java.lang.String" resultType="com.gionee.wms.entity.Sku" >
+        select id,wares_id waresId,sku_name skuName,sku_code skuCode,sku_barcode skuBarcode from wms_sku where SKU_CODE = #{skuNo}
+    </select>
+
+    <select id="selectSkuByKey" parameterType="java.lang.String" resultType="com.gionee.wms.entity.Sku" >
+        select id,wares_id waresId,sku_name skuName,sku_code skuCode,sku_barcode skuBarcode from wms_sku where id = #{id}
+    </select>
+
+    <select id="getTotalUseStoreBySku" parameterType="com.gionee.wms.entity.StorePlatform" resultType="int" >
+        select NVL(sum(TOTAL_NUM),0) from WMS_STORE_PLATFORM where SKU_NO = #{skuNo,jdbcType=VARCHAR}
+
+    </select>
+
+    <select id="getPlatformStoreBySku" parameterType="com.gionee.wms.entity.StorePlatform" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from WMS_STORE_PLATFORM where SKU_NO = #{skuNo,jdbcType=VARCHAR} and PLATFORM_NO = #{platformNo,jdbcType=VARCHAR}
+    </select>
 </mapper>

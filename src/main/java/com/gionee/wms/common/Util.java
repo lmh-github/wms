@@ -42,6 +42,21 @@ public class Util {
 		return str;
 	}
 
+    /**
+     * 根据编号获取订单来源名称
+     * @param code
+     * @return
+     */
+    public static String getNameByCode(String code){
+        WmsConstants.OrderSource[] values = WmsConstants.OrderSource.values();
+        for(WmsConstants.OrderSource os: values){
+            if(os.getCode().equals(code)){
+                return os.getName();
+            }
+        }
+        return null;
+    }
+
 	public static void main(String[] args) {
 		String xml = loadFile(args[0]);
 		String checkword = loadFile(args[1]);

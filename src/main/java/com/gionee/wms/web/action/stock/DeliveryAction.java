@@ -106,7 +106,7 @@ public class DeliveryAction extends AjaxActionSupport implements Preparable {
 
     public String listForBatchSearch() throws Exception {
         Validate.notNull(batchId);
-        // 初始化页面数据
+        //        // 初始化页面数据
         shippingList = shippingService.getValidShippings();
         deliveryBatch = deliveryService.getDeliveryBatch(batchId);
 

@@ -65,6 +65,9 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
     private SalesOrderNodeInfoService salesOrderNodeInfoService;
     @Autowired
     private UpdDestJsonService updDestJsonService;
+    @Autowired
+    private StorePlatformService storePlatformService;
+
 
 
     @Override
@@ -219,6 +222,38 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
     }
 
     /**
+     * 平台库存处理
+     * @param orderIds
+     * @throws Exception
+     */
+    private void storePlatformHandle(String[] orderIds) throws Exception {
+        List<SalesOrderVo> orderVoList = orderDao.queryOrderListByOrderIds(orderIds);
+        for (SalesOrderVo salesOrderVo : orderVoList) {
+            List<SalesOrderGoods> goods = salesOrderVo.getGoodsList();    // 商品列表
+            Map<Long, Integer> sumSkuMap = new HashMap<Long, Integer>();    // 记录本批订单中出货每个sku的总量
+            for (SalesOrderGoods salesOrderGoods : goods) {
+                Long skuId = salesOrderGoods.getSkuId();
+                Integer quantity = salesOrderGoods.getQuantity();
+                Integer quanInSum = sumSkuMap.get(skuId);    // 某skuId下的总量
+                if (null == quanInSum) {
+                    sumSkuMap.put(skuId, quantity);    // 设置skuId起始值
+                } else {
+                    quanInSum = quanInSum + quantity;    // 累加该skuId的数量
+                    sumSkuMap.put(skuId, quanInSum);
+                }
+
+
+            }
+            for (Iterator<Long> iterator = sumSkuMap.keySet().iterator(); iterator.hasNext(); ) {
+                Long skuId = iterator.next();
+                Integer quantity = sumSkuMap.get(skuId);
+                // 平台库存扣减
+                storePlatformService.afterOutStoreHandle(skuId.toString(), salesOrderVo.getOrderSource(), quantity);
+            }
+        }
+    }
+
+    /**
      * 确认发货
      */
     @Override
@@ -258,9 +293,12 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
             criteria.put("batchId", deliveryBatch.getId());
             List<SalesOrder> orderList = orderDao.queryOrderList(paramsMap);
             if (CollectionUtils.isNotEmpty(orderList)) {
+                String[] oIds = new String[orderList.size()];
                 List<Long> orderIds = new ArrayList<Long>();
+                int count =0;
                 for (SalesOrder order : orderList) {
                     orderIds.add(order.getId());
+                    oIds[count++] = order.getId().toString();
                 }
 
                 //批量保存操作日志
@@ -272,6 +310,8 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
                     paramsMap2.put("opTime", new Date());
                     paramsMap2.put("remark", "更新订单为已出库状态");
                     salesOrderLogDao.batchInsertSalesOrderLog(paramsMap2);
+                    //相对应的平台库存扣减
+                    storePlatformHandle(oIds);
                 } catch (Exception e) {
                     logger.error("业务日志记录异常", e);
                 }
@@ -298,6 +338,8 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
             for (DeliverySummary summary : goodsSummaryList) {
                 StockRequest stockRequest = new StockRequest(summary.getWarehouseId(), summary.getSkuId(), StockType.STOCK_SALES, summary.getQuantity(), StockBizType.OUT_SALES, deliveryBatch.getBatchCode());
                 stockService.decreaseStock(stockRequest);
+
+                //TODO 库存平台库存
             }
             // 获得所有配送方式
             List<Shipping> validShippings = shippingService.getValidShippings();
@@ -870,6 +912,8 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
                     Integer quantity = sumSkuMap.get(skuId);
                     StockRequest stockRequest = new StockRequest(warehouseId, skuId, StockType.STOCK_OCCUPY, quantity, StockBizType.OUT_SALES, salesOrderVo.getOrderCode());
                     stockService.decreaseStock(stockRequest);
+                    // 平台库存扣减
+                    storePlatformService.afterOutStoreHandle(skuId.toString(),salesOrderVo.getOrderSource(),quantity);
                 }
 
                 if (null != salesOrderVo.getShippingNo() && !"".equals(salesOrderVo.getShippingNo())) {
@@ -922,7 +966,6 @@ public class DeliveryServiceImpl extends CommonServiceImpl implements DeliverySe
                 salesOrderService.notifyOrder(orderList);
                 orderStatService.addSalesOutStat(statList);
                 updDestJsonService.sendIMEIBat(orderList);//发送IMEI收货地址信息
-
                 //删除对应的批次信息
                 deliveryDao.deleteDeliveryByBatchCode(batchCode);
             }

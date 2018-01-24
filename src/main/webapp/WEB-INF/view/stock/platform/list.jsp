@@ -12,39 +12,39 @@
     <div class="pageContent">
         <div class="pageFormContent" layoutH="97">
             <fieldset>
-                <legend>基本信息</legend>
-                <dl class="nowrap">
-                    <dt>SKU编号：</dt>
-                    <dd>111111</dd>
+                <legend>库存信息</legend>
+                <dl>
+                    <dt>SKU：</dt>
+                    <dd>${sku.skuCode}</dd>
                 </dl>
-                <dl class="nowrap">
+                <dl >
                     <dt>SKU名称：</dt>
-                    <dd>测试</dd>
+                    <dd>${sku.skuName}</dd>
                 </dl>
-                <dl class="nowrap">
+                <dl>
                     <dt>计量单位：</dt>
-                    <dd>PC</dd>
+                    <dd>${wares.measureUnit}</dd>
                 </dl>
-                <dl class="nowrap">
+                <dl class="">
                     <dt>可销售库存：</dt>
-                    <dd>100</dd>
+                    <dd>${stock.salesQuantity}</dd>
                 </dl>
-                <dl class="nowrap">
+                <dl class="">
                     <dt>已分配库存：</dt>
-                    <dd>10</dd>
+                    <dd>${totalUseStore}</dd>
                 </dl>
-                <dl class="nowrap">
-                    <dt>剩余可分配库存：</dt>
-                    <dd>90</dd>
+                <dl class="">
+                    <dt>可分配库存：</dt>
+                    <dd>${unuseStore}</dd>
                 </dl>
             </fieldset>
             <s:set name="auditStatus" value="check.auditStatus"></s:set>
             <h3 class="contentTitle">平台库存分配列表</h3>
             <div class="panelBar">
                 <ul class="toolBar">
-                    <li><a class="icon" href="${ctx}/stock/stockCheck!inputUploadIndivGoodsList.action?id=${id}&type=${check.checkType}" rel="dlg_checkGoods" target="dialog" mask="true" width="800" height="600"><span>添加库存分配</span></a></li>
+                    <li><a class="add" href="${ctx}/store/platform/toAdd.do?skuNo=${sku.skuCode}" rel="dlg_addPlatformStore" target="dialog" mask="true" width="800" height="400"><span>添加库存分配</span></a></li>
                     <li class="line">line</li>
-                    <li><a class="icon" href="${ctx}/stock/stockCheck!inputUploadIndivGoodsList.action?id=${id}&type=${check.checkType}" rel="dlg_checkGoods" target="dialog" mask="true" width="800" height="600"><span>导出数据</span></a></li>
+                    <li><a class="icon" href="${ctx}/store/platform/export.do?skuNo=${sku.skuCode}&navTabId=tab_store_platform" target="dwzExport" targettype="navTab"><span>导出数据到excel</span></a></li>
                 </ul>
             </div>
 
@@ -63,8 +63,8 @@
                                 <th>操作</th>
                             </tr>
                             </thead>
-                            <tbody id="stockInDetailTbody">
-                            <s:iterator value="list">
+                            <tbody id="">
+                           <%-- <s:iterator value="list">
                                 <tr class="unitBox">
                                     <td>${skuCode }</td>
                                     <td>${platformNo }</td>
@@ -73,60 +73,34 @@
                                     <td>${createBy }</td>
                                     <td><fmt:formatDate value='${updateDate }'   pattern='yyyy-MM-dd' /></td>
                                     <td>
-                                        <a title="确实要删除吗？" target="ajaxTodo" href="${ctx}/stock/stockCheck!deleteGoods.action?id=${id}&navTabId=tab_checkGoods" class="btnDel"></a>
-                                        <a title="分配库存" target="navTab" rel="tab_checkItem" href="${ctx}/stock/stockCheck!listItem.action?id=${check.id}&skuCode=${skuCode}" class="btnView"></a>
+                                        <a title="删除库存分配" target="ajaxTodo" href="${ctx}/store/platform/delete.json?id=${id}&navTabId=tab_store_platform" class="btnDel"></a>
+                                        <a title="修改库存分配" target="dialog" rel="dlg_editPlatformStore" maxable="false" resizable="false" mask="true" width="600" height="500" warn="修改库存分配" href="${ctx}/store/platform/toUpdate.do?id=${id}" class="btnEdit"></a>
                                     </td>
                                 </tr>
-                            </s:iterator>
-                            <tr class="unitBox">
-                                <td>11}</td>
-                                <td>1</td>
-                                <td>金立官网</td>
-                                <td>10</td>
-                                <td>何霞</td>
-                                <td>2018-1-17</td>
-                                <td>
-                                    <a title="确认要删除吗？" target="ajaxTodo" href="${ctx}/stock/stockCheck!deleteGoods.action?id=${id}&navTabId=tab_checkGoods" class="btnDel"></a>
-                                    <a title="分配库存" target="navTab" rel="tab_checkItem" href="${ctx}/stock/stockCheck!listItem.action?id=${check.id}&skuCode=${skuCode}" class="btnView"></a>
-                                </td>
-                            </tr>
-
+                            </s:iterator>--%>
+                           <c:forEach items="${list}" var="item">
+                               <tr class="unitBox">
+                                   <td>${item.skuNo }</td>
+                                   <td>${item.platformNo }</td>
+                                   <td>${item.platformName }</td>
+                                   <td>${item.totalNum}</td>
+                                   <td>${item.createBy }</td>
+                                   <td><fmt:formatDate value='${item.updateDate }'   pattern='yyyy-MM-dd' /></td>
+                                   <td>
+                                       <a title="确认删除库存分配？" target="ajaxTodo" href="${ctx}/store/platform/delete.json?id=${item.id}&navTabId=tab_store_platform" class="btnDel"></a>
+                                       <a title="修改库存分配" target="dialog" rel="dlg_editPlatformStore" maxable="false" resizable="false" mask="true" width="800" height="400" warn="修改库存分配" href="${ctx}/store/platform/toUpdate.do?id=${item.id}" class="btnEdit"></a>
+                                   </td>
+                               </tr>
+                           </c:forEach>
                             </tbody>
                         </table>
-
                     </div>
                 </div>
                 <div class="tabsFooter">
                     <div class="tabsFooterContent"></div>
                 </div>
             </div>
-            <div class="divider"></div>
-            <div class="tabs">
-                <dl>
-                    <dt>制单人：</dt>
-                    <dt><input readonly="true" name="field5" type="text" value="测试"/></dt>
-                </dl>
-                <dl>
-                    <dt>制单日期：</dt>
-                    <dt><input readonly="true" name="field5" type="text" value="2018-1-1"/></dt>
-                </dl>
-            </div>
         </div>
-        <%--<div class="formBar">
-            <ul>
-                <s:if test="receive.handlingStatus==@com.gionee.wms.common.WmsConstants$ReceiveStatus@RECEIVING.code">
-                    <li><div class="buttonActive"><div class="buttonContent"><button type="button" onclick="purchaseInSubmit();">确认</button></div></div></li>
-                </s:if>
-                <li>
-                    <s:if test="id==null">
-                        <a class="button" target="ajaxTodo" href="${ctx}/stock/stockIn!cancel.action?stockInCode=${stockInCode}&callbackType=closeCurrent&navTabId=tab_stockIn"><span>取消</span></a>
-                    </s:if>
-                    <s:else>
-                        <div class="button"><div class="buttonContent"><button class="close" type="button">关闭</button></div></div>
-                    </s:else>
-                </li>
-            </ul>
-        </div>--%>
     </div>
 </form>
 <script>

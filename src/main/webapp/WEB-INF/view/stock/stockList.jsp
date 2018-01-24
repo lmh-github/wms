@@ -96,6 +96,7 @@
 				<td>
 					<%--<a title="设置安全库存" target="dialog" mask="true" width="500" height="600" href="${ctx}/stock/stock!inputLimit.action?id=${id }">设置安全库存</a>--%>
                     <s:if test="warehouse.warehouseName != '东莞电商仓' "><a href="${ctx}/stock/stock!queryRealTimeInvBalance.action?skuCode=${sku.skuCode}&warehouse=${warehouse.warehouseCode}" target="dialog" rel="dlg_RealTimeInventoryBalance" maxable="false" resizable="false" mask="true" width="600" height="500" warn="查看实时库存">查看实时库存</a></s:if>
+                        <s:else><a href="${ctx}/store/platform/list.do?skuNo=${sku.skuCode}" target="navTab" rel="tab_store_platform" title="分配各平台库存" class="btnView"></a></s:else>
 				</td>
 			</tr>
 			</s:iterator>

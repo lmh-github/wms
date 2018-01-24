@@ -20,6 +20,8 @@ public class Sku {
 	private String remark;
 	private Date createTime; // 创建时间
 	private Integer enabled; // 是否启用
+    private Long waresId;// 商品
+
 	private Wares wares;// 商品
 	// private Supplier supplier;// 供应商
 	private List<SkuItem> itemList = Lists.newArrayList();
@@ -27,7 +29,15 @@ public class Sku {
 	/** 组合SKU */
 	private List<SkuBomDetail> skuBomList = Lists.newArrayList();
 
-	public Long getId() {
+    public Long getWaresId() {
+        return waresId;
+    }
+
+    public void setWaresId(Long waresId) {
+        this.waresId = waresId;
+    }
+
+    public Long getId() {
 		return id;
 	}
 

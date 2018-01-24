@@ -76,6 +76,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
     private LogService logService;
     @Autowired
     private UpdDestJsonService updDestJsonService;
+    @Autowired
+    private StorePlatformService storePlatformService;
 
     @Override
     public int getTransferListTotal(Map<String, Object> criteria) {
@@ -324,7 +326,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
             if (g.getQuantity() == null || g.getPreparedNum() == null || g.getQuantity().intValue() != g.getPreparedNum().intValue()) {
                 return new ServiceCtrlMessage(false, String.format("SKU：%s 尚未配货完成，无法发货！", g.getSkuCode()));
             }
+            //判断调货的SKU库存是否超过平台分配后的剩余库存，如果超过，则提示库存不足，可去分配的库存页面释放库存
+            if(!storePlatformService.hasEnoughStore(g.getSkuCode(),g.getQuantity())){
+                return new ServiceCtrlMessage(false, String.format("SKU：%s 剩余库存不足，请检查是否将库存分配给京东淘宝等各大平台！", g.getSkuCode()));
+            }
         }
+
 
         indivDao.updatePrepareToDly(LinkMapUtils.<String, Object>newHashMap().put("prepareId", transferId).put("outId", transferId).put("outCode", transferId).put("outTime", new Date()).put("stockStatus", OUT_WAREHOUSE.getCode()).getMap());
         for (TransferGoods g : transferGoods) {
@@ -348,7 +355,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         }
         // 同步IMEI码到第三方系统
         updDestJsonService.sendIMEI(transfer);
-
         return new ServiceCtrlMessage(true, "发货成功！");
     }
 
@@ -956,8 +962,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
         if (!CollectionUtils.isEmpty(transfers)) {
             Map<String, Long> warehouseMap = getWarehouseMap(warehouseService.getWarehouseList(null));
             String loginName = ActionUtils.getLoginName();
-            String orderPushStatus = type == null?null:"0";//type=1 表示顺丰调拨单，orderPushStatus必须设置值，否则会在"调货-->调拨单"中重复出现
-            String flowType = type ==null?"待审核":null;
+            String orderPushStatus = (type != null&&type==1)?"0":null;//type=1 表示顺丰调拨单，orderPushStatus必须设置值，否则会在"调货-->调拨单"中重复出现
+            String flowType = (type != null&&type==1)?null:"待审核";
             int transType = 0;
             long warehouse = 1643L;
             for (int i = 0; i < transfers.size(); i++) {
